@@ -1,0 +1,72 @@
+#!/usr/bin/env node
+
+'use strict';
+
+// True = print console.logs (Global variable available to all modules).
+global.debuglog = 0;
+// node_modules/oauth2orize/ inserted comment visiblity
+global.oa2debuglog = 0;
+
+// Read /.env file and set enviornment variables in process.env
+require('dotenv').config();
+
+const config = require('../server/config/');
+
+const timestamp = new Date();
+console.log('Server timestamp: ' + timestamp.toISOString());
+
+const app = require('../server/app');
+
+// node server modules
+const http = require('http');
+const https = require('https');
+const fs = require('fs');
+
+const nodeEnv = process.env.NODE_ENV || 'development';
+
+let server = null;
+
+if (config.server.tls) {
+  console.log('NODE_ENV ' + nodeEnv + ' starting https  (TLS encrypted)');
+  const options = {
+    key: fs.readFileSync(config.server.serverTlsKey),
+    cert: fs.readFileSync(config.server.serverTlsCert),
+    minVersion: 'TLSv1.2'
+  };
+  server = https.createServer(options, app);
+} else {
+  console.log('NODE_ENV ' + nodeEnv + ' starting http (non-encrypted)');
+  server = http.createServer(app);
+}
+server.listen(config.server.port);
+
+server.on('listening', function () {
+  const address = server.address();
+  console.log('listening: ' + address.address + ':' + address.port +
+    ' ' + address.family);
+  // intended for use in logrotate, or in restart bash script
+  try {
+    const pidFilename = config.server.pidFilename;
+    if ((pidFilename) && (pidFilename.length > 0)) {
+      fs.writeFileSync(pidFilename, '' + process.pid + '\n');
+    }
+  } catch (err) {
+    console.log(err);
+    process.exit(1);
+  }
+});
+
+server.on('error', function (error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+  if (error.code === 'EACCES') {
+    console.log('Port requires elevated privledges');
+    process.exit(1);
+  }
+  if (error.code === 'EADDRINUSE') {
+    console.log('Address or port in use');
+    process.exit(1);
+  }
+  throw error;
+});

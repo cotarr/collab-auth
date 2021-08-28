@@ -1,0 +1,143 @@
+html {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+}
+body {
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  background-color: #a6ecff;
+}
+
+.button {
+  background-color: #f4f4f4;
+  border-top: 1px solid #777777;
+  border-right: 2px solid #444444;
+  border-bottom: 2px solid #444444;
+  border-left: 1px solid #777777;
+  border-radius: 5px;
+  box-shadow: 2px 2px 3px #808080;
+  color: black;
+  margin-top: 0px;
+  margin-bottom: 5px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+.button:hover {
+  background-color: #e2e2e2;
+}
+
+.button-div {
+  margin-bottom: 20px;
+}
+
+.button-description {
+  margin-left: 10px;
+}
+
+.head-fixed {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  width: 100%;
+  z-index: 4;
+}
+.head-flex {
+  margin-top: 0px;
+  background-color: #60d7f7;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px 5px 10px;
+  margin-bottom: 5px;
+}
+
+.head-left {
+  display: inline;
+  fon
+}
+
+.head-center {
+  display: inline;
+}
+
+.head-right {
+  display: inline;
+  padding-right: 10px;
+}
+
+.scrollable-div {
+  margin-top: 50px;
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 10px;
+}
+
+.center {
+  text-align: center;
+}
+
+.labels {
+
+}
+
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 8px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #b0b0b0;
+    box-sizing: border-box;
+}
+
+form {
+  border: 3px solid #a0a0a0;
+  border-radius: 10px;
+  padding: 12px;
+  width: 300px;
+  background-color: #ffffff;
+}
+
+.content-area {
+  background-color: white;
+  padding: 0px 10px 10px 10px;
+  border: 1px solid black;
+  border-radius: 8px;
+}
+
+.user-table {
+  background-color: white;
+  border-spacing: 0;
+}
+.account-table {
+  background-color: white;
+  border-spacing: 0;
+}
+/* td {
+  font-size: 80%;
+} */
+
+.footer {
+  margin-top: 30px;
+  background-color: #60d7f7;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  padding: 8px 10px 5px 10px;
+  text-align: center;
+}
+
+.red-text {
+  color: red;
+}
+
+.div-height-20 {
+  height: 20px;
+}
+
+.lm-10 {
+  margin-left: 10px;
+}
+
+.lm-20 {
+  margin-left: 10px;
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Collab-auth menu</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+    <%- include('menu-header') %>
+    <div class="scrollable-div">
+
+      <h2>Web Access Menu</h2>
+
+      <table border="0">
+        <tbody>
+
+          <tr><td>
+            <a href="/account"><button class="button">Account Info</button></a>
+          </td><td width="20px"></td><td>
+            View User Account Info
+          </td><td width="20px"></td><td>
+            (user.read)
+          </td></tr>
+
+          <tr><td>
+            <a href="/changepassword"><button class="button">Change Password</button></a>
+          </td><td></td><td>
+            Change your user password
+          </td><td></td><td>
+            (user.write)
+          </td></tr>
+
+          <tr><td>
+            <a href="/listeditusers"><button class="button">List/Edit Users</button></a>
+          </td><td></td><td>
+            Edit a user record
+          </td><td></td><td>
+            (user.admin)
+          </td></tr>
+
+          <tr><td>
+            <a href="/removealltokens"><button class="button">Clear Auth</button></a>
+          </td><td></td><td>
+            Removes tokens and sessions
+          </td><td></td><td>
+            (user.admin)
+          </td></tr>
+
+        </tbody>
+      </table>
+    </div>
+    <%- include('menu-footer') %>
+  </body>
+</html>

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Redirect Error</title>
+    <link rel="stylesheet" href="css/styles.css">
+  </head>
+  <body>
+    <%- include('menu-header') %>
+    <div class="scrollable-div">
+      <div class="content-area">
+        <h3>Redirect Error</h3>
+        <p>
+          Oops, something seems to have gone wrong.
+        </p><p>
+          It appears that your user login credentials
+          were accepted by the authorization server,
+          but is was not possible to redirect your browser
+          back to the main web site.
+          The most likely cause is that your login
+          request did not include a proper oauth2
+          callback redirect uri in the url query parameters.
+        </p>
+      </div>
+    </div>
+    <%- include('menu-footer') %>
+  </body>
+</html>

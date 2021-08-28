@@ -1,0 +1,50 @@
+{
+  "name": "collab-auth",
+  "version": "0.0.1",
+  "description": "Collaboration project repo for oauth2 provider",
+  "main": "bin/www",
+  "scripts": {
+    "lint": "eslint *.js config db test",
+    "start": "node bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cotarr/collab-auth.git"
+  },
+  "author": "Dave Bolenbaugh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cotarr/collab-auth/issues"
+  },
+  "homepage": "https://github.com/cotarr/collab-auth#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "connect-ensure-login": "^0.1.1",
+    "connect-pg-simple": "^6.2.1",
+    "cookie-parser": "^1.4.5",
+    "dotenv": "^10.0.0",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "express-session": "^1.17.2",
+    "helmet": "^4.6.0",
+    "jsonwebtoken": "^8.5.1",
+    "memorystore": "^1.6.6",
+    "morgan": "^1.10.0",
+    "oauth2orize": "^1.11.0",
+    "passport": "^0.4.1",
+    "passport-http": "^0.3.0",
+    "passport-http-bearer": "^1.0.1",
+    "passport-local": "^1.0.0",
+    "passport-oauth2-client-password": "^0.1.2",
+    "pg": "^8.7.1",
+    "uid2": "^0.0.3",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^7.30.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.23.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0"
+  }
+}

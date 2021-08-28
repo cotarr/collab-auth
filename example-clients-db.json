@@ -1,0 +1,23 @@
+[
+  {
+    "id": "e840e5f5-7aea-4df9-b602-42069d1c371d",
+    "name": "collab-frontend",
+    "clientId": "abc123",
+    "clientSecret": "ssh-secret",
+    "trustedClient": false,
+    "allowedScope": [
+      "offline_access",
+      "auth.none",
+      "auth.read",
+      "api.read",
+      "api.write",
+      "api.admin"
+    ],
+    "defaultScope": [
+      "auth.none"
+    ],
+    "allowedRedirectURI": [
+      "http://localhost:3000/login/callback"
+    ]
+  }
+]

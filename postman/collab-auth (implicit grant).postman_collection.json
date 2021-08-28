@@ -1,0 +1,487 @@
+{
+	"info": {
+		"name": "collab-auth (implicit grant)",
+		"description": "See collab-auth/postman/README.md\n\nToken Workflows\n\n- No cookie, Untrusted Client 1-3-4-5-6\n- No cookie, Trusted Client 1-3-4-6 (skip 5)\n- Cookie, Untrusted Client 1-5-6\n- Cookie, Trusted Client 1-6 (skip 5)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "0a Invalidate cookie session",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/logout",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "0b Clear Global Variables",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('transaction_id');",
+							"    pm.globals.unset('auth_code');",
+							"    pm.globals.unset('access_token');",
+							"    pm.globals.unset('refresh_token');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/not-found",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"not-found"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1 /dialog/authorize 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// There are no pass/fail tests here",
+							"",
+							"// Case of untrusted client",
+							"pm.test('Extract transaction code', function () {",
+							"  // get response body as string (find the one with the nonce)",
+							"  let arrayOfQuotedStrings = pm.response.text().split('\\\"')",
+							"  //console.log(JSON.stringify(arrayOfQuotedStrings, null, 2));",
+							"  let transactionIdIndex = arrayOfQuotedStrings.indexOf('transaction_id');",
+							"  // console.log('transactionIdIndex ' + transactionIdIndex);",
+							"  if (transactionIdIndex > 0) {",
+							"      let transactionIdValue = arrayOfQuotedStrings[transactionIdIndex + 4];",
+							"      // console.log('transactionIdValue ' + transactionIdValue);",
+							"      pm.globals.set('transaction_id', transactionIdValue);",
+							"  } else {",
+							"      pm.globals.set('transaction_id', '');",
+							"  }",
+							"});",
+							"",
+							"",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=token&client_id={{client_id}}&scope={{scopes}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "response_type",
+							"value": "token"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "scope",
+							"value": "{{scopes}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2 /login (form)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3 login (username, password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{user_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4 /dialog/authorize 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"",
+							"// Case of untrusted client",
+							"pm.test('Extract transaction code', function () {",
+							"  // get response body as string (find the one with the nonce)",
+							"  let arrayOfQuotedStrings = pm.response.text().split('\\\"')",
+							"  //console.log(JSON.stringify(arrayOfQuotedStrings, null, 2));",
+							"  let transactionIdIndex = arrayOfQuotedStrings.indexOf('transaction_id');",
+							"  // console.log('transactionIdIndex ' + transactionIdIndex);",
+							"  if (transactionIdIndex > 0) {",
+							"      let transactionIdValue = arrayOfQuotedStrings[transactionIdIndex + 4];",
+							"      // console.log('transactionIdValue ' + transactionIdValue);",
+							"      pm.globals.set('transaction_id', transactionIdValue);",
+							"  } else {",
+							"      pm.globals.set('transaction_id', '');",
+							"  }",
+							"});",
+							"",
+							"// Case of truseted client",
+							"pm.test(\"Extrace access token from redirect URI\", function () {",
+							"    let accessToken = null;",
+							"    let locationHeader = pm.response.headers.get('Location');",
+							"    if (locationHeader) {",
+							"      accessToken = locationHeader.split('=')[1].split('&')[0];",
+							"    }",
+							"    if (accessToken) {",
+							"      pm.globals.set('access_token', accessToken);",
+							"      pm.globals.set('refresh_token', null);",
+							"      // If client property trustedClient = true, decision step is skipped",
+							"      postman.setNextRequest('/introspect (access_token)')",
+							"    }",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=token&client_id={{client_id}}&scope={{scopes}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "redirect_uri",
+							"value": "{{redirect_uri}}"
+						},
+						{
+							"key": "response_type",
+							"value": "token"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}"
+						},
+						{
+							"key": "scope",
+							"value": "{{scopes}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5 /dialog/authorize/decision (untrusted)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Extrace access token from redirect URI\", function () {",
+							"    let accessToken = null;",
+							"    let locationHeader = pm.response.headers.get('Location');",
+							"    if (locationHeader) {",
+							"      accessToken = locationHeader.split('=')[1].split('&')[0];",
+							"    }",
+							"    if (accessToken) {",
+							"      pm.globals.set('access_token', accessToken);",
+							"      pm.globals.set('refresh_token', null);",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "transaction_id",
+							"value": "{{transaction_id}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/dialog/authorize/decision",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"dialog",
+						"authorize",
+						"decision"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/introspect (access_token)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"body has grant type password\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.grant_type).to.eql(\"implicit\");",
+							"});",
+							"pm.test(\"body has active true\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.active).to.eql(true);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/introspect",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"introspect"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

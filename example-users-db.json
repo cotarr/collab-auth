@@ -1,0 +1,34 @@
+[
+  {
+    "id": "05d3649f-2bdc-4e0e-aaf7-848dd1516ca0",
+    "username": "bob",
+    "password": "secret",
+    "name": "Bob Smith",
+    "loginDisabled": false,
+    "role": [
+      "offline_access",
+      "auth.read",
+      "api.read",
+      "user.read"
+    ],
+    "lastLogin": null,
+    "createdAt": "2021-08-22T18:38:29.250Z",
+    "updatedAt": "2021-08-22T18:38:29.250Z"
+  },
+  {
+    "id": "560df31c-15c6-43d5-882b-f8891cbfb200",
+    "username": "joe",
+    "password": "password",
+    "name": "Joe Davis",
+    "loginDisabled": false,
+    "role": [
+      "offline_access",
+      "auth.read",
+      "api.read",
+      "user.read"
+    ],
+    "lastLogin": null,
+    "createdAt": "2021-08-22T18:38:29.250Z",
+    "updatedAt": "2021-08-22T18:38:29.250Z"
+  }
+]

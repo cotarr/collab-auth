@@ -1,0 +1,13 @@
+node_modules
+server/certs/*.pem
+server/certs/*.csr
+*.bak
+credentials.json
+clients-db.json
+users-db.json
+*.PID
+push*
+notes.md
+*.tar
+.env
+sessions/
