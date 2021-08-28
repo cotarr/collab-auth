@@ -53,7 +53,7 @@ exports.introspect = [
 
 /**
  * This endpoint is for revoking tokens.
- * Accepts either access_token, refresh_token or both
+ * Accepts either access_token, refresh_token, or both
  *
  *    POST request
  *

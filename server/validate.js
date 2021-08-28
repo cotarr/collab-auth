@@ -305,7 +305,7 @@ validate.tokenForHttp = (token) =>
  * Given a token this will return the token if it is not null and not empty object.
  * Otherwise this will throw a HTTP error.
  * @param   {Object} token - The token to check
- * @throws  {Error}  If the client is null
+ * @throws  {Error}  If the client is null or if {}
  * @returns {Object} The client if it is a valid client
  */
 validate.tokenExistsForHttp = (token) => {
