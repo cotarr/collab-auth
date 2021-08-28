@@ -19,7 +19,7 @@ const logStuff = (req, res, next) => {
   //   console.log('Query: ' + JSON.stringify(req.query));
   // }
   // console.log('rawHeaders: ' + JSON.stringify(req.rawHeaders, null, 2));
-  // console.log('Headers: ' + JSON.stringify(req.headers, null, 2));
+  console.log('Headers: ' + JSON.stringify(req.headers, null, 2));
   // if (Object.keys(req.cookies).length > 0) {
   //   console.log('cookies \n' + JSON.stringify(req.cookies, null, 2));
   // }
@@ -70,7 +70,8 @@ const logsession = (req, res, next) => {
 // Debug:  the route /debug will write the databases to console
 // ------------------------------------------------------------
 router.get('/debug', (req, res, next) => {
-  if (debuglog) {
+  // if (debuglog) {
+  if (true) {
     // * * * token databases * * *
     const db = require('./db');
     db.authorizationCodes.debug();

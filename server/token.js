@@ -62,45 +62,49 @@ exports.introspect = [
  *      refresh_token: 'xxxx'
  *    }
  */
-exports.revoke = (req, res) => {
-  if (req.body.access_token) {
-    validate.tokenForHttp(req.body.access_token)
-      .then(() => db.accessTokens.delete(req.body.access_token))
-      .then((deletedAccessToken) => validate.tokenExistsForHttp(deletedAccessToken))
-      .then(() => {
-        if (req.body.refresh_token) {
-          // case of both access token and refresh token
-          validate.tokenForHttp(req.body.refresh_token)
-            .then(() => db.refreshTokens.delete(req.body.refresh_token))
-            .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken));
-        } else {
-          // else, case of only access_token, but not refresh token
-          return {};
-        }
-      })
-      .then(() => {
-        return res.json({});
-      })
-      .catch((err) => {
-        res.status(err.status);
-        res.json({ error: err.message });
-      });
-  } else {
-    // case of missing access_token, checkfor refresh_token
-    if (req.body.refresh_token) {
-      validate.tokenForHttp(req.body.refresh_token)
-        .then(() => db.refreshTokens.delete(req.body.refresh_token))
-        .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken))
-        .then(() => res.json({}))
+exports.revoke = [
+  passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
+  // passport.authenticate(['basic'], { session: false }),
+  (req, res, next) => {
+    if (req.body.access_token) {
+      validate.tokenForHttp(req.body.access_token)
+        .then(() => db.accessTokens.delete(req.body.access_token))
+        .then((deletedAccessToken) => validate.tokenExistsForHttp(deletedAccessToken))
+        .then(() => {
+          if (req.body.refresh_token) {
+            // case of both access token and refresh token
+            validate.tokenForHttp(req.body.refresh_token)
+              .then(() => db.refreshTokens.delete(req.body.refresh_token))
+              .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken));
+          } else {
+            // else, case of only access_token, but not refresh token
+            return {};
+          }
+        })
+        .then(() => {
+          return res.json({});
+        })
         .catch((err) => {
           res.status(err.status);
           res.json({ error: err.message });
         });
     } else {
-      const err = new Error('invalid_token');
-      err.status = 400;
-      res.status(err.status);
-      res.json({ error: err.message });
+      // case of missing access_token, checkfor refresh_token
+      if (req.body.refresh_token) {
+        validate.tokenForHttp(req.body.refresh_token)
+          .then(() => db.refreshTokens.delete(req.body.refresh_token))
+          .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken))
+          .then(() => res.json({}))
+          .catch((err) => {
+            res.status(err.status);
+            res.json({ error: err.message });
+          });
+      } else {
+        const err = new Error('invalid_token');
+        err.status = 400;
+        res.status(err.status);
+        res.json({ error: err.message });
+      }
     }
   }
-}; // exports.revoke
+]; // exports.revoke

@@ -45,6 +45,10 @@ const logFormat = ':date[iso] :remote-addr :status :method :http-version :req[ho
 const logOptions = {};
 app.use(logger(logFormat, logOptions));
 
+// debug logging
+// const logStuff = require('./debug-utils').logStuff;
+// app.use(logStuff);
+
 // ---------------
 // clean headers
 // ---------------
