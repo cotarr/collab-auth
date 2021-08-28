@@ -292,9 +292,8 @@ validate.generateTokens = (authCode) => {
  */
 validate.tokenForHttp = (token) =>
   new Promise((resolve, reject) => {
-    if (debuglog) console.log('validate.tokenForHttp (called)');
     try {
-      utils.verifyToken(token);
+      jwt.verify(token, publicKey);
     } catch (err) {
       const error = new Error('invalid_token');
       error.status = 400;
@@ -303,14 +302,15 @@ validate.tokenForHttp = (token) =>
     resolve(token);
   });
 /**
- * Given a token this will return the token if it is not null. Otherwise this will throw a
- * HTTP error.
+ * Given a token this will return the token if it is not null and not empty object.
+ * Otherwise this will throw a HTTP error.
  * @param   {Object} token - The token to check
  * @throws  {Error}  If the client is null
  * @returns {Object} The client if it is a valid client
  */
 validate.tokenExistsForHttp = (token) => {
-  if (token == null) {
+  if ((token == null) ||
+    ((typeof token === 'object') && (Object.keys(token).length === 0))) {
     const error = new Error('invalid_token');
     error.status = 400;
     throw error;

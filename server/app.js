@@ -149,7 +149,7 @@ app.get('/dialog/authorize', logsession, oauth2.authorization);
 app.post('/dialog/authorize/decision', logsession, oauth2.decision);
 app.post('/oauth/token', logsession, oauth2.token);
 app.get('/introspect', logsession, token.introspect);
-app.get('/api/revoke', logsession, token.revoke);
+app.post('/token/revoke', logsession, token.revoke);
 
 // Secure link to challenge cookie
 app.get('/secure', (req, res, next) => {

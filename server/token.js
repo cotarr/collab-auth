@@ -52,41 +52,55 @@ exports.introspect = [
 ];
 
 /**
- * This endpoint is for revoking a token.  This has the same signature to
- * Google's token revocation system from:
- * https://developers.google.com/identity/protocols/OAuth2WebServer
+ * This endpoint is for revoking tokens.
+ * Accepts either access_token, refresh_token or both
  *
- * You call it like so
- * https://localhost:3000/api/revoke?token=someToken
+ *    POST request
  *
- * If the token is valid you get returned a 200 and an empty object
- * {}
- *
- * If the token is not valid you get a 400 Status and this returned
- * {
- *   "error": "invalid_token"
- * }
- * This will first try to delete the token as an access token.  If one is not found it will try and
- * delete the token as a refresh token.  If both fail then an error is returned.
- * @param   {Object}  req - The request
- * @param   {Object}  res - The response
- * @returns {Promise} Returns the promise for testing
+ *    req.body {
+ *      access_token: 'xxxx',
+ *      refresh_token: 'xxxx'
+ *    }
  */
-exports.revoke = (req, res) =>
-  validate.tokenForHttp(req.query.token)
-    .then(() => db.accessTokens.delete(req.query.token))
-    .then((token) => {
-      if (token == null) {
-        return db.refreshTokens.delete(req.query.token);
-      }
-      return token;
-    })
-    .then((tokenDeleted) => validate.tokenExistsForHttp(tokenDeleted))
-    .then(() => {
-      if (debuglog) console.log('token.revoke (called)');
-      res.json({});
-    })
-    .catch((err) => {
+exports.revoke = (req, res) => {
+  if (req.body.access_token) {
+    validate.tokenForHttp(req.body.access_token)
+      .then(() => db.accessTokens.delete(req.body.access_token))
+      .then((deletedAccessToken) => validate.tokenExistsForHttp(deletedAccessToken))
+      .then(() => {
+        if (req.body.refresh_token) {
+          // case of both access token and refresh token
+          validate.tokenForHttp(req.body.refresh_token)
+            .then(() => db.refreshTokens.delete(req.body.refresh_token))
+            .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken));
+        } else {
+          // else, case of only access_token, but not refresh token
+          return {};
+        }
+      })
+      .then(() => {
+        return res.json({});
+      })
+      .catch((err) => {
+        res.status(err.status);
+        res.json({ error: err.message });
+      });
+  } else {
+    // case of missing access_token, checkfor refresh_token
+    if (req.body.refresh_token) {
+      validate.tokenForHttp(req.body.refresh_token)
+        .then(() => db.refreshTokens.delete(req.body.refresh_token))
+        .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken))
+        .then(() => res.json({}))
+        .catch((err) => {
+          res.status(err.status);
+          res.json({ error: err.message });
+        });
+    } else {
+      const err = new Error('invalid_token');
+      err.status = 400;
       res.status(err.status);
       res.json({ error: err.message });
-    });
+    }
+  }
+}; // exports.revoke

@@ -73,8 +73,8 @@ router.get('/debug', (req, res, next) => {
   if (debuglog) {
     // * * * token databases * * *
     const db = require('./db');
-    db.accessTokens.debug();
     db.authorizationCodes.debug();
+    db.accessTokens.debug();
     db.refreshTokens.debug();
 
     // * * *  client/user databases * * *
