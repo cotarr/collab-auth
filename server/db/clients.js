@@ -37,7 +37,7 @@ let clients = [];
 //     allowedScope: [
 //       'offline_access',
 //       'auth.none',
-//       'auth.read',
+//       'auth.token',
 //       'api.read',
 //       'api.write',
 //       'api.admin'

@@ -18,7 +18,7 @@ Note: auth_host must be different domain from frontend and backend
 - client_id      (abc123)
 - client_secret  (ssh-secret)
 - client_base64  (YWJjMTIzOnNzaC1zZWNyZXQ=)
-- scopes         (offline_access auth.read api.read)
+- scopes         (offline_access auth.token api.read)
 
 ## collection: "colab-auth (code grant)"
 

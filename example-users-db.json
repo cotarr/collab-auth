@@ -7,7 +7,7 @@
     "loginDisabled": false,
     "role": [
       "offline_access",
-      "auth.read",
+      "auth.token",
       "api.read",
       "user.read"
     ],
@@ -23,7 +23,7 @@
     "loginDisabled": false,
     "role": [
       "offline_access",
-      "auth.read",
+      "auth.token",
       "api.read",
       "user.read"
     ],

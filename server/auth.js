@@ -91,7 +91,7 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, 
     })
     // Validate will return token, token payload, user and client in an object
     .then((tokenData) => {
-      // check scope, requires auth.read to check tokens
+      // check scope, requires auth.token to check tokens
       if ((tokenData.token) && (tokenData.token.scope) &&
         (tokenData.token.scope.indexOf('auth.token') >= 0)) {
         if (debuglog) console.log('    token (passport) ', tokenData);

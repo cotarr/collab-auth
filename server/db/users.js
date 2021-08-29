@@ -26,7 +26,7 @@ let users = [];
 //     name: 'Bob Smith',
 //     role: [
 //       'offline_access',
-//       'auth.read',
+//       'auth.token',
 //       'api.read'
 //     ]
 //   }
