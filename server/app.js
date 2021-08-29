@@ -157,6 +157,25 @@ app.post('/oauth/token', logsession, oauth2.token);
 app.post('/oauth/introspect', logsession, token.introspect);
 app.post('/token/revoke', logsession, token.revoke);
 
+// ----------------
+// Change Password
+// ----------------
+app.get('/changepassword', site.changePassword);
+app.post('/changepassword', login.ensureLoggedIn(), (req, res, next) => {
+  // not implemented yet, fall through to 404
+  res.redirect('/panel/menu');
+});
+
+// ----------------
+//    Web site
+// ----------------
+app.get('/panel/menu', site.menu);
+app.get('/panel/viewuser', site.viewUser);
+app.get('/panel/viewclient', site.viewClient);
+app.get('/panel/listusers', site.listUsers);
+app.get('/panel/listclients', site.listClients);
+app.get('/panel/removealltokens', site.removeAllTokens);
+
 // Secure link to challenge cookie
 app.get('/secure', (req, res, next) => {
   if (req.isAuthenticated()) {
@@ -170,20 +189,6 @@ app.get('/secure', (req, res, next) => {
 if (nodeEnv === 'development') {
   app.use(debugUtils);
 }
-
-// ----------------
-//    Web site
-// ----------------
-app.get('/menu', site.menu);
-app.get('/account', site.account);
-app.get('/changepassword', site.changePassword);
-app.get('/listeditusers', site.editUser);
-app.get('/removealltokens', site.removeAllTokens);
-
-app.post('/changepassword', login.ensureLoggedIn(), (req, res, next) => {
-  // not implemented yet, fall through to 404
-  res.next();
-});
 
 // --------------------------------------
 // Static Web server

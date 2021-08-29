@@ -9,7 +9,7 @@
       "offline_access",
       "auth.token",
       "api.read",
-      "user.read"
+      "user.password"
     ],
     "lastLogin": null,
     "createdAt": "2021-08-22T18:38:29.250Z",
@@ -25,7 +25,7 @@
       "offline_access",
       "auth.token",
       "api.read",
-      "user.read"
+      "user.password"
     ],
     "lastLogin": null,
     "createdAt": "2021-08-22T18:38:29.250Z",

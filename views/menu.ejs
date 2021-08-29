@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Collab-auth menu</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body>
     <%- include('menu-header') %>
@@ -15,7 +15,7 @@
         <tbody>
 
           <tr><td>
-            <a href="/account"><button class="button">Account Info</button></a>
+            <a href="/panel/viewuser"><button class="button">User Info</button></a>
           </td><td width="20px"></td><td>
             View User Account Info
           </td><td width="20px"></td><td>
@@ -31,7 +31,7 @@
           </td></tr>
 
           <tr><td>
-            <a href="/listeditusers"><button class="button">List/Edit Users</button></a>
+            <a href="/panel/listusers"><button class="button">List Users</button></a>
           </td><td></td><td>
             Edit a user record
           </td><td></td><td>
@@ -39,7 +39,15 @@
           </td></tr>
 
           <tr><td>
-            <a href="/removealltokens"><button class="button">Clear Auth</button></a>
+            <a href="/panel/listclients"><button class="button">List Clients</button></a>
+          </td><td></td><td>
+            Edit a clientrecord
+          </td><td></td><td>
+            (user.admin)
+          </td></tr>
+
+          <tr><td>
+            <a href="/panel/removealltokens"><button class="button">Clear Auth</button></a>
           </td><td></td><td>
             Removes tokens and sessions
           </td><td></td><td>

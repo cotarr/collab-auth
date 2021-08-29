@@ -94,6 +94,17 @@ exports.findByClientId = (clientId) => {
   return Promise.resolve(clients.find((client) => client.clientId === clientId));
 };
 
+exports.findAll = () => {
+  return new Promise((resolve, reject) => {
+    const error = false;
+    if (!error) {
+      resolve(clients);
+    } else {
+      reject(error);
+    }
+  });
+};
+
 if (debuglog) {
   exports.debug = () => {
     console.log('clients\n' + JSON.stringify(clients, null, 2));

@@ -46,6 +46,21 @@ PGDATABASE=collabauth
 PGSSLMODE=disable
 ```
 
+### Scopes
+
+| Scope         | Permission              | Component  |
+| ------------- | :---------------------- | :--------- |
+| auth.none     | No access               | OAuth2 API |
+| auth.info     | Check token status      | OAuth2 API |
+| auth.token    | Issue new tokens        | OAuth2 API |
+| auth.admin    | Reserved for future use | OAuth2 API |
+| user.none     | No access               | Web control panel |
+| user.info     | View own account        | Web control panel |
+| user.password | Change own password     | Web control panel |
+| user.admin    | Edit any record         | Web control panel |
+| api.read      | Read only API requests  | Mock REST API |
+| api.write     | API write requests      | Mock REST API |
+
 ### User configuration
 
 At this time, users are read from static files with plain text credentials.

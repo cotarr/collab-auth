@@ -53,35 +53,35 @@ exports.logout = (req, res) => {
   // res.redirect('/');
 };
 
-const requireRead = (req, res, next) => {
+const requireInfo = (req, res, next) => {
   if (!req.user) throw new Error('User record not found in request object');
   db.users.find(req.user.id)
     .then((user) => {
       if (!user) throw new Error('User record not found in user database');
       if ((user.role) && (Array.isArray(user.role)) && (req.user.role.length > 0)) {
-        if (user.role.indexOf('user.read') >= 0) return next();
-        if (user.role.indexOf('user.write') >= 0) return next();
+        if (user.role.indexOf('user.info') >= 0) return next();
+        if (user.role.indexOf('user.password') >= 0) return next();
         if (user.role.indexOf('user.admin') >= 0) return next();
       }
       return res.render('access-denied',
-        { name: user.name, username: user.username, required: 'user.read' });
+        { name: user.name, username: user.username, required: 'user.info' });
     })
     .catch((err) => {
       return next(err);
     });
 };
 
-const requireWrite = (req, res, next) => {
+const requirePassword = (req, res, next) => {
   if (!req.user) throw new Error('User record not found in request object');
   db.users.find(req.user.id)
     .then((user) => {
       if (!user) throw new Error('User record not found in user database');
       if ((user.role) && (Array.isArray(user.role)) && (req.user.role.length > 0)) {
-        if (user.role.indexOf('user.write') >= 0) return next();
+        if (user.role.indexOf('user.password') >= 0) return next();
         if (user.role.indexOf('user.admin') >= 0) return next();
       }
       return res.render('access-denied',
-        { name: user.name, username: user.username, required: 'user.write' });
+        { name: user.name, username: user.username, required: 'user.password' });
     })
     .catch((err) => {
       return next(err);
@@ -106,7 +106,7 @@ const requireAdmin = (req, res, next) => {
 
 exports.menu = [
   login.ensureLoggedIn(),
-  requireRead,
+  requireInfo,
   (req, res, next) => {
     res.render('menu', { name: req.user.name });
   }
@@ -118,9 +118,9 @@ exports.menu = [
  * @param   {Object}   res - The response
  * @returns {undefined}
  */
-exports.account = [
+exports.viewUser = [
   login.ensureLoggedIn(),
-  requireRead,
+  requireInfo,
   (req, res, next) => {
     db.users.find(req.user.id)
       .then((user) => {
@@ -133,7 +133,7 @@ exports.account = [
           return user;
         } else if ((req.query) && (req.query.id)) {
           // Else case of lookup account of another user
-          // Example: /account?id=9158a0c0-85fc-4f7d-a9cf-328c5f4227b9
+          // Example: /listuser?id=9158a0c0-85fc-4f7d-a9cf-328c5f4227b9
           // This requires user role: user.admin
           if ((user.role) && (user.role.indexOf('user.admin') >= 0)) {
             return db.users.find(req.query.id);
@@ -147,12 +147,35 @@ exports.account = [
       })
       .then((user) => {
         if (!user) throw new Error('User record not found (2)');
-        let roleString = '';
-        user.role.forEach((scope, i) => {
-          if (i > 0) roleString += ', ';
-          roleString += ' ' + scope.toString();
-        });
-        return res.render('account', { name: user.name, user: user, userScope: roleString });
+        return res.render('view-user', { name: req.user.name, user: user });
+      })
+      .catch((err) => {
+        return next(err);
+      });
+  }
+];
+
+// Example: /listclient?id=9158a0c0-85fc-4f7d-a9cf-328c5f4227b9
+// This requires user role: user.admin
+exports.viewClient = [
+  login.ensureLoggedIn(),
+  requireAdmin,
+  (req, res, next) => {
+    if ((req.user.role) && (req.user.role.indexOf('user.admin') < 0)) {
+      return res.render('access-denied',
+        { name: req.user.name, required: 'user.admin' });
+    }
+    if ((!req.query) || (!req.query.id)) {
+      // 404 not found
+      return next();
+    }
+    db.clients.find(req.query.id)
+      .then((client) => {
+        if (!client) {
+          // 404 not found
+          return next();
+        }
+        return res.render('view-client', { name: req.user.name, aclient: client });
       })
       .catch((err) => {
         return next(err);
@@ -162,7 +185,7 @@ exports.account = [
 
 exports.changePassword = [
   login.ensureLoggedIn(),
-  requireWrite,
+  requirePassword,
   (req, res, next) => {
     db.users.find(req.user.id)
       .then((user) => {
@@ -175,13 +198,27 @@ exports.changePassword = [
   }
 ];
 
-exports.editUser = [
+exports.listUsers = [
   login.ensureLoggedIn(),
   requireAdmin,
   (req, res, next) => {
     db.users.findAll()
       .then((userArray) => {
-        return res.render('list-edit-users', { name: req.user.name, users: userArray });
+        return res.render('list-users', { name: req.user.name, users: userArray });
+      })
+      .catch((err) => {
+        return next(err);
+      });
+  }
+];
+exports.listClients = [
+  login.ensureLoggedIn(),
+  requireAdmin,
+  (req, res, next) => {
+    db.clients.findAll()
+      .then((clientArray) => {
+        // console.log('clientArray ', clientArray);
+        return res.render('list-clients', { name: req.user.name, clients: clientArray });
       })
       .catch((err) => {
         return next(err);
@@ -198,7 +235,7 @@ exports.removeAllTokens = [
       db.refreshTokens.removeAll();
       // This is only active for PostgreSQL
       db.sessions.removeAll();
-      res.redirect('/menu');
+      res.redirect('/panel/menu');
     } else {
       res.render('confirm-remove', { name: req.user.name });
     }

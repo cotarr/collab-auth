@@ -9,7 +9,7 @@
   <body>
     <%- include('menu-header') %>
     <div class="scrollable-div">
-      <h2>List / Edit Users</h2>
+      <h2>List Users</h2>
 
       <table class='user-table' border="1" cellpadding="5">
       <tr>
@@ -20,7 +20,7 @@
       </tr>
       <% for(var i=0; i < users.length; i++) { %>
          <tr>
-           <td><a href="/account?id=<%= users[i].id %>"><button class="button">View</button></a></td>
+           <td><a href="/panel/viewuser?id=<%= users[i].id %>"><button class="button">View</button></a></td>
            <td><%= users[i].username %></td>
            <td><%= users[i].name %></td>
            <td><%= users[i].lastLogin %></td>

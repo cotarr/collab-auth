@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <title>Collab-auth menu</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body>
     <%- include('menu-header') %>
@@ -15,8 +15,8 @@
         In the case of PostgreSQL, stored sessions are cleared.
       </p>
       <div>
-        <a href="/removealltokens?confirm=yes"><button class="button">Remove</button></a>
-        <a href="/menu"><button class="button">Cancel</button></a>
+        <a href="/panel/removealltokens?confirm=yes"><button class="button">Remove</button></a>
+        <a href="/panel/menu"><button class="button">Cancel</button></a>
       </div>
     </div>
     <%- include('menu-footer') %>
