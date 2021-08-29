@@ -17,39 +17,53 @@ const scope = require('./scope');
  */
 
 exports.introspect = [
-  passport.authenticate('bearer', { session: false }),
+  passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
+  scope.requireAuthDotInfoForHTTP,
   (req, res, next) => {
-    if (debuglog) {
-      console.log('user.info passport.authenticate bearer (req, res) middleware (called)');
-      if (req.authInfo) {
-        console.log('    req.authInfo', req.authInfo);
-        console.log('    req.user ', req.user);
-      }
+    if (debuglog) console.log('token.introspect (req, res) middleware (called)');
+    if ((req.body) && (req.body.access_token) &&
+      (typeof req.body.access_token === 'string') &&
+      (req.body.access_token.length > 0)) {
+      const accessToken = req.body.access_token;
+      db.accessTokens.find(accessToken)
+        // Validate checks: valid token signature, client in database, user in database
+        .then((token) => validate.token(token, accessToken))
+        .then((tokenMetadata) => {
+          // if (debuglog) console.log('    tokenMetadata ', tokenMetadata);
+          // Properties of tokenMetadata
+          //   decoded: payload of decoded JWT token
+          //   token:   stored token database contents
+          //   client:  Client that issued token
+          //   user:    User requesting token (not applicable to client issued tokens)
+          //
+          // Build the response object
+          //
+          const resJson = {
+            active: true,
+            revocable: true,
+            issuer: config.site.authURL + '/oauth/token',
+            jti: tokenMetadata.decoded.jti,
+            sub: tokenMetadata.decoded.sub,
+            exp: tokenMetadata.decoded.exp,
+            iat: tokenMetadata.decoded.iat,
+            grant_type: tokenMetadata.token.grantType,
+            expires_in: Math.floor((tokenMetadata.token.expirationDate.getTime() - Date.now()) / 1000),
+            auth_time: Math.floor(tokenMetadata.token.authTime.valueOf() / 1000),
+            scope: tokenMetadata.token.scope,
+            client: tokenMetadata.client
+          };
+          if (tokenMetadata.user) {
+            resJson.user = tokenMetadata.user;
+          }
+          if (debuglog) console.log('    res.json ' + JSON.stringify(resJson, null, 2));
+          res.json(resJson);
+        })
+        .catch(() => {
+          res.status(401).send('Unauthorized');
+        });
+    } else {
+      res.status(401).send('Unauthorized');
     }
-    //
-    // Build the response object
-    // The req.authInfo if inserted by passport strategy.
-    // The content is parsed in validate.token()
-    //
-    const resJson = {
-      active: true,
-      revocable: true,
-      issuer: config.site.authURL + '/oauth/token',
-      jti: req.authInfo.decoded.jti,
-      sub: req.authInfo.decoded.sub,
-      exp: req.authInfo.decoded.exp,
-      iat: req.authInfo.decoded.iat,
-      grant_type: req.authInfo.token.grantType,
-      expires_in: Math.floor((req.authInfo.token.expirationDate.getTime() - Date.now()) / 1000),
-      auth_time: Math.floor(req.authInfo.token.authTime.valueOf() / 1000),
-      scope: req.authInfo.token.scope,
-      client: req.authInfo.client
-    };
-    if (req.authInfo.user) {
-      resJson.user = req.authInfo.user;
-    }
-    if (debuglog) console.log('    res.json ' + JSON.stringify(resJson, null, 2));
-    res.json(resJson);
   }
 ];
 
@@ -70,7 +84,7 @@ exports.introspect = [
  */
 exports.revoke = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  scope.requireAuthTokenForHTTP,
+  scope.requireAuthDotTokenforHTTP,
   (req, res, next) => {
     if (req.body.access_token) {
       validate.tokenForHttp(req.body.access_token)

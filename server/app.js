@@ -45,7 +45,9 @@ const logFormat = ':date[iso] :remote-addr :status :method :http-version :req[ho
 const logOptions = {};
 app.use(logger(logFormat, logOptions));
 
+// ------------------
 // debug logging
+// ------------------
 // const logStuff = require('./debug-utils').logStuff;
 // app.use(logStuff);
 
@@ -152,7 +154,7 @@ app.get('/logout', logsession, site.logout);
 app.get('/dialog/authorize', logsession, oauth2.authorization);
 app.post('/dialog/authorize/decision', logsession, oauth2.decision);
 app.post('/oauth/token', logsession, oauth2.token);
-app.get('/introspect', logsession, token.introspect);
+app.post('/oauth/introspect', logsession, token.introspect);
 app.post('/token/revoke', logsession, token.revoke);
 
 // Secure link to challenge cookie

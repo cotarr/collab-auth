@@ -8,7 +8,7 @@ const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
-const { Strategy: BearerStrategy } = require('passport-http-bearer');
+// const { Strategy: BearerStrategy } = require('passport-http-bearer');
 const validate = require('./validate');
 const scope = require('./scope');
 
@@ -44,7 +44,7 @@ passport.use(new LocalStrategy((username, password, done) => {
 passport.use(new BasicStrategy({ passReqToCallback: true },
   (req, clientId, clientSecret, done) => {
     if (debuglog) console.log('auth.passport.use basic callback (called)');
-    // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
+    if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
       .then((client) => scope.addScopeToReq(req, client))
@@ -80,39 +80,17 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
  * application, which is issued an access token to make requests on behalf of
  * the authorizing user.
  *
+ * Currently not required, disabled as comment
  */
 
-passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, done) => {
-  if (debuglog) console.log('auth.passport.use bearer callback (called)');
-  db.accessTokens.find(accessToken)
-    .then((token) => {
-      // Validate checks valid token signature, client in database, user in database
-      return validate.token(token, accessToken);
-    })
-    // Validate will return token, token payload, user and client in an object
-    .then((tokenData) => {
-      // check scope, requires auth.token to check tokens
-      if ((tokenData.token) && (tokenData.token.scope) &&
-        (tokenData.token.scope.indexOf('auth.token') >= 0)) {
-        if (debuglog) console.log('    token (passport) ', tokenData);
-
-        // The passport strategy will place user data in /req/user
-        // However, this endpoint does not use req.user, add data is in req.authInfo
-        // Therefore, the client + user ID is a placeholder, to satisfy the passport trategy.
-        const reqUser = {
-          clientID: tokenData.client.id
-        };
-        if (tokenData.user) {
-          reqUser.userID = tokenData.user.id;
-        }
-        // The third optional done argument is placed in req.authInfo
-        done(null, reqUser, tokenData);
-      } else {
-        done(null, false, 'Token Insufficient Scope');
-      }
-    })
-    .catch(() => done(null, false));
-}));
+// passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, done) => {
+//   if (debuglog) console.log('auth.passport.use bearer callback (called)');
+//   db.accessTokens.find(accessToken)
+//     .then((token) => validate.token(token, accessToken))
+//     .then((client) => scope.addScopeToReq(req, client))
+//     .then((client) => done(null, client))
+//     .catch(() => done(null, false));
+// }));
 
 // Register serialialization and deserialization functions.
 //

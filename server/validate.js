@@ -122,6 +122,8 @@ validate.clientExists = (client) => {
 validate.token = (token, accessToken) => {
   if (debuglog) console.log('validate.token (called)');
 
+
+
   // jwt.verify will throw an error upon failure
   const decoded = jwt.verify(accessToken, publicKey);
 

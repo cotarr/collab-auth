@@ -10,7 +10,7 @@ exports.addScopeToReq = (req, client) => {
   return client;
 };
 
-exports.requireAuthInfoForHTTP = (req, res, next) => {
+exports.requireAuthDotInfoForHTTP = (req, res, next) => {
   if (debuglog) console.log('scope.requireInfoForHTTP (called)');
   if ((req.locals) && (req.locals.clientScope)) {
     const scope = req.locals.clientScope;
@@ -25,7 +25,7 @@ exports.requireAuthInfoForHTTP = (req, res, next) => {
     'Status 403, Forbidden, client token insufficient scope');
 };
 
-exports.requireAuthTokenForHTTP = (req, res, next) => {
+exports.requireAuthDotTokenforHTTP = (req, res, next) => {
   if (debuglog) console.log('scope.requireInfoForHTTP (called)');
   if ((req.locals) && (req.locals.clientScope)) {
     const scope = req.locals.clientScope;
@@ -39,7 +39,7 @@ exports.requireAuthTokenForHTTP = (req, res, next) => {
     'Status 403, Forbidden, client token insufficient scope');
 };
 
-exports.requireAuthAdminForHTTP = (req, res, next) => {
+exports.requireAuthDotAdminForHTTP = (req, res, next) => {
   if (debuglog) console.log('scope.requireInfoForHTTP (called)');
   if ((req.locals) && (req.locals.clientScope)) {
     const scope = req.locals.clientScope;
