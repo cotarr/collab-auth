@@ -8,6 +8,7 @@ const config = require('./config');
 
 const db = require('./db');
 const validate = require('./validate');
+const scope = require('./scope');
 
 /**
  * This endpoint is for verifying a token.  This has the same signature to
@@ -16,7 +17,8 @@ const validate = require('./validate');
  */
 
 exports.introspect = [
-  passport.authenticate('bearer', { session: false }), (req, res) => {
+  passport.authenticate('bearer', { session: false }),
+  (req, res, next) => {
     if (debuglog) {
       console.log('user.info passport.authenticate bearer (req, res) middleware (called)');
       if (req.authInfo) {
@@ -57,6 +59,10 @@ exports.introspect = [
  *
  *    POST request
  *
+ *    Authorization: client credentials
+ *    Accepts Authorizaton header with base64 encoded client credentials,
+ *    or accepts client_id and client_secret in body of POST
+ *
  *    req.body {
  *      access_token: 'xxxx',
  *      refresh_token: 'xxxx'
@@ -64,7 +70,7 @@ exports.introspect = [
  */
 exports.revoke = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  // passport.authenticate(['basic'], { session: false }),
+  scope.requireAuthTokenForHTTP,
   (req, res, next) => {
     if (req.body.access_token) {
       validate.tokenForHttp(req.body.access_token)

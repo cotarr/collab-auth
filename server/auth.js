@@ -10,6 +10,7 @@ const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 const { Strategy: BearerStrategy } = require('passport-http-bearer');
 const validate = require('./validate');
+const scope = require('./scope');
 
 /**
  * LocalStrategy ('local')
@@ -40,14 +41,17 @@ passport.use(new LocalStrategy((username, password, done) => {
  * to the `Authorization` header).  While this approach is not recommended by
  * the specification, in practice it is quite common.
  */
-passport.use(new BasicStrategy((clientId, clientSecret, done) => {
-  if (debuglog) console.log('auth.passport.use basic callback (called)');
-  // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
-  db.clients.findByClientId(clientId)
-    .then((client) => validate.client(client, clientSecret))
-    .then((client) => done(null, client))
-    .catch(() => done(null, false));
-}));
+passport.use(new BasicStrategy({ passReqToCallback: true },
+  (req, clientId, clientSecret, done) => {
+    if (debuglog) console.log('auth.passport.use basic callback (called)');
+    // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
+    db.clients.findByClientId(clientId)
+      .then((client) => validate.client(client, clientSecret))
+      .then((client) => scope.addScopeToReq(req, client))
+      .then((client) => done(null, client))
+      .catch(() => done(null, false));
+  }
+));
 
 /**
  * Client Password strategy ('oauth2-client-password')
@@ -56,14 +60,17 @@ passport.use(new BasicStrategy((clientId, clientSecret, done) => {
  * using a client ID and client secret. The strategy requires a verify callback,
  * which accepts those credentials and calls done providing a client.
  */
-passport.use(new ClientPasswordStrategy((clientId, clientSecret, done) => {
-  if (debuglog) console.log('auth.passport.use oauth2-client-password callback (called)');
-  // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
-  db.clients.findByClientId(clientId)
-    .then((client) => validate.client(client, clientSecret))
-    .then((client) => done(null, client))
-    .catch(() => done(null, false));
-}));
+passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
+  (req, clientId, clientSecret, done) => {
+    if (debuglog) console.log('auth.passport.use oauth2-client-password callback (called)');
+    // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
+    db.clients.findByClientId(clientId)
+      .then((client) => validate.client(client, clientSecret))
+      .then((client) => scope.addScopeToReq(req, client))
+      .then((client) => done(null, client))
+      .catch(() => done(null, false));
+  }
+));
 
 /**
  * BearerStrategy ('bearer')
@@ -86,7 +93,7 @@ passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, 
     .then((tokenData) => {
       // check scope, requires auth.read to check tokens
       if ((tokenData.token) && (tokenData.token.scope) &&
-        (tokenData.token.scope.indexOf('auth.read') >= 0)) {
+        (tokenData.token.scope.indexOf('auth.token') >= 0)) {
         if (debuglog) console.log('    token (passport) ', tokenData);
 
         // The passport strategy will place user data in /req/user

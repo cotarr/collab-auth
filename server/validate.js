@@ -292,6 +292,8 @@ validate.generateTokens = (authCode) => {
  */
 validate.tokenForHttp = (token) =>
   new Promise((resolve, reject) => {
+    if (debuglog) console.log('validate.tokenForHttp (called)');
+    if (debuglog) console.log('    token ', token);
     try {
       jwt.verify(token, publicKey);
     } catch (err) {
@@ -309,8 +311,11 @@ validate.tokenForHttp = (token) =>
  * @returns {Object} The client if it is a valid client
  */
 validate.tokenExistsForHttp = (token) => {
+  if (debuglog) console.log('validate.tokenExistsForHttp (called)');
+  // if (debuglog) console.log('    token ', token);
   if ((token == null) ||
-    ((typeof token === 'object') && (Object.keys(token).length === 0))) {
+    // PostggreSQL returns data.rows as empty array if not found
+    ((token.rows) && (Array.isArray(token.rows)) && (token.rows.length === 0))) {
     const error = new Error('invalid_token');
     error.status = 400;
     throw error;

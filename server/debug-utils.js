@@ -70,8 +70,7 @@ const logsession = (req, res, next) => {
 // Debug:  the route /debug will write the databases to console
 // ------------------------------------------------------------
 router.get('/debug', (req, res, next) => {
-  // if (debuglog) {
-  if (true) {
+  if (debuglog) {
     // * * * token databases * * *
     const db = require('./db');
     db.authorizationCodes.debug();
