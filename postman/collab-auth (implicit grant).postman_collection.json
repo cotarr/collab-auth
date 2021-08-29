@@ -407,7 +407,7 @@
 			"response": []
 		},
 		{
-			"name": "/introspect (access_token)",
+			"name": "/oauth/introspect",
 			"event": [
 				{
 					"listen": "test",
@@ -438,11 +438,11 @@
 				"auth": {
 					"type": "noauth"
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer {{access_token}}",
+						"value": "Basic {{client_base64}}",
 						"type": "text"
 					},
 					{
@@ -451,12 +451,23 @@
 						"type": "text"
 					}
 				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "access_token",
+							"value": "{{access_token}}",
+							"type": "text"
+						}
+					]
+				},
 				"url": {
-					"raw": "{{auth_host}}/introspect",
+					"raw": "{{auth_host}}/oauth/introspect",
 					"host": [
 						"{{auth_host}}"
 					],
 					"path": [
+						"oauth",
 						"introspect"
 					]
 				}
