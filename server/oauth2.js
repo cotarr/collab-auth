@@ -3,12 +3,14 @@
 // conditional debug console.log statements
 const debuglog = global.debuglog || false;
 
-// Register supported grant types.
-//
-// OAuth 2.0 specifies a framework that allows users to grant client
-// applications limited access to their protected resources.  It does this
-// through a process of the user granting access, and the client exchanging
-// the grant for an access token.
+/**
+ * Register supported grant types.
+ *
+ * OAuth 2.0 specifies a framework that allows users to grant client
+ * applications limited access to their protected resources.  It does this
+ * through a process of the user granting access, and the client exchanging
+ * the grant for an access token.
+*/
 
 const config = require('./config');
 const db = require('./db');
@@ -22,9 +24,6 @@ const uid2 = require('uid2');
 // create OAuth 2.0 server
 const server = oauth2orize.createServer();
 
-// Configured expiresIn
-// const expiresIn = { expires_in: config.token.expiresIn };
-
 /**
  * Grant authorization codes
  *
@@ -33,8 +32,13 @@ const server = oauth2orize.createServer();
  * `user` granting access, and their response, which contains approved scope,
  * duration, etc. as parsed by the application.  The application issues a code,
  * which is bound to these values, and will be exchanged for an access token.
+ *
+ * The scope to be included with the requested token is saved here with the
+ * authorization code. The scope was created in the authorization endpoint
+ * and it was previously saved with the authorization transaction.
+ * The scope is the intersection of requesting client's `allowedScope`,
+ * the requesting user's `role`, and the `scope` submitted in the authorization request.
  */
-// Note: client and user are full json obj, ares = { allow: true }
 server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, done) => {
   if (debuglog) console.log('oauth2.server.grant oauthorize.grant.code callback (called --> Promise)');
   // if (debuglog) console.log('    client ', client);
@@ -63,6 +67,11 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, done) => {
  * `user` granting access, and their response, which contains approved scope,
  * duration, etc. as parsed by the application.  The application issues a token,
  * which is bound to these values.
+ *
+ * The scope was created in the authorization endpoint
+ * and it was previously saved with the authorization transaction.
+ * The scope is the intersection of requesting client's `allowedScope`,
+ * the requesting user's `role`, and the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.token((client, user, ares, done) => {
   if (debuglog) console.log('oauth2.server.grant oauth2orize.grant.token callback (called --> Promise)');
@@ -94,8 +103,13 @@ server.grant(oauth2orize.grant.token((client, user, ares, done) => {
  * `redirectURI` from the authorization request for verification.  If these values
  * are validated, the application issues an access token on behalf of the user who
  * authorized the code.
+ *
+ * The scope was created in the authorization endpoint and subsequently saved
+ * with the authorization code for use here in creating the token.
+ * The scope is the intersection of requesting client's `allowedScope`,
+ * the requesting user's `role`, and the `scope` submitted in the authorization request.
+ *
  */
-// Note: client is full json, code is string 'MXQ1ZvTcaw6'
 server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
   if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.code callback (called --> Promise)');
   // if (debuglog) console.log('    client ', client);
@@ -148,6 +162,9 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
  * The callback accepts the `client`, which is exchanging the user's name and password
  * from the token request for verification. If these values are validated, the
  * application issues an access token on behalf of the user who authorized the code.
+ *
+ * The token's scope is formed by the intersection of
+ * the issuing client's allowedScope and scope parameter of the token request
  */
 server.exchange(oauth2orize.exchange.password((client, username, password, scope, done) => {
   if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.password callback (called --> Promise)');
@@ -222,6 +239,9 @@ server.exchange(oauth2orize.exchange.password((client, username, password, scope
  * The callback accepts the `client`, which is exchanging the client's id and
  * password/secret from the token request for verification. If these values are validated, the
  * application issues an access token on behalf of the client who authorized the code.
+ *
+ * The token's scope is formed by the intersection of
+ * the issuing client's allowedScope and scope parameter of the token request
  */
 server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => {
   if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.clientCredentials callback (called --> Promise)');
@@ -287,6 +307,9 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
  * The callback accepts the `client`, which is exchanging the client's id from the token
  * request for verification.  If this value is validated, the application issues an access
  * token on behalf of the client who authorized the code
+ *
+ * The scope used to create the replacement access_token is retrived from the
+ * refresh_token record in the database.
  */
 server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, done) => {
   if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.refreshToken callback (called --> Promise)');
@@ -314,8 +337,8 @@ server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, 
  *
  * `authorization` middleware accepts a `validate` callback which is
  * responsible for validating the client making the authorization request.  In
- * doing so, is recommended that the `redirectURI` be checked against a
- * registered value, although security requirements may vary accross
+ * doing so, the `redirectURI` be checked against a registered value included
+ * in the client record, although security requirements may vary accross
  * implementations.  Once validated, the `done` callback must be invoked with
  * a `client` instance, as well as the `redirectURI` to which the user will be
  * redirected after an authorization decision is obtained.
@@ -325,6 +348,13 @@ server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, 
  * to obtain their approval (displaying details about the client requesting
  * authorization).  We accomplish that here by routing through `ensureLoggedIn()`
  * first, and rendering the `dialog` view.
+ *
+ * At this step, the scope of the requsted token is formed.
+ * The scope is the intersection of requesting client's `allowedScope`,
+ * the requesting user's `role`, and the `scope` submitted in the authorization request.
+ * The authorization endpoint adds this scope authroization transaction.
+ * The interescted scope will be used later saved with the authorization code
+ * and subsequently used during exchange of code for token.
  */
 exports.authorization = [
   (req, res, next) => { if (debuglog) { console.log('oauth2.authorization endpoint [server.authorization()] (entry) '); } next(); },

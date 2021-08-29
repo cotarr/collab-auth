@@ -17,7 +17,10 @@ exports.loginForm = (req, res, next) => {
   if (debuglog) console.log('site.loginForm (called)');
   res.render('login');
 };
-
+/**
+ * redirectError an informational web page to inform the
+ * user a `/login` was initiated without a valid redirectURL.
+ */
 exports.redirectError = [
   (req, res, next) => { if (debuglog) { console.log('site.redirectError (called)'); } next(); },
   login.ensureLoggedIn(),

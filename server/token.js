@@ -11,11 +11,21 @@ const validate = require('./validate');
 const scope = require('./scope');
 
 /**
- * This endpoint is for verifying a token.  This has the same signature to
+ * This endpoint is for verifying a token and returning token information
  *
- * Description TODO
+ * The introspect array contains an array of middlewares.
+ *
+ * 1) Authenticate HTTP request using passport with client credentials
+ * 2) Check client's scope to see if introspect request is permitted
+ * 3) Lookup token in database to make sure not revoked, returning stored token data
+ * 4) Validate token signature, token's issuing client, and token's requesting user
+ *      Validate() compiles and returns token meta data
+ *        decoded: payload of decoded JWT token
+ *        token:   stored token database contents
+ *        client:  Client that issued token
+ *        user:
+ * 5) Return JSON object containing token information, or else return error
  */
-
 exports.introspect = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   scope.requireAuthDotInfoForHTTP,
@@ -26,18 +36,9 @@ exports.introspect = [
       (req.body.access_token.length > 0)) {
       const accessToken = req.body.access_token;
       db.accessTokens.find(accessToken)
-        // Validate checks: valid token signature, client in database, user in database
         .then((token) => validate.token(token, accessToken))
         .then((tokenMetadata) => {
           // if (debuglog) console.log('    tokenMetadata ', tokenMetadata);
-          // Properties of tokenMetadata
-          //   decoded: payload of decoded JWT token
-          //   token:   stored token database contents
-          //   client:  Client that issued token
-          //   user:    User requesting token (not applicable to client issued tokens)
-          //
-          // Build the response object
-          //
           const resJson = {
             active: true,
             revocable: true,
@@ -75,7 +76,7 @@ exports.introspect = [
  *
  *    Authorization: client credentials
  *    Accepts Authorizaton header with base64 encoded client credentials,
- *    or accepts client_id and client_secret in body of POST
+ *    or alternately, it accepts client_id and client_secret in body of POST
  *
  *    req.body {
  *      access_token: 'xxxx',

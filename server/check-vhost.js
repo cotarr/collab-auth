@@ -20,7 +20,11 @@ if (vhost === '*') vhost = null;
 if (vhost) {
   console.log('Vhost: ' + vhost);
 }
-
+/**
+ * Express middleware to accept HTTP request by passing to next()
+ * when the HTTP request domain name matchs configuration value
+ * otherise return 404 not found.
+ */
 const rejectNotVhost = function (req, res, next) {
   if (vhost) {
     if ((req.hostname) && (typeof req.hostname === 'string') &&
@@ -38,6 +42,12 @@ const rejectNotVhost = function (req, res, next) {
   }
 };
 
+/**
+ * isVhostMatch returns true if HTTP request domain name
+ * matches configuration file, else return false.
+ * @param   {Object} req - Express request object
+ * @returns {boolean}
+ */
 const isVhostMatch = function (req) {
   if (vhost) {
     if ((req.hostname) && (typeof req.hostname === 'string') &&
@@ -53,6 +63,12 @@ const isVhostMatch = function (req) {
   }
 };
 
+/**
+ * notVhostMatch returns false if HTTP request domain name
+ * matches configuration file, else return true for mis-match.
+ * @param   {Object} req - Express request object
+ * @returns {boolean}
+ */
 const notVhostMatch = function (req) {
   if (vhost) {
     // negate result
@@ -70,6 +86,7 @@ const notVhostMatch = function (req) {
     return true;
   }
 };
+
 module.exports = {
   rejectNotVhost: rejectNotVhost,
   isVhostMatch: isVhostMatch,
