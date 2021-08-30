@@ -161,10 +161,7 @@ app.post('/token/revoke', logsession, token.revoke);
 // Change Password
 // ----------------
 app.get('/changepassword', site.changePassword);
-app.post('/changepassword', login.ensureLoggedIn(), (req, res, next) => {
-  // not implemented yet, fall through to 404
-  res.redirect('/panel/menu');
-});
+app.post('/changepassword', site.changePasswordHandler);
 
 // ----------------
 //    Web site

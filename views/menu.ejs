@@ -56,6 +56,16 @@
 
         </tbody>
       </table>
+      <div class="content-area" <%= visibility %>>
+        Warning: The PostgreSQL database has been disabled in the configuration.
+        The authorization server is operating in a development mode with temporary
+        users and clients being defined in static files
+        &quotclient-db.json&quot and &quotuser-db.json&quot.
+        <b>User data and client data are not editable in this configuration.</b>
+        The editing forms are available for demonstration purposes only.
+        To make changes to users and clients including passwords and scope,
+        edit the static configuration files and restart the authorization server.
+      </div>
     </div>
     <%- include('menu-footer') %>
   </body>

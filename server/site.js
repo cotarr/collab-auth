@@ -7,6 +7,9 @@ const login = require('connect-ensure-login');
 const passport = require('passport');
 const db = require('./db');
 
+const config = require('./config/');
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
 /**
  * Render the login.ejs
  * @param   {Object} req - The request
@@ -49,7 +52,8 @@ exports.login = [
 exports.logout = (req, res) => {
   if (debuglog) console.log('site.logout (called)');
   req.logout();
-  res.render('logout');
+  // name empty string for header
+  res.render('logout', { name: '' });
   // res.redirect('/');
 };
 
@@ -108,7 +112,10 @@ exports.menu = [
   login.ensureLoggedIn(),
   requireInfo,
   (req, res, next) => {
-    res.render('menu', { name: req.user.name });
+    let visibility = '';
+    if (config.disableInMemoryDb) visibility = 'hidden';
+
+    res.render('menu', { name: req.user.name, visibility: visibility });
   }
 ];
 
@@ -198,6 +205,22 @@ exports.changePassword = [
   }
 ];
 
+exports.changePasswordHandler = [
+  login.ensureLoggedIn(),
+  requirePassword,
+  (req, res, next) => {
+    // console.log('req.body ', req.body);
+    db.users.find(req.user.id)
+      .then((user) => {
+        if (!user) throw new Error('User record not found');
+        return res.render('change-password-message', { name: req.user.name });
+      })
+      .catch((err) => {
+        return next(err);
+      });
+  }
+];
+
 exports.listUsers = [
   login.ensureLoggedIn(),
   requireAdmin,
@@ -235,7 +258,11 @@ exports.removeAllTokens = [
       db.refreshTokens.removeAll();
       // This is only active for PostgreSQL
       db.sessions.removeAll();
-      res.redirect('/panel/menu');
+      res.render('generic-message', {
+        name: req.user.name,
+        title: 'Clear Auth',
+        message: 'Access tokens, refresh tokens, and session data has been cleared'
+      });
     } else {
       res.render('confirm-remove', { name: req.user.name });
     }
