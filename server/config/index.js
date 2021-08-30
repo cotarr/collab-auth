@@ -10,7 +10,8 @@ require('dotenv').config();
 
 exports.site = {
   vhost: process.env.SITE_VHOST || '*',
-  authURL: process.env.SITE_AUTH_URL || 'http://127.0.0.1:3500'
+  authURL: process.env.SITE_AUTH_URL || 'http://127.0.0.1:3500',
+  authHost: process.env.SITE_AUTH_HOST || '127.0.0.1:3500'
 };
 
 exports.server = {

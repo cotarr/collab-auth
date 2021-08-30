@@ -27,6 +27,7 @@ The `.env` file is supported.
 ```
 SITE_VHOST=*
 SITE_AUTH_URL=http://127.0.0.1:3500
+SITE_AUTH_HOST=127.0.0.1:3500
 SERVER_TLS_KEY=../../server/certs/privatekey.pem
 SERVER_TLS_CERT=../../server/certs/certificate.pem
 SERVER_TLS=false

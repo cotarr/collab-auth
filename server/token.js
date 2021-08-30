@@ -28,7 +28,7 @@ const scope = require('./scope');
  */
 exports.introspect = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  scope.requireAuthDotInfoForHTTP,
+  scope.requireScopeForOauthHTTP(['auth.info', 'auth.token', 'auth.admin']),
   (req, res, next) => {
     if (debuglog) console.log('token.introspect (req, res) middleware (called)');
     if ((req.body) && (req.body.access_token) &&
@@ -85,7 +85,7 @@ exports.introspect = [
  */
 exports.revoke = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  scope.requireAuthDotTokenforHTTP,
+  scope.requireScopeForOauthHTTP(['auth.token', 'auth.admin']),
   (req, res, next) => {
     if (req.body.access_token) {
       validate.tokenForHttp(req.body.access_token)

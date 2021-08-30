@@ -47,7 +47,7 @@ passport.use(new BasicStrategy({ passReqToCallback: true },
     if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
-      .then((client) => scope.addScopeToReq(req, client))
+      .then((client) => scope.addScopeToPassportReqObj(req, client))
       .then((client) => done(null, client))
       .catch(() => done(null, false));
   }
@@ -66,7 +66,7 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
     // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
-      .then((client) => scope.addScopeToReq(req, client))
+      .then((client) => scope.addScopeToPassportReqObj(req, client))
       .then((client) => done(null, client))
       .catch(() => done(null, false));
   }
@@ -87,7 +87,7 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
 //   if (debuglog) console.log('auth.passport.use bearer callback (called)');
 //   db.accessTokens.find(accessToken)
 //     .then((token) => validate.token(token, accessToken))
-//     .then((client) => scope.addScopeToReq(req, client))
+//     .then((client) => scope.addScopeToPassportReqObj(req, client))
 //     .then((client) => done(null, client))
 //     .catch(() => done(null, false));
 // }));

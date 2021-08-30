@@ -3,89 +3,95 @@
 // conditional debug console.log statements
 const debuglog = global.debuglog || false;
 
+const config = require('./config');
 const db = require('./db');
 
 /**
  * Add client scope array to req.locals
  *
+ * Include in passport strategy to process as request passes through passport authorization.
+ *
  * @param   {Object} req - Express request object
  * @param   {Object} client - Client object
- * @returns {Object} client - Client is returned unchanged.
+ * @returns {Object} The client is returned unchanged.
  */
-exports.addScopeToReq = (req, client) => {
-  if (debuglog) console.log('scope.addScopeToReq (called)');
+exports.addScopeToPassportReqObj = (req, client) => {
+  if (debuglog) console.log('scope.addScopeToPassportReqObj (called)');
   if (!req.locals) req.locals = {};
   if (client.allowedScope) req.locals.clientScope = client.allowedScope;
   return client;
 };
 
 /**
- * Scope evaluation middleware, required scope = auth.info or greater
+ * Middleware for enforcing OAuth API scope Restrictions
  *
- * If scope of requesting client credentials is accepted,
- * pass control to next(), else return status 403 Forbidden
- */
-exports.requireAuthDotInfoForHTTP = (req, res, next) => {
-  if (debuglog) console.log('scope.requireInfoForHTTP (called)');
-  if ((req.locals) && (req.locals.clientScope)) {
-    const scope = req.locals.clientScope;
-    if (
-      (scope.indexOf('auth.info') >= 0) ||
-      (scope.indexOf('auth.token') >= 0) ||
-      (scope.indexOf('auth.admin') >= 0)) {
-      return next();
-    }
-  }
-  return res.status(403).send(
-    'Status 403, Forbidden, client token insufficient scope');
-};
-
-/**
- * Scope evaluation middleware, required scope = auth.token or greater
+ * Usage:
+ *    app.get('/path',
+ *      passport.authenticate('some-strategy', { session: false }),
+ *      requireScopeForOauthHTTP('api.scope'),
+ *      handleRequest);
  *
- * If scope of requesting client credentials is accepted,
- * pass control to next(), else return status 403 Forbidden
- */
-
-exports.requireAuthDotTokenforHTTP = (req, res, next) => {
-  if (debuglog) console.log('scope.requireInfoForHTTP (called)');
-  if ((req.locals) && (req.locals.clientScope)) {
-    const scope = req.locals.clientScope;
-    if (
-      (scope.indexOf('auth.token') >= 0) ||
-      (scope.indexOf('auth.admin') >= 0)) {
-      return next();
-    }
-  }
-  return res.status(403).send(
-    'Status 403, Forbidden, client token insufficient scope');
-};
-
-/**
- * Scope evaluation middleware, required scope = auth.admin
+ *    app.get('/path',
+ *      passport.authenticate('some-strategy', { session: false }),
+ *      requireScopeForOauthHTTP(['api.scope1', 'api.scope2']),
+ *      handleRequest);
  *
- * If scope of requesting client credentials is accepted,
- * pass control to next(), else return status 403 Forbidden
+ * Express req object required params: req.locals.clientScope
+ *
+ * The clientScope parameter contains allowedScopes form the client database entry.
+ * This value is parsed by the above addScopeToPassportReqObj function to be included
+ * into the passport client authorization strategy, where req.locals.clientScope is added.
+ *
+ * If scope found, passes next(), else returns HTTP error
  */
-
-exports.requireAuthDotAdminForHTTP = (req, res, next) => {
-  if (debuglog) console.log('scope.requireInfoForHTTP (called)');
-  if ((req.locals) && (req.locals.clientScope)) {
-    const scope = req.locals.clientScope;
-    if (
-      (scope.indexOf('auth.admin') >= 0)) {
-      return next();
-    }
+exports.requireScopeForOauthHTTP = (requiredScope) => {
+  if ((requiredScope == null) ||
+    ((typeof requiredScope !== 'string') &&
+    (!Array.isArray(requiredScope)))) {
+    throw new Error('requireScopeForOauthHTTP requires string or array');
   }
-  return res.status(403).send(
-    'Status 403, Forbidden, client token insufficient scope');
-};
+  if (typeof requiredScope === 'string') {
+    requiredScope = [requiredScope];
+  }
+  return (req, res, next) => {
+    let scopeFound = false;
+    if ((req.locals) && (req.locals.clientScope) &&
+      (Array.isArray(req.locals.clientScope) &&
+      (req.locals.clientScope.length > 0))) {
+      requiredScope.forEach((scopeString) => {
+        if (req.locals.clientScope.indexOf(scopeString) >= 0) scopeFound = true;
+      });
+      if (scopeFound) {
+        return next();
+      } else {
+        // Case where bearer token fail /introspect due to denied client allowedScope
+        // WWW-Authenticate Response Header rfc2617 Section-3.2.1
+        const wwwError = 'Bearer realm=user@' + config.site.authHost +
+        ' error="Bad Request", error_description="Client credentials insufficient scope"';
+        return res.set('WWW-Authenticate', wwwError)
+          .status(400)
+          .send('Status 400, Bad Request, Client credentials insufficient scope');
+      }
+    } else {
+      throw new Error('Error, Scope not found in request object');
+    }
+  }; // (req, res, next) => ...
+}; // requireScopeForOauthHTTP()
+
 /**
  * Middleware for enforcing Web Panel Scope Restrictions
  *
  * Usage:
- *    app.get('/path', requireScopeForWebPanel('api.scope'), renderPage);
- *    app.get('/path', requireScopeForWebPanel(['api.scope1', 'api.scope2']), renderPage);
+ *
+ *    app.get('/path',
+ *      ensureLoggedIn(),
+ *      requireScopeForWebPanel('api.scope'),
+ *      renderPage);
+ *
+ *    app.get('/path',
+ *      ensureLoggedIn(),
+ *      requireScopeForWebPanel(['api.scope1', 'api.scope2']),
+ *      renderPage);
  *
  * Express req object required params:
  *    req.user.id (for user scope lookup)
@@ -116,16 +122,15 @@ exports.requireScopeForWebPanel = (requiredScope) => {
           if (scopeFound) {
             return next();
           } else {
-            return res.status(403).send('Status 403, Forbidden, User role does not include required scope.');
+            return res.status(403).send('Status 403, Forbidden, User role insufficient scope.');
           }
         })
         .catch((err) => {
-          console.log(err.message || err);
-          return res.status(401).send('Unauthorized');
+          return next(err);
         });
     } else {
-      console.log('Error, User not found in request object');
-      return res.status(401).send('Unauthorized');
+      const err = new Error('Error, User not found in request object');
+      return next(err);
     }
   }; // (req, res, next) => ...
 }; // requireScopeForWebPanel
