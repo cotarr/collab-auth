@@ -66,7 +66,7 @@ exports.requireScopeForOauthHTTP = (requiredScope) => {
       } else {
         // Case where bearer token fail /introspect due to denied client allowedScope
         // WWW-Authenticate Response Header rfc2617 Section-3.2.1
-        const wwwError = 'Bearer realm=user@' + config.site.authHost +
+        const wwwError = 'Bearer realm=user@' + config.site.ownHost +
         ' error="Bad Request", error_description="Client credentials insufficient scope"';
         return res.set('WWW-Authenticate', wwwError)
           .status(400)
@@ -129,8 +129,7 @@ exports.requireScopeForWebPanel = (requiredScope) => {
           return next(err);
         });
     } else {
-      const err = new Error('Error, User not found in request object');
-      return next(err);
+      throw new Error('Error, User not found in request object');
     }
   }; // (req, res, next) => ...
 }; // requireScopeForWebPanel
