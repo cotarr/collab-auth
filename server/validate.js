@@ -313,9 +313,7 @@ validate.tokenForHttp = (token) =>
 validate.tokenExistsForHttp = (token) => {
   if (debuglog) console.log('validate.tokenExistsForHttp (called)');
   // if (debuglog) console.log('    token ', token);
-  if ((token == null) ||
-    // PostggreSQL returns data.rows as empty array if not found
-    ((token.rows) && (Array.isArray(token.rows)) && (token.rows.length === 0))) {
+  if (token == null) {
     const error = new Error('invalid_token');
     error.status = 400;
     throw error;

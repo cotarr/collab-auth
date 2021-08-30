@@ -34,9 +34,8 @@ exports.find = (token) => {
 
   // Return Promise
   return pgPool.query(query)
-    .then((response) => {
-      if (debuglog) console.log('    pg find ' + response.rows[0]);
-      return response.rows[0];
+    .then((queryResponse) => {
+      return queryResponse.rows[0];
     });
 };
 
@@ -54,7 +53,10 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
   };
 
   // Return Promise
-  return pgPool.query(query);
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows[0];
+    });
 };
 
 exports.delete = (token) => {
@@ -65,7 +67,10 @@ exports.delete = (token) => {
     values: [id]
   };
   // Return Promise
-  return pgPool.query(query);
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows[0];
+    });
 };
 
 exports.removeExpired = () => {
@@ -74,7 +79,10 @@ exports.removeExpired = () => {
     text: 'DELETE FROM accesstokens WHERE "expirationDate" < now() RETURNING *'
   };
   // Return Promise
-  return pgPool.query(query);
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows;
+    });
 };
 
 exports.removeAll = () => {
@@ -83,14 +91,17 @@ exports.removeAll = () => {
     text: 'DELETE FROM accesstokens RETURNING *'
   };
   // Return Promise
-  return pgPool.query(query);
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows;
+    });
 };
 
 if (debuglog) {
   exports.debug = () => {
     pgPool.query('SELECT * FROM accesstokens')
-      .then((response) => {
-        console.log('accesstokens\n', response.rows);
+      .then((queryResponse) => {
+        console.log('accesstokens\n', queryResponse.rows);
       })
       .catch((err) => {
         console.error(err.stack);

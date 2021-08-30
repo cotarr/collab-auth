@@ -14,5 +14,8 @@ exports.removeAll = () => {
     text: 'DELETE FROM session'
   };
   // Return Promise
-  return pgPool.query(query);
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows;
+    });
 };

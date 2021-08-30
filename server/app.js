@@ -238,14 +238,8 @@ app.use(function (err, req, res, next) {
 setInterval(() => {
   if (debuglog) console.log('Pruning at ' + new Date().toISOString());
   db.accessTokens.removeExpired()
-    .then((data) => {
-      if (debuglog) console.log('    deleted ' + data.rows.length + ' access-tokens');
-    })
     .catch((err) => console.error('Error trying to remove expired tokens:', err.stack));
   db.refreshTokens.removeExpired()
-    .then((data) => {
-      if (debuglog) console.log('    deleted ' + data.rows.length + ' refresh-tokens');
-    })
     .catch((err) => console.error('Error trying to remove expired refreshTokens:', err.stack));
   db.authorizationCodes.removeExpired()
     .catch((err) => console.error('Error trying to remove expired authorization codes', err.stack));
