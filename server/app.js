@@ -12,7 +12,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const session = require('express-session');
-const login = require('connect-ensure-login');
+// const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const oauth2 = require('./oauth2');
 const passport = require('passport');
 const logger = require('morgan');
@@ -21,6 +21,7 @@ const helmet = require('helmet');
 // Application custom modules
 const db = require('./db');
 const site = require('./site');
+const adminPanel = require('./admin-panel');
 const token = require('./token');
 const checkVhost = require('./check-vhost');
 const debugUtils = require('./debug-utils').router;
@@ -166,12 +167,12 @@ app.post('/changepassword', site.changePasswordHandler);
 // ----------------
 //    Web site
 // ----------------
-app.get('/panel/menu', site.menu);
-app.get('/panel/viewuser', site.viewUser);
-app.get('/panel/viewclient', site.viewClient);
-app.get('/panel/listusers', site.listUsers);
-app.get('/panel/listclients', site.listClients);
-app.get('/panel/removealltokens', site.removeAllTokens);
+app.get('/panel/menu', adminPanel.menu);
+app.get('/panel/viewuser', adminPanel.viewUser);
+app.get('/panel/viewclient', adminPanel.viewClient);
+app.get('/panel/listusers', adminPanel.listUsers);
+app.get('/panel/listclients', adminPanel.listClients);
+app.get('/panel/removealltokens', adminPanel.removeAllTokens);
 
 // Secure link to challenge cookie
 app.get('/secure', (req, res, next) => {

@@ -10,10 +10,16 @@
     <div class="scrollable-div">
 
       <h2>Remove Tokens</h2>
-      <p>
-        Confirm you want to remove all access-tokens and refresh-tokens from the database.
-        In the case of PostgreSQL, stored sessions are cleared.
-      </p>
+      <div class="content-area">
+        This function will remove all access-tokens and refresh-tokens from the database.
+        All remote web servers and resource servers will need to obtain new tokens
+        to continue access.
+        Authorization server stored sessions are also cleared, requiring users
+        to login to the authoriztion server with a username and password.
+        Note: Sessions and cookies of remote web servers are not impacted,
+        however, stored tokens on these remote web servers will have been revoked.
+      </div>
+      <div class="vh-20"></div>
       <div>
         <a href="/panel/removealltokens?confirm=yes"><button class="button">Remove</button></a>
         <a href="/panel/menu"><button class="button">Cancel</button></a>

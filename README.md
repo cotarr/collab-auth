@@ -55,7 +55,6 @@ PGSSLMODE=disable
 | auth.token    | Issue new tokens        | OAuth2 API |
 | auth.admin    | Reserved for future use | OAuth2 API |
 | user.none     | No access               | Web control panel |
-| user.info     | View own account        | Web control panel |
 | user.password | Change own password     | Web control panel |
 | user.admin    | Edit any record         | Web control panel |
 | api.read      | Read only API requests  | Mock REST API |

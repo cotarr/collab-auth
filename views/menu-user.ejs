@@ -15,7 +15,7 @@
         <tbody>
 
           <tr><td>
-            <a href="/panel/viewuser"><button class="button">User Info</button></a>
+            <a href="/panel/viewuser"><button class="button">Current User Info</button></a>
           </td><td width="20px"></td><td>
             View User Account Info
           </td><td width="20px"></td><td>
@@ -30,32 +30,9 @@
             (user.write)
           </td></tr>
 
-          <tr><td>
-            <a href="/panel/listusers"><button class="button">List Users</button></a>
-          </td><td></td><td>
-            Edit a user record
-          </td><td></td><td>
-            (user.admin)
-          </td></tr>
-
-          <tr><td>
-            <a href="/panel/listclients"><button class="button">List Clients</button></a>
-          </td><td></td><td>
-            Edit a clientrecord
-          </td><td></td><td>
-            (user.admin)
-          </td></tr>
-
-          <tr><td>
-            <a href="/panel/removealltokens"><button class="button">Clear Auth</button></a>
-          </td><td></td><td>
-            Removes tokens and sessions
-          </td><td></td><td>
-            (user.admin)
-          </td></tr>
-
         </tbody>
       </table>
+      <div class="vh-20"></div>
       <div class="content-area" <%= visibility %>>
         Warning: The PostgreSQL database has been disabled in the configuration.
         The authorization server is operating in a development mode with temporary
