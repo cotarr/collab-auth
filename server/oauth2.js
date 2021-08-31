@@ -83,13 +83,14 @@ server.grant(oauth2orize.grant.token((client, user, ares, done) => {
   const grantType = 'implicit';
   const token = utils.createToken({ sub: user.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
-  const authTime = Math.floor(Date.now().valueOf() / 1000);
+  const authTime = new Date();
   // Note responseParams returned in redirect URL query parameter
   const responseParams = {
     expires_in: config.token.expiresIn
-    // *** removed next 2 in order to clean up redirect query string
+    // *** removed next 3 in order to clean up redirect query string
     // grant_type: grantType,
-    // scope: client.scope
+    // scope: client.scope,
+    // auth_time: Math.floor(authTime.valueOf() / 1000)
   };
   db.accessTokens.save(token, expiration, user.id, client.id, client.scope, grantType, authTime)
     .then(() => done(null, token, responseParams))
@@ -206,9 +207,9 @@ server.exchange(oauth2orize.exchange.password((client, username, password, scope
           });
         }
       }
-      const authTime = Math.floor(Date.now().valueOf() / 1000);
+      const authTime = new Date();
       responseParams.scope = scopeIntersection;
-      responseParams.auth_time = authTime;
+      responseParams.auth_time = Math.floor(authTime.valueOf() / 1000);
       return validate.generateTokens({
         scope: scopeIntersection,
         userID: user.id,
@@ -277,13 +278,13 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
 
   const token = utils.createToken({ sub: client.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
-  const authTime = Math.floor(Date.now().valueOf() / 1000);
+  const authTime = new Date();
   const grantType = 'client_credentials';
   const responseParams = {
     expires_in: config.token.expiresIn,
     scope: scopeIntersection,
     grantType: grantType,
-    auth_time: authTime
+    auth_time: Math.floor(authTime.valueOf() / 1000)
   };
 
   //
