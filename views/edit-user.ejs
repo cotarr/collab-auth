@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <%- include('menu-header') %>
+    <div class="scrollable-div">
+      <h2>Edit User</h2>
+      <form action="/panel/edituser" method="post" autocomplete="OFF">
+        <fieldset>
+          <table class="account-table" border="1" cellpadding="5px">
+            <tr><td>Id</td></td><td><%= user.id %></td></tr>
+            <tr>
+              <td><label for "name">Username</label></td>
+              <td><input type="text" name="name" value="<%= user.name %>" /></td>
+            </tr>
+            <tr><td>Username</td><td><%= user.username %></td></tr>
+            <tr>
+              <td><label for="newpassword1">New password</label></td>
+              <td><input type="password" name="newpassword1" minlength="8" maxlength="24" autocomplete="new-password" /></td>
+            </tr>
+            <tr>
+              <td><label for="newpassword2">New password</label></td>
+              <td><input type="password" name="newpassword2" minlength="8" maxlength="24" autocomplete="new-password" /></td>
+            </tr>
+            <tr>
+              <td><label for "loginDisabled">Account Disabled</label></td>
+              <td><input type="checkbox" name="loginDisabled" <%= user.disabled %> ></td>
+            </tr>
+            <tr>
+              <td><label for "role">Role</label></td>
+              <td><textarea type="text" name="role" cols="50" rows="3"><%= user.role %></textarea></td>
+            </tr>
+            <tr><td>Last Login</td><td><%= user.lastLogin %></td></tr>
+            <tr><td>Created At</td><td><%= user.createdAt %></td></tr>
+            <tr><td>Updated At</td><td><%= user.updatedAt %></td></tr>
+          </table>
+          <div class="div-height-20"></div>
+          <div>
+            <button class="button" type="submit" value="Submit">Submit</button>
+            <a href="/panel/listusers"><button class="button lm-20" type="button">Cancel</button></a>
+          </div>
+        </fieldset>
+      </form>
+      <div class="div-height-20"></div>
+    </div>
+    <%- include('menu-footer') %>
+  </body>
+</html>

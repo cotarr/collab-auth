@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Client</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <%- include('menu-header') %>
+    <div class="scrollable-div">
+      <h2>Create New Client</h2>
+      <form action="/panel/createclient" method="post" autocomplete="OFF">
+        <fieldset>
+          <table class="account-table" border="1" cellpadding="5px">
+            <tr>
+              <td><label for "name">Name</label></td>
+              <td><input type="text" name="name" autocomplete="OFF" required /></td>
+            </tr>
+            <tr>
+              <td><label for "clientId">Client ID</label></td>
+              <td><input type="text" name="clientId" autocomplete="OFF" required /></td>
+            </tr>
+            <tr>
+              <td><label for="clientSecret">Client Secret</label></td>
+              <td><input type="text" name="clientSecret" value="<%= clientDefault.clientSecret %>"/></td>
+            </tr>
+            <tr>
+              <td><label for "trustedClient">Trusted Client</label></td>
+              <td><input type="checkbox" name="trustedClient" <%= clientDefault.trustedClient %> /></td>
+            </tr>
+            <tr>
+              <td><label for "allowedScope">allowedScope</label></td>
+              <td><textarea type="text" name="allowedScope" cols="80" rows="3"><%= clientDefault.allowedScope %></textarea></td>
+            </tr>
+            <tr>
+              <td><label for "defaultScope">Default Scope</label></td>
+              <td><textarea type="text" name="defaultScope" cols="80" rows="3"><%= clientDefault.defaultScope %></textarea></td>
+            </tr>
+            <tr>
+              <td><label for "allowedRedirectURI">Allowed Redirect URI</label></td>
+              <td><textarea type="text" name="allowedRedirectURI" cols="80" rows="3"><%= clientDefault.allowedRedirectURI %>"</textarea></td>
+            </tr>
+          </table>
+          <div class="div-height-20"></div>
+          <div>
+            <button class="button" type="submit" value="Submit">Submit</button>
+            <a href="/panel/listusers"><button class="button lm-20" type="button">Cancel</button></a>
+          </div>
+        </fieldset>
+      </form>
+      <div class="div-height-20"></div>
+    </div>
+    <%- include('menu-footer') %>
+  </body>
+</html>

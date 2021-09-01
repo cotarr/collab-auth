@@ -13,51 +13,40 @@
 
       <table border="0">
         <tbody>
-
           <tr><td>
-            <a href="/panel/viewuser"><button class="button">Current User Info</button></a>
-          </td><td width="20px"></td><td>
-            View User Account Info
-          </td><td width="20px"></td><td>
-            (user.read)
+            <a href="/panel/listusers"><button class="button">Select</button></a>
+          </td><td></td><td>
+            List users, select a user record for editing.
           </td></tr>
 
           <tr><td>
-            <a href="/changepassword"><button class="button">Change Password</button></a>
+            <a href="/panel/createuser"><button class="button">Select</button></a>
           </td><td></td><td>
-            Change your user password
-          </td><td></td><td>
-            (user.write)
+            Create a new user record
           </td></tr>
 
           <tr><td>
-            <a href="/panel/listusers"><button class="button">List Users</button></a>
+            <a href="/panel/listclients"><button class="button">Select</button></a>
           </td><td></td><td>
-            Edit a user record
-          </td><td></td><td>
-            (user.admin)
+            List clients, select a client record for editing
           </td></tr>
 
           <tr><td>
-            <a href="/panel/listclients"><button class="button">List Clients</button></a>
+            <a href="/panel/createclient"><button class="button">Select</button></a>
           </td><td></td><td>
-            Edit a clientrecord
-          </td><td></td><td>
-            (user.admin)
+            Create a new client record
           </td></tr>
 
           <tr><td>
-            <a href="/panel/removealltokens"><button class="button">Clear Auth</button></a>
+            <a href="/panel/removealltokens"><button class="button">Select</button></a>
           </td><td></td><td>
             Removes tokens and sessions
-          </td><td></td><td>
-            (user.admin)
           </td></tr>
 
         </tbody>
       </table>
       <div class="vh-20"></div>
-      <div class="content-area" <%= visibility %>>
+      <div class="content-area" <%= visibility %> >
         Warning: The PostgreSQL database has been disabled in the configuration.
         The authorization server is operating in a development mode with temporary
         users and clients being defined in static files

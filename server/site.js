@@ -59,27 +59,31 @@ exports.logout = (req, res) => {
 /**
  * Change Password Forms
  *
- * Change password used web panel scope definitions
  * Required scope: role=user.password or role=user.admin
  */
 exports.changePassword = [
   ensureLoggedIn(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
   (req, res, next) => {
-    res.render('change-password', { name: req.user.name, username: req.user.username });
+    if ((req.query) && (req.query.cancel) && (req.query.cancel === 'yes')) {
+      const message = 'Your password change request has been cancelled.';
+      res.render('change-password-message', { name: req.user.name, passwordMessage: message });
+    } else {
+      res.render('change-password', { name: req.user.name, username: req.user.username });
+    }
   }
 ];
 
 /**
  * Change Password POST request handler
  *
- * Change password used web panel scope definitions
  * Required scope: role=user.password or role=user.admin
  */
 exports.changePasswordHandler = [
   ensureLoggedIn(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
   (req, res, next) => {
-    res.render('change-password-message', { name: req.user.name });
+    const message = 'Your password has been successfully changed. ';
+    res.render('change-password-message', { name: req.user.name, passwordMessage: message });
   }
 ];

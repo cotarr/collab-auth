@@ -71,6 +71,35 @@ body {
   padding-right: 10px;
 }
 
+
+.footer {
+}
+
+.foot-flex {
+  margin-top: 30px;
+  background-color: #60d7f7;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 10px 5px 10px;
+  margin-bottom: 5px;
+}
+
+.foot-left {
+  display: inline;
+  fon
+}
+
+.foot-center {
+  display: inline;
+}
+
+.foot-right {
+  display: inline;
+  padding-right: 10px;
+}
+
 .scrollable-div {
   margin-top: 50px;
   padding-left: 15px;
@@ -82,28 +111,27 @@ body {
   text-align: center;
 }
 
-.labels {
-
-}
-
-input[type=text], input[type=password] {
+input {
     width: 100%;
-    padding: 8px;
-    margin: 8px 0;
+    padding: 4px;
     border: 1px solid #b0b0b0;
     display: inline-block;
     box-sizing: border-box;
 }
 
-.val-input:invalid {
-  border: 2px dashed red;
+textarea {
+  resize: none;
 }
 
-form {
+.password-form {
   border: 3px solid #a0a0a0;
   border-radius: 10px;
   padding: 12px;
   width: 300px;
+  background-color: #ffffff;
+}
+
+.account-form {
   background-color: #ffffff;
 }
 
@@ -126,14 +154,6 @@ form {
   font-size: 80%;
 } */
 
-.footer {
-  margin-top: 30px;
-  background-color: #60d7f7;
-  border-top: 1px solid black;
-  border-bottom: 1px solid black;
-  padding: 8px 10px 5px 10px;
-  text-align: center;
-}
 
 .red-text {
   color: red;

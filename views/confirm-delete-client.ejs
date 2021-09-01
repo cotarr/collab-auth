@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Confirm Delete Client</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <%- include('menu-header') %>
+    <div class="scrollable-div">
+
+      <h2>Confirm Delete Client</h2>
+      <div class="content-area">
+        This will delete client record id=<%= deleteId %> from the database.
+      </div>
+      <div class="vh-20"></div>
+      <div>
+        <a href="/panel/deleteclient?id=<%= deleteId %>&confirm=yes"><button class="button">Delete</button></a>
+        <a href="/panel/menu"><button class="button">Cancel</button></a>
+      </div>
+    </div>
+    <%- include('menu-footer') %>
+  </body>
+</html>

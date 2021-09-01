@@ -169,7 +169,18 @@ app.post('/changepassword', site.changePasswordHandler);
 // ----------------
 app.get('/panel/menu', adminPanel.menu);
 app.get('/panel/viewuser', adminPanel.viewUser);
+app.get('/panel/createuser', adminPanel.createUser);
+app.post('/panel/createuser', adminPanel.createUserHandler);
+app.get('/panel/edituser', adminPanel.editUser);
+app.post('/panel/edituser', adminPanel.editUserHandler);
+app.get('/panel/deleteuser', adminPanel.deleteUser);
 app.get('/panel/viewclient', adminPanel.viewClient);
+app.get('/panel/createclient', adminPanel.createClient);
+app.post('/panel/createclient', adminPanel.createClientHandler);
+app.get('/panel/editclient', adminPanel.editClient);
+app.post('/panel/editclient', adminPanel.editClientHandler);
+app.get('/panel/deleteclient', adminPanel.deleteClient);
+
 app.get('/panel/listusers', adminPanel.listUsers);
 app.get('/panel/listclients', adminPanel.listClients);
 app.get('/panel/removealltokens', adminPanel.removeAllTokens);

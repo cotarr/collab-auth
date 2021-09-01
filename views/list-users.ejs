@@ -14,20 +14,29 @@
       <table class='user-table' border="1" cellpadding="5">
       <tr>
         <th></th>
+        <th></th>
         <th>Username</th>
         <th>Name</th>
         <th>Last Login</th>
+        <th></th>
       </tr>
       <% for(var i=0; i < users.length; i++) { %>
          <tr>
            <td><a href="/panel/viewuser?id=<%= users[i].id %>"><button class="button">View</button></a></td>
+           <td><a href="/panel/edituser?id=<%= users[i].id %>"><button class="button">Edit</button></a></td>
            <td><%= users[i].username %></td>
            <td><%= users[i].name %></td>
            <td><%= users[i].lastLogin %></td>
+           <td><a href="/panel/deleteuser?id=<%= users[i].id %>"><button class="button">Delete</button></a></td>
          </tr>
       <% } %>
       </table>
-
+      <div>
+        <div class="vh-20"></div>
+        <a href="/panel/createuser"><button class="button">Create New User</button></a>
+        <a href="/panel/menu"><button class="button lm-20" type="button">Cancel</button></a>
+      </div>
+      <div class="vh-20"></div>
     </div>
     <%- include('menu-footer') %>
   </body>
