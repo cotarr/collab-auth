@@ -10,7 +10,6 @@ exports.find = (id) => {
     text: 'SELECT * FROM authclients WHERE "id" = $1 AND "deleted" = FALSE',
     values: [id]
   };
-  // Return Promise
   return pgPool.query(query)
     .then((queryResponse) => {
       return queryResponse.rows[0];
@@ -33,7 +32,6 @@ exports.findAll = () => {
   const query = {
     text: 'SELECT * FROM authclients WHERE "deleted" = FALSE'
   };
-  // Return Promise
   return pgPool.query(query)
     .then((queryResponse) => {
       return queryResponse.rows;
@@ -50,8 +48,14 @@ exports.save = (user) => {
       if (foundClient.rows.length === 0) {
         const saveQuery = {
           text: 'INSERT INTO authclients (' +
-          '"name","clientId","clientSecret","trustedClient","allowedScope",' +
-          '"defaultScope","allowedRedirectURI","createdAt","updatedAt") ' +
+          '"name",' +
+          '"clientId",' +
+          '"clientSecret",' +
+          '"trustedClient",' +
+          '"allowedScope",' +
+          '"defaultScope",' +
+          '"allowedRedirectURI",' +
+          '"createdAt","updatedAt") ' +
           'VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING *',
           values: [
             user.name,
@@ -103,16 +107,13 @@ exports.update = (user) => {
 };
 
 exports.delete = (id) => {
-  console.log('id', id);
   const query = {
     text: 'UPDATE authclients SET "deleted" = TRUE ' +
       'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
     values: [id]
   };
-  // Return Promise
   return pgPool.query(query)
     .then((queryResponse) => {
-      console.log(queryResponse);
       return queryResponse.rows[0];
     });
 };

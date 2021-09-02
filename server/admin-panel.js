@@ -242,7 +242,6 @@ exports.listClients = [
   (req, res, next) => {
     db.clients.findAll()
       .then((clientArray) => {
-        // console.log('clientArray ', clientArray);
         return res.render('list-clients', { name: req.user.name, clients: clientArray });
       })
       .catch((err) => {
@@ -302,7 +301,6 @@ exports.createClientHandler = [
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
-    // console.log('body ', req.body);
     const client = {
       name: req.body.name,
       clientId: req.body.clientId,
@@ -312,7 +310,6 @@ exports.createClientHandler = [
       defaultScope: req.body.defaultScope.split(','),
       allowedRedirectURI: req.body.allowedRedirectURI.split(',')
     };
-    // console.log('client ', client);
     db.clients.save(client)
       .then((createdClient) => {
         if (createdClient == null) {
@@ -394,7 +391,6 @@ exports.editClientHandler = [
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
-    console.log(req.body);
     const client = {
       id: req.body.id,
       name: req.body.name,
@@ -404,7 +400,6 @@ exports.editClientHandler = [
       defaultScope: req.body.defaultScope.split(','),
       allowedRedirectURI: req.body.allowedRedirectURI.split(',')
     };
-    // console.log('client ', client);
     db.clients.update(client)
       .then((createdClient) => {
         if (createdClient == null) {
@@ -459,7 +454,6 @@ exports.deleteClient = [
       ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
       db.clients.delete(req.query.id)
         .then((deletedClient) => {
-          console.log(deletedClient);
           if (deletedClient == null) {
             throw new Error('Error deleting client');
           } else {
