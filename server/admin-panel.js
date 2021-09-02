@@ -1,5 +1,8 @@
 'use strict';
 
+const express = require('express');
+const router = express.Router();
+
 const uid2 = require('uid2');
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const db = require('./db');
@@ -17,7 +20,7 @@ const config = require('./config/');
  * Password authentication is required with user role = user.admin
  */
 
-exports.menu = [
+router.get('/menu',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -26,11 +29,12 @@ exports.menu = [
     if (config.database.disableInMemoryDb) visibility = 'hidden';
     res.render('menu-admin', { name: req.user.name, visibility: visibility });
   }
-];
+);
+
 /**
  * List users endpoint
  */
-exports.listUsers = [
+router.get('/listusers',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -56,13 +60,13 @@ exports.listUsers = [
         return next(err);
       });
   }
-];
+);
 /**
  * View user record endpoint
  *
  * User record ID is passed as a GET query paraeter
  */
-exports.viewUser = [
+router.get('/viewuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -99,12 +103,12 @@ exports.viewUser = [
       next(err);
     }
   }
-];
+);
 
 /**
  * Create new user record endpoint
  */
-exports.createUser = [
+router.get('/createuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -114,26 +118,26 @@ exports.createUser = [
     };
     return res.render('create-user', { name: req.user.name, defaultUser: defaultUser });
   }
-];
+);
 
 /**
  * Create new user POST request handler
  */
-exports.createUserHandler = [
+router.post('/createuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     console.log(req.body);
     return res.redirect('/panel/listusers');
   }
-];
+);
 
 /**
  * Edit user record endpoint
  *
  * User ID is passed as a GET request URL query parameter
  */
-exports.editUser = [
+router.get('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -182,19 +186,19 @@ exports.editUser = [
       next(err);
     }
   }
-];
+);
 
 /**
  * Edit user POST request handler
  */
-exports.editUserHandler = [
+router.post('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     console.log(req.body);
     return res.redirect('/panel/listusers');
   }
-];
+);
 
 /**
  * Delete user record endpoint
@@ -205,7 +209,7 @@ exports.editUserHandler = [
  * Second call (query: id, confirmation='yes'), delete the record
  * Otherwise throw HTTP error
  */
-exports.deleteUser = [
+router.get('/deleteuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -231,12 +235,12 @@ exports.deleteUser = [
       next(err);
     }
   }
-];
+);
 
 /**
  * List clients endpoint
  */
-exports.listClients = [
+router.get('/listclients',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -248,13 +252,14 @@ exports.listClients = [
         return next(err);
       });
   }
-];
+);
+
 /**
  * View client record endpoint
  *
  * Client record ID is passed as a GET query paraeter
  */
-exports.viewClient = [
+router.get('/viewclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -274,12 +279,12 @@ exports.viewClient = [
         return next(err);
       });
   }
-];
+);
 
 /**
  * Create new client record endpoint
  */
-exports.createClient = [
+router.get('/createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -292,12 +297,12 @@ exports.createClient = [
     };
     return res.render('create-client', { name: req.user.name, clientDefault: clientDefault });
   }
-];
+);
 
 /**
  * Create new client POST request handler
  */
-exports.createClientHandler = [
+router.post('./createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -334,14 +339,14 @@ exports.createClientHandler = [
         }
       });
   }
-];
+);
 
 /**
  * Edit client record endpoint
  *
  * THe ID value is passed as a GET request query parameter
  */
-exports.editClient = [
+router.get('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -382,12 +387,12 @@ exports.editClient = [
       next(err);
     }
   }
-];
+);
 
 /**
  * Edit client POST request handler
  */
-exports.editClientHandler = [
+router.post('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -424,7 +429,7 @@ exports.editClientHandler = [
         }
       });
   }
-];
+);
 
 /**
  * Delete client record endpoint
@@ -435,7 +440,7 @@ exports.editClientHandler = [
  * Second call (query: id, confirmation='yes'), delete the record
  * Otherwise throw HTTP error
  */
-exports.deleteClient = [
+router.get('/deleteclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -471,7 +476,7 @@ exports.deleteClient = [
       next(err);
     }
   }
-];
+);
 
 /**
  * Remove all tokens and invalidate all authorization server sessions
@@ -484,7 +489,7 @@ exports.deleteClient = [
  * Note: when using MemoryStore, it is not possible to clear sessions
  * so only token will cleared unless uing PostgreSQL
  */
-exports.removeAllTokens = [
+router.get('/removealltokens',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
@@ -503,4 +508,6 @@ exports.removeAllTokens = [
       res.render('confirm-remove', { name: req.user.name });
     }
   }
-];
+);
+
+module.exports = router;
