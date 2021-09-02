@@ -269,11 +269,30 @@ router.get('/viewclient',
     }
     db.clients.find(req.query.id)
       .then((client) => {
-        if (!client) {
-          // 404 not found
-          return next();
+        if (client == null) {
+          const err = new Error('Invalid Id parameter');
+          err.status = 400;
+          return next(err);
         }
-        return res.render('view-client', { name: req.user.name, aclient: client });
+
+        const filteredClient = {
+          id: client.id,
+          name: client.name,
+          clientId: client.clientId,
+          clientSecret: client.clientSecret,
+          allowedScope: client.allowedScope,
+          defaultScope: client.defaultScope,
+          allowedRedirectURI: client.allowedRedirectURI,
+          updatedAt: client.updatedAt.toISOString(),
+          createdAt: client.createdAt.toISOString()
+        };
+
+        if (client.trusted) {
+          filteredClient.trustedClient = 'Yes';
+        } else {
+          filteredClient.trustedClient = 'No';
+        }
+        return res.render('view-client', { name: req.user.name, aclient: filteredClient });
       })
       .catch((err) => {
         return next(err);
@@ -302,7 +321,7 @@ router.get('/createclient',
 /**
  * Create new client POST request handler
  */
-router.post('./createclient',
+router.post('/createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
