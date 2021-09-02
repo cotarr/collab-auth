@@ -12,6 +12,10 @@
       <h2>Edit Client</h2>
       <form action="/panel/editclient" method="post" autocomplete="OFF">
         <fieldset>
+
+          <!-- Hidden input for record id -->
+          <input name="id" type="hidden" value="<%= aclient.id %>" />
+
           <table class="account-table" border="1" cellpadding="5px">
             <tr><td>Id</td></td><td><%= aclient.id %></td></tr>
             <tr><td>Client ID</td><td><%= aclient.clientId %></td></tr>

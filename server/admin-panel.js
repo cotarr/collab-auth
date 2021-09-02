@@ -302,8 +302,40 @@ exports.createClientHandler = [
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
-    console.log(req.body);
-    return res.redirect('/panel/listusers');
+    // console.log('body ', req.body);
+    const client = {
+      name: req.body.name,
+      clientId: req.body.clientId,
+      clientSecret: req.body.clientSecret,
+      trustedClient: (req.body.trustedClient === 'on') || false,
+      allowedScope: req.body.allowedScope.split(','),
+      defaultScope: req.body.defaultScope.split(','),
+      allowedRedirectURI: req.body.allowedRedirectURI.split(',')
+    };
+    // console.log('client ', client);
+    db.clients.save(client)
+      .then((createdClient) => {
+        if (createdClient == null) {
+          throw new Error('Error saving client');
+        } else {
+          return res.render('generic-message', {
+            name: req.user.name,
+            title: 'Ceate New Client',
+            message: 'New client record successfully saved.'
+          });
+        }
+      })
+      .catch((err) => {
+        if (err.message === 'clientId already exists') {
+          return res.render('generic-message', {
+            name: req.user.name,
+            title: 'Bad Request',
+            message: 'clientId already exists'
+          });
+        } else {
+          return next(err);
+        }
+      });
   }
 ];
 
@@ -363,7 +395,39 @@ exports.editClientHandler = [
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     console.log(req.body);
-    next();
+    const client = {
+      id: req.body.id,
+      name: req.body.name,
+      clientSecret: req.body.clientSecret,
+      trustedClient: (req.body.trustedClient === 'on') || false,
+      allowedScope: req.body.allowedScope.split(','),
+      defaultScope: req.body.defaultScope.split(','),
+      allowedRedirectURI: req.body.allowedRedirectURI.split(',')
+    };
+    // console.log('client ', client);
+    db.clients.update(client)
+      .then((createdClient) => {
+        if (createdClient == null) {
+          throw new Error('Error saving client');
+        } else {
+          return res.render('generic-message', {
+            name: req.user.name,
+            title: 'Edit Client',
+            message: 'Modified client record successfully saved.'
+          });
+        }
+      })
+      .catch((err) => {
+        if (err.message === 'clientId already exists') {
+          return res.render('generic-message', {
+            name: req.user.name,
+            title: 'Bad Request',
+            message: 'clientId already exists'
+          });
+        } else {
+          return next(err);
+        }
+      });
   }
 ];
 
@@ -393,9 +457,20 @@ exports.deleteClient = [
         .catch((err) => next(err));
     } else if ((req.query) && (Object.keys(req.query).length === 2) &&
       ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
-      // TODO delete the record
-      console.log('Delete req.query ', req.query);
-      res.redirect('/panel/menu');
+      db.clients.delete(req.query.id)
+        .then((deletedClient) => {
+          console.log(deletedClient);
+          if (deletedClient == null) {
+            throw new Error('Error deleting client');
+          } else {
+            return res.render('generic-message', {
+              name: req.user.name,
+              title: 'Delete Client',
+              message: 'Client successfully deleted.'
+            });
+          }
+        })
+        .catch((err) => next(err));
     } else {
       const err = new Error('Invalid query parameters');
       err.status = 400;
