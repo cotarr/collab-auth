@@ -11,7 +11,6 @@
  * clientSecret: A unique password(ish) secret that is _best not_ shared with anyone but your
  *               client application and the authorization server.
  * allowedScope  Array of scope strings
- * defaultScope  Array of scope strings (fallback if no scope found)
  * allowedRedirectURI Array of URL strings. Redirect URI must be in this list or error is generated.
  *
  * trustedClient: default if missing is false. If this is set to true then the client is regarded
@@ -90,17 +89,15 @@ exports.save = (client) => {
           '"clientSecret",' +
           '"trustedClient",' +
           '"allowedScope",' +
-          '"defaultScope",' +
           '"allowedRedirectURI",' +
           '"createdAt","updatedAt") ' +
-          'VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING *',
+          'VALUES ($1, $2, $3, $4, $5, $6, now(), now()) RETURNING *',
           values: [
             client.name,
             client.clientId,
             client.clientSecret,
             client.trustedClient,
             client.allowedScope,
-            client.defaultScope,
             client.allowedRedirectURI
           ]
         };
@@ -128,16 +125,14 @@ exports.update = (client) => {
       '"clientSecret" = $2, ' +
       '"trustedClient" = $3, ' +
       '"allowedScope" = $4, ' +
-      '"defaultScope" = $5, ' +
-      '"allowedRedirectURI" = $6, ' +
+      '"allowedRedirectURI" = $5, ' +
       '"updatedAt" = now() ' +
-      'WHERE "id" = $7 AND "deleted" = FALSE RETURNING *',
+      'WHERE "id" = $6 AND "deleted" = FALSE RETURNING *',
     values: [
       client.name,
       client.clientSecret,
       client.trustedClient,
       client.allowedScope,
-      client.defaultScope,
       client.allowedRedirectURI,
       client.id
     ]

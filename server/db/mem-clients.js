@@ -11,7 +11,6 @@
  * clientSecret: A unique password(ish) secret that is _best not_ shared with anyone but your
  *               client application and the authorization server.
  * allowedScope  Array of scope strings
- * defaultScope  Array of scope strings (fallback if no scope found)
  * allowedRedirectURI Array of URL strings. Redirect URI must be in this list or error is generated.
  *
  * trustedClient: default if missing is false. If this is set to true then the client is regarded
@@ -131,7 +130,6 @@ exports.update = (client) => {
       foundClient.name = client.name;
       foundClient.clientSecret = client.clientSecret;
       foundClient.allowedScope = client.allowedScope;
-      foundClient.defaultScope = client.defaultScope;
       foundClient.allowedRedirectURI = client.allowedRedirectURI;
       foundClient.updatedAt = new Date();
       resolve(client);

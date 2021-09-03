@@ -45,7 +45,6 @@ exports.database = {
       'api.write',
       'api.admin'
     ],
-    defaultScope: ['auth.none'],
     allowedRedirectURI: ['http://localhost:3000/login/callback']
   },
   defaultUser: {

@@ -280,13 +280,12 @@ router.get('/viewclient',
           clientId: client.clientId,
           clientSecret: client.clientSecret,
           allowedScope: client.allowedScope,
-          defaultScope: client.defaultScope,
           allowedRedirectURI: client.allowedRedirectURI,
           updatedAt: client.updatedAt.toISOString(),
           createdAt: client.createdAt.toISOString()
         };
 
-        if (client.trusted) {
+        if (client.trustedClient) {
           filteredClient.trustedClient = 'Yes';
         } else {
           filteredClient.trustedClient = 'No';
@@ -310,7 +309,6 @@ router.get('/createclient',
       clientSecret: uid2(config.database.defaultClient.randomSecretLength),
       trustedClient: config.database.defaultClient.trustedClient,
       allowedScope: config.database.defaultClient.allowedScope,
-      defaultScope: config.database.defaultClient.defaultScope,
       allowedRedirectURI: config.database.defaultClient.allowedRedirectURI
     };
     return res.render('create-client', { name: req.user.name, clientDefault: clientDefault });
@@ -330,7 +328,6 @@ router.post('/createclient',
       clientSecret: req.body.clientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: req.body.allowedScope.split(','),
-      defaultScope: req.body.defaultScope.split(','),
       allowedRedirectURI: req.body.allowedRedirectURI.split(',')
     };
     db.clients.save(client)
@@ -383,16 +380,15 @@ router.get('/editclient',
             clientId: client.clientId,
             clientSecret: client.clientSecret,
             allowedScope: client.allowedScope,
-            defaultScope: client.defaultScope,
             allowedRedirectURI: client.allowedRedirectURI,
             updatedAt: client.updatedAt.toISOString(),
             createdAt: client.createdAt.toISOString()
           };
 
-          if (client.trusted) {
-            filteredClient.trusted = 'checked';
+          if (client.trustedClient) {
+            filteredClient.trustedClient = 'checked';
           } else {
-            filteredClient.trusted = '';
+            filteredClient.trustedClient = '';
           }
           return res.render('edit-client', { name: req.user.name, aclient: filteredClient });
         })
@@ -420,7 +416,6 @@ router.post('/editclient',
       clientSecret: req.body.clientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: req.body.allowedScope.split(','),
-      defaultScope: req.body.defaultScope.split(','),
       allowedRedirectURI: req.body.allowedRedirectURI.split(',')
     };
     db.clients.update(client)
