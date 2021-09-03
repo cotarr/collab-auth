@@ -1,10 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
-const fs = require('fs');
-
 /**
  * This is the configuration of the clients that are allowed to connected to your authorization
  * server. These represent client applications that can connect. At a minimum you need the required
@@ -15,8 +10,9 @@ const fs = require('fs');
  * clientId:     A unique id of your client application
  * clientSecret: A unique password(ish) secret that is _best not_ shared with anyone but your
  *               client application and the authorization server.
- *
- * Optionally you can set these properties which are
+ * allowedScope  Array of scope strings
+ * defaultScope  Array of scope strings (fallback if no scope found)
+ * allowedRedirectURI Array of URL strings. Redirect URI must be in this list or error is generated.
  *
  * trustedClient: default if missing is false. If this is set to true then the client is regarded
  * as a trusted client and not a 3rd party application. That means that the user will not be
@@ -25,32 +21,10 @@ const fs = require('fs');
  * access.
  */
 
-let clients = [];
+const fs = require('fs');
+const uuid = require('uuid');
 
-// clients = [
-//   {
-//     id: '5515a9c6-6354-4331-84dc-af8595fbbebf',
-//     name: 'collab-frontend',
-//     clientId: 'abc123',
-//     clientSecret: 'ssh-secret',
-//     trustedClient: false,
-//     allowedScope: [
-//       'offline_access',
-//       'auth.none',
-//       'auth.token',
-//       'api.read',
-//       'api.write',
-//       'api.admin'
-//     ],
-//     defaultScope: [
-//       'auth.none'
-//     ],
-//     allowedRedirectURI: [
-//       'http://127.0.0.1:3000/login/callback',
-//       'http://localhost:3003/login/callback'
-//     ]
-//   }
-// ];
+let clients = [];
 
 try {
   clients = JSON.parse(fs.readFileSync('./clients-db.json', 'utf8'));
@@ -58,6 +32,12 @@ try {
   console.log(e.message);
   process.exit(1);
 }
+// convert dates from ISO string to JS Date.
+clients.forEach((client) => {
+  client.createdAt = new Date(Date(client.createdAt));
+  client.updatedAt = new Date(Date(client.updatedAt));
+});
+
 // console.log(JSON.stringify(clients, null, 2));
 
 /**
@@ -65,35 +45,20 @@ try {
  * @param   {String}   id   - The unique id of the client to find
  * @returns {Promise}  resolved promise with the client if found, otherwise undefined
  */
-
-// TODO rewrite for console.log
-// exports.find = (id) =>
-//   Promise.resolve(clients.find((client) => client.id === id));
-exports.find = (id) => {
-  if (debuglog) {
-    console.log('db.clients.find (entry)');
-    // console.log('    find(id) ' +
-    //   JSON.stringify(clients.find((client) => client.id === id), null, 2));
-    console.log('db.clients.find (finished)');
-  }
-  return Promise.resolve(clients.find((client) => client.id === id));
-};
+exports.find = (id) => Promise.resolve(clients.find((client) => client.id === id));
 
 /**
  * Returns a client if it finds one, otherwise returns null if a client is not found.
  * @param   {String}   clientId - The unique client id of the client to find
- * @param   {Function} done     - The client if found, otherwise returns undefined
  * @returns {Promise} resolved promise with the client if found, otherwise undefined
  */
+exports.findByClientId = (clientId) =>
+  Promise.resolve(clients.find((client) => client.clientId === clientId));
 
-// TODO rewrite for console.log
-// exports.findByClientId = (clientId) =>
-//   Promise.resolve(clients.find((client) => client.clientId === clientId));
-exports.findByClientId = (clientId) => {
-  if (debuglog) console.log('db.users.findByUsername (called)');
-  return Promise.resolve(clients.find((client) => client.clientId === clientId));
-};
-
+/**
+ * Returns an array of client objects, otherwise returns empty array
+ * @returns {Promise} resolved promise with the array if found, otherwise error
+ */
 exports.findAll = () => {
   return new Promise((resolve, reject) => {
     const error = false;
@@ -105,8 +70,83 @@ exports.findAll = () => {
   });
 };
 
-if (debuglog) {
-  exports.debug = () => {
-    console.log('clients\n' + JSON.stringify(clients, null, 2));
-  };
-}
+/**
+ * Save a new client record to the database
+ * @param   {Object}   client Object containing client properties
+ * @returns {Promise}  resolved promise with the client if found, otherwise throws error
+ */
+exports.save = (client) => {
+  return new Promise((resolve, reject) => {
+    let err = false;
+    const foundClient = clients.find((cli) => cli.clientId === client.clientId);
+    if (!(foundClient == null)) {
+      err = new Error('clientId already exists');
+      err.status = 400;
+      throw err;
+    }
+    if (!err) {
+      client.id = uuid.v4();
+      client.createdAt = new Date();
+      client.updatedAt = new Date();
+      clients.push(client);
+      resolve(client);
+    } else {
+      reject(err);
+    }
+  });
+};
+
+/**
+ * Modify an existing client record
+ * @param   {Object}   client Object containing modified client properties
+ * @returns {Promise}  resolved promise with the modifiedclient, otherwise throws error
+ */
+exports.update = (client) => {
+  return new Promise((resolve, reject) => {
+    let err = false;
+    const foundClient = clients.find((cli) => cli.id === client.id);
+    if (foundClient == null) {
+      err = new Error('client not found');
+      err.status = 400;
+      throw err;
+    }
+    if (!err) {
+      foundClient.name = client.name;
+      foundClient.clientSecret = client.clientSecret;
+      foundClient.allowedScope = client.allowedScope;
+      foundClient.defaultScope = client.defaultScope;
+      foundClient.allowedRedirectURI = client.allowedRedirectURI;
+      foundClient.updatedAt = new Date();
+      resolve(client);
+    } else {
+      reject(err);
+    }
+  });
+};
+
+/**
+ * Delete a client record
+ * @param   {Object}   id The id of the object to delete
+ * @returns {Promise}  resolved promise with celeted client object, otherwise throws error
+ */
+exports.delete = (id) => {
+  return new Promise((resolve, reject) => {
+    let err = false;
+    let arrayIndex = -1;
+    if (clients.length > 0) {
+      for (let i = 0; i < clients.length; i++) {
+        if (clients[i].id === id) arrayIndex = i;
+      }
+    }
+    if (arrayIndex === -1) {
+      err = new Error('client not found');
+      err.status = 400;
+      throw err;
+    }
+    if (!err) {
+      resolve(clients.splice(arrayIndex, 1));
+    } else {
+      reject(err);
+    }
+  });
+};

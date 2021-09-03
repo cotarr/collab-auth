@@ -1,10 +1,33 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
+/**
+ * This is the configuration of the clients that are allowed to connected to your authorization
+ * server. These represent client applications that can connect. At a minimum you need the required
+ * properties of
+ *
+ * id:           A unique numeric id of your client application
+ * name:         The name of your client application
+ * clientId:     A unique id of your client application
+ * clientSecret: A unique password(ish) secret that is _best not_ shared with anyone but your
+ *               client application and the authorization server.
+ * allowedScope  Array of scope strings
+ * defaultScope  Array of scope strings (fallback if no scope found)
+ * allowedRedirectURI Array of URL strings. Redirect URI must be in this list or error is generated.
+ *
+ * trustedClient: default if missing is false. If this is set to true then the client is regarded
+ * as a trusted client and not a 3rd party application. That means that the user will not be
+ * presented with a decision dialog with the trusted application and that the trusted application
+ * gets full scope access without the user having to make a decision to allow or disallow the scope
+ * access.
+ */
 
 const pgPool = require('./pg-pool');
 
+/**
+ * Returns a client if it finds one, otherwise returns null if a client is not found.
+ * @param   {String}   id   - The unique id of the client to find
+ * @returns {Promise}  resolved promise with the client if found, otherwise undefined
+ */
 exports.find = (id) => {
   const query = {
     text: 'SELECT * FROM authclients WHERE "id" = $1 AND "deleted" = FALSE',
@@ -16,6 +39,11 @@ exports.find = (id) => {
     });
 };
 
+/**
+ * Returns a client if it finds one, otherwise returns null if a client is not found.
+ * @param   {String}   clientId - The unique client id of the client to find
+ * @returns {Promise} resolved promise with the client if found, otherwise undefined
+ */
 exports.findByClientId = (clientId) => {
   const query = {
     text: 'SELECT * FROM authclients WHERE "clientId" = $1 AND "deleted" = FALSE',
@@ -28,6 +56,10 @@ exports.findByClientId = (clientId) => {
     });
 };
 
+/**
+ * Returns an array of client objects, otherwise returns empty array
+ * @returns {Promise} resolved promise with the array if found, otherwise error
+ */
 exports.findAll = () => {
   const query = {
     text: 'SELECT * FROM authclients WHERE "deleted" = FALSE'
@@ -38,10 +70,15 @@ exports.findAll = () => {
     });
 };
 
-exports.save = (user) => {
+/**
+ * Save a new client record to the database
+ * @param   {Object}   client Object containing client properties
+ * @returns {Promise}  resolved promise with the client if found, otherwise throws error
+ */
+exports.save = (client) => {
   const cidQuery = {
     text: 'SELECT * FROM authclients WHERE "clientId" = $1 AND "deleted" = FALSE',
-    values: [user.clientId]
+    values: [client.clientId]
   };
   return pgPool.query(cidQuery)
     .then((foundClient) => {
@@ -58,13 +95,13 @@ exports.save = (user) => {
           '"createdAt","updatedAt") ' +
           'VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING *',
           values: [
-            user.name,
-            user.clientId,
-            user.clientSecret,
-            user.trustedClient,
-            user.allowedScope,
-            user.defaultScope,
-            user.allowedRedirectURI
+            client.name,
+            client.clientId,
+            client.clientSecret,
+            client.trustedClient,
+            client.allowedScope,
+            client.defaultScope,
+            client.allowedRedirectURI
           ]
         };
         return pgPool.query(saveQuery);
@@ -79,7 +116,12 @@ exports.save = (user) => {
     });
 };
 
-exports.update = (user) => {
+/**
+ * Modify an existing client record
+ * @param   {Object}   client Object containing modified client properties
+ * @returns {Promise}  resolved promise with the modifiedclient, otherwise throws error
+ */
+exports.update = (client) => {
   const updateQuery = {
     text: 'UPDATE authclients SET ' +
       '"name" = $1, ' +
@@ -91,13 +133,13 @@ exports.update = (user) => {
       '"updatedAt" = now() ' +
       'WHERE "id" = $7 AND "deleted" = FALSE RETURNING *',
     values: [
-      user.name,
-      user.clientSecret,
-      user.trustedClient,
-      user.allowedScope,
-      user.defaultScope,
-      user.allowedRedirectURI,
-      user.id
+      client.name,
+      client.clientSecret,
+      client.trustedClient,
+      client.allowedScope,
+      client.defaultScope,
+      client.allowedRedirectURI,
+      client.id
     ]
   };
   return pgPool.query(updateQuery)
@@ -106,6 +148,11 @@ exports.update = (user) => {
     });
 };
 
+/**
+ * Delete a client record by marking property deleted = true
+ * @param   {Object}   id The id of the object to delete
+ * @returns {Promise}  resolved promise with celeted client object, otherwise throws error
+ */
 exports.delete = (id) => {
   const query = {
     text: 'UPDATE authclients SET "deleted" = TRUE ' +
@@ -117,25 +164,3 @@ exports.delete = (id) => {
       return queryResponse.rows[0];
     });
 };
-
-if (debuglog) {
-  exports.debug = () => {
-    pgPool.query('SELECT * FROM authclients')
-      .then((queryResponse) => {
-        console.log('clients\n', queryResponse.rows);
-      })
-      .catch((err) => {
-        console.error(err.stack);
-      });
-  };
-};
-
-// exports.find('dd2e3a2e-b7a0-4eeb-9325-bbb0f69be1f5')
-// // exports.findByClientId('abc123')
-// // exports.findAll()
-//   .then((client) => {
-//     console.log('client find', client);
-//   })
-//   .catch((err) => {
-//     console.log(err);
-//   });

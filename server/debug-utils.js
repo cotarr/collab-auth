@@ -78,7 +78,6 @@ router.get('/debug', (req, res, next) => {
     db.refreshTokens.debug();
 
     // * * *  client/user databases * * *
-    // db.clients.debug();
     // db.users.debug();
     // * * * session * * *
     // console.log('req.session\n' + JSON.stringify(req.session, null, 2));
