@@ -14,18 +14,20 @@ const pgPool = require('./pg-pool');
  * @returns {Promise} resolved with the token
  */
 exports.find = (token) => {
-  const id = jwt.decode(token).jti;
-
-  const query = {
-    text: 'SELECT * FROM refreshtokens WHERE id = $1',
-    values: [id]
-  };
-
-  // Return Promise
-  return pgPool.query(query)
-    .then((queryResponse) => {
-      return queryResponse.rows[0];
-    });
+  // catch JWT decode errors
+  try {
+    const id = jwt.decode(token).jti;
+    const query = {
+      text: 'SELECT * FROM refreshtokens WHERE id = $1',
+      values: [id]
+    };
+    return pgPool.query(query)
+      .then((queryResponse) => {
+        return queryResponse.rows[0];
+      });
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
 };
 /**
  * Saves a refresh token, user id, client id, and scope. Note: The actual full refresh token is
@@ -42,17 +44,22 @@ exports.find = (token) => {
  * @returns {Promise} resolved with the saved token
  */
 exports.save = (token, expirationDate, userID, clientID, scope, grantType, authTime) => {
-  const id = jwt.decode(token).jti;
-  const query = {
-    text: 'INSERT INTO refreshtokens ' +
-      '("id", "userID", "clientID", "expirationDate", "scope", "grantType", "authTime") ' +
-      'VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-    values: [id, userID, clientID, expirationDate, scope, grantType, authTime]
-  };
-  return pgPool.query(query)
-    .then((queryResponse) => {
-      return queryResponse.rows[0];
-    });
+  // catch JWT decode errors
+  try {
+    const id = jwt.decode(token).jti;
+    const query = {
+      text: 'INSERT INTO refreshtokens ' +
+        '("id", "userID", "clientID", "expirationDate", "scope", "grantType", "authTime") ' +
+        'VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      values: [id, userID, clientID, expirationDate, scope, grantType, authTime]
+    };
+    return pgPool.query(query)
+      .then((queryResponse) => {
+        return queryResponse.rows[0];
+      });
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
 };
 
 /**
@@ -61,16 +68,21 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
  * @returns {Promise} resolved with the deleted token
  */
 exports.delete = (token) => {
-  const id = jwt.decode(token).jti;
-  const query = {
-    text: 'DELETE FROM refreshtokens WHERE "id" = $1 RETURNING *',
-    values: [id]
-  };
-  // Return Promise
-  return pgPool.query(query)
-    .then((queryResponse) => {
-      return queryResponse.rows[0];
-    });
+  // catch JWT decode errors
+  try {
+    const id = jwt.decode(token).jti;
+    const query = {
+      text: 'DELETE FROM refreshtokens WHERE "id" = $1 RETURNING *',
+      values: [id]
+    };
+    // Return Promise
+    return pgPool.query(query)
+      .then((queryResponse) => {
+        return queryResponse.rows[0];
+      });
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
 };
 
 /**

@@ -34,6 +34,9 @@ exports.introspect = [
       db.accessTokens.find(accessToken)
         .then((token) => validate.token(token, accessToken))
         .then((tokenMetadata) => {
+          if (tokenMetadata == null) {
+            throw new Error('invalid_token');
+          }
           const resJson = {
             active: true,
             revocable: true,

@@ -286,6 +286,9 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
  * refresh_token record in the database.
  */
 server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, done) => {
+  console.log();
+  console.log('TODO: oauthorize.exchange.refreshToken not need client auth');
+  console.log();
   const responseParams = {
     expires_in: config.token.expiresIn,
     grant_type: 'refresh_token'

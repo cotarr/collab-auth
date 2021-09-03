@@ -9,15 +9,20 @@ const pgPool = require('./pg-pool');
  * @returns {Promise} resolved with the token if found, otherwise resolved with undefined
  */
 exports.find = (token) => {
-  const id = jwt.decode(token).jti;
-  const query = {
-    text: 'SELECT * FROM accesstokens WHERE id = $1',
-    values: [id]
-  };
-  return pgPool.query(query)
-    .then((queryResponse) => {
-      return queryResponse.rows[0];
-    });
+  // catch JWT decode errors
+  try {
+    const id = jwt.decode(token).jti;
+    const query = {
+      text: 'SELECT * FROM accesstokens WHERE id = $1',
+      values: [id]
+    };
+    return pgPool.query(query)
+      .then((queryResponse) => {
+        return queryResponse.rows[0];
+      });
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
 };
 
 /**
@@ -34,18 +39,22 @@ exports.find = (token) => {
  * @returns {Promise} resolved with the saved token
  */
 exports.save = (token, expirationDate, userID, clientID, scope, grantType, authTime) => {
-  const id = jwt.decode(token).jti;
-  const query = {
-    text: 'INSERT INTO accesstokens ' +
-      '("id", "userID", "clientID", "expirationDate", "scope", "grantType", "authTime") ' +
-      'VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
-    values: [id, userID, clientID, expirationDate, scope, grantType, authTime]
-  };
-
-  return pgPool.query(query)
-    .then((queryResponse) => {
-      return queryResponse.rows[0];
-    });
+  // catch JWT decode errors
+  try {
+    const id = jwt.decode(token).jti;
+    const query = {
+      text: 'INSERT INTO accesstokens ' +
+        '("id", "userID", "clientID", "expirationDate", "scope", "grantType", "authTime") ' +
+        'VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+      values: [id, userID, clientID, expirationDate, scope, grantType, authTime]
+    };
+    return pgPool.query(query)
+      .then((queryResponse) => {
+        return queryResponse.rows[0];
+      });
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
 };
 /**
  * Deletes/Revokes an access token by getting the ID and removing it from the storage.
@@ -53,16 +62,21 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
  * @returns {Promise} resolved with the deleted token
  */
 exports.delete = (token) => {
-  const id = jwt.decode(token).jti;
-  const query = {
-    text: 'DELETE FROM accesstokens WHERE "id" = $1 RETURNING *',
-    values: [id]
-  };
-  // Return Promise
-  return pgPool.query(query)
-    .then((queryResponse) => {
-      return queryResponse.rows[0];
-    });
+  // catch JWT decode errors
+  try {
+    const id = jwt.decode(token).jti;
+    const query = {
+      text: 'DELETE FROM accesstokens WHERE "id" = $1 RETURNING *',
+      values: [id]
+    };
+    // Return Promise
+    return pgPool.query(query)
+      .then((queryResponse) => {
+        return queryResponse.rows[0];
+      });
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
 };
 
 /**
