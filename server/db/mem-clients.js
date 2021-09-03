@@ -45,15 +45,32 @@ clients.forEach((client) => {
  * @param   {String}   id   - The unique id of the client to find
  * @returns {Promise}  resolved promise with the client if found, otherwise undefined
  */
-exports.find = (id) => Promise.resolve(clients.find((client) => client.id === id));
+exports.find = (id) => {
+  try {
+    let client = clients.find((client) => client.id === id);
+    // make sure database remains immutable on emulated read
+    if (client) client = JSON.parse(JSON.stringify(client));
+    return Promise.resolve(client);
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
+};
 
 /**
  * Returns a client if it finds one, otherwise returns null if a client is not found.
  * @param   {String}   clientId - The unique client id of the client to find
  * @returns {Promise} resolved promise with the client if found, otherwise undefined
  */
-exports.findByClientId = (clientId) =>
-  Promise.resolve(clients.find((client) => client.clientId === clientId));
+exports.findByClientId = (clientId) => {
+  try {
+    let client = clients.find((client) => client.clientId === clientId);
+    // make sure database remains immutable on emulated read
+    if (client) client = JSON.parse(JSON.stringify(client));
+    return Promise.resolve(client);
+  } catch (err) {
+    return Promise.resolve(undefined);
+  }
+};
 
 /**
  * Returns an array of client objects, otherwise returns empty array
