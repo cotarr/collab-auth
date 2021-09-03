@@ -129,3 +129,68 @@ exports.requireScopeForWebPanel = (requiredScope) => {
     }
   }; // (req, res, next) => ...
 }; // requireScopeForWebPanel
+
+/**
+ * Intercept data in multiple scope arrays.
+ * @param   {Array} httpRequestedScope - Array of scope strings from HTTP request
+ * @param   {Array} clientAllowedScope - Array of scope strings for client
+ * @param   {Array} userRole - Array of scope strings for user
+ * @returns {Array} Returns intercepted scope, or default scope
+ */
+exports.intersectReqCliUsrScopes = (httpRequestedScope, clientAllowedScope, userRole) => {
+  const defaultScope = ['auth.none'];
+  const scopeIntersection = [];
+
+  if ((httpRequestedScope == null) || (httpRequestedScope.length === 0)) {
+    return defaultScope;
+  } else if ((clientAllowedScope == null) || (clientAllowedScope.length === 0)) {
+    return defaultScope;
+  } else if ((userRole == null) || (userRole.length === 0)) {
+    return defaultScope;
+  } else {
+    httpRequestedScope.forEach((reqScope) => {
+      if ((clientAllowedScope.indexOf(reqScope) >= 0) && (userRole.indexOf(reqScope) >= 0)) {
+        scopeIntersection.push(reqScope);
+      }
+    });
+    return scopeIntersection;
+  }
+};
+
+/**
+ * Intercept data in multiple scope arrays.
+ * @param   {Array} httpRequestedScope - Array of scope strings from HTTP request
+ * @param   {Array} clientAllowedScope - Array of scope strings for client
+ * @returns {Array} Returns intercepted scope, or default scope
+ */
+exports.intersectReqCliScopes = (httpRequestedScope, clientAllowedScope, userRole) => {
+  const defaultScope = ['auth.none'];
+  const scopeIntersection = [];
+
+  if ((httpRequestedScope == null) || (httpRequestedScope.length === 0)) {
+    return defaultScope;
+  } else if ((clientAllowedScope == null) || (clientAllowedScope.length === 0)) {
+    return defaultScope;
+  } else {
+    httpRequestedScope.forEach((reqScope) => {
+      if (clientAllowedScope.indexOf(reqScope) >= 0) {
+        scopeIntersection.push(reqScope);
+      }
+    });
+    return scopeIntersection;
+  }
+};
+
+/**
+ * Convert array of strings to comma separated list of scopes
+ * @param   {Array} scopeArray - Array of scope strings
+ * @returns {String} Returns string with comma separated scopes
+ */
+exports.toScopeString = (scopeArray) => {
+  let scopeString = '';
+  scopeArray.forEach((scope, i) => {
+    if (i > 0) scopeString += ', ';
+    scopeString += scope.toString();
+  });
+  return scopeString;
+};

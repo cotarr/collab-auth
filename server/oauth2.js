@@ -15,6 +15,7 @@ const login = require('connect-ensure-login');
 const oauth2orize = require('oauth2orize');
 const passport = require('passport');
 const utils = require('./utils');
+const { intersectReqCliUsrScopes, intersectReqCliScopes, toScopeString } = require('./scope');
 const validate = require('./validate');
 const uid2 = require('uid2');
 
@@ -148,41 +149,16 @@ server.exchange(oauth2orize.exchange.password(
       scope: scope,
       grant_type: 'password'
     };
-    // Array to hold intersection of client allowedScope, user role, and scope request
-    const scopeIntersection = [];
     db.users.findByUsername(username)
       .then((user) => validate.user(user, password))
       .then((user) => {
-        // Validate client and user scope properties
-        if ((user) && (client) &&
-          (client.allowedScope) && (user.role) &&
-          (client.allowedScope.length > 0) &&
-          (user.role.length > 0)) {
-          // If scope not in request, fall back to default and intersect with client and user
-          if ((!scope) || (scope.length === 0)) {
-            if (client.defaultScope) {
-              client.defaultScope.forEach((defScope) => {
-                if ((client.allowedScope.indexOf(defScope) >= 0) &&
-                  (user.role.indexOf(defScope) >= 0)) {
-                  scopeIntersection.push(defScope);
-                }
-              });
-            }
-          } else {
-            // Case of valid scope in request, intersect request scope with client and user
-            scope.forEach((reqScope) => {
-              if ((client.allowedScope.indexOf(reqScope) >= 0) &&
-              (user.role.indexOf(reqScope) >= 0)) {
-                scopeIntersection.push(reqScope);
-              }
-            });
-          }
-        }
+        // Compile token scope
+        const tokenScope = intersectReqCliUsrScopes(scope, client.allowedScope, user.role);
+        responseParams.scope = tokenScope;
         const authTime = new Date();
-        responseParams.scope = scopeIntersection;
         responseParams.auth_time = Math.floor(authTime.valueOf() / 1000);
         return validate.generateTokens({
-          scope: scopeIntersection,
+          scope: tokenScope,
           userID: user.id,
           clientID: client.id,
           grantType: 'password',
@@ -220,47 +196,22 @@ server.exchange(oauth2orize.exchange.password(
  *    - the `scope` submitted in the authorization request.
  */
 server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, authInfo, done) => {
-  // Array to hold intersection of client allowedScope, user role, and scope request
-  const scopeIntersection = [];
-
-  // validate client scope properties
-  if ((client) && (client.allowedScope) && (client.allowedScope.length > 0)) {
-    // If scope not in request, fall back to default and intersect with client
-    if ((!scope) || (scope.length === 0)) {
-      if (client.defaultScope) {
-        client.defaultScope.forEach((defScope) => {
-          if (client.allowedScope.indexOf(defScope) >= 0) {
-            scopeIntersection.push(defScope);
-          }
-        });
-      }
-    } else {
-      // Case of valid scope in request, intersect request scope with client
-      scope.forEach((reqScope) => {
-        if (client.allowedScope.indexOf(reqScope) >= 0) {
-          scopeIntersection.push(reqScope);
-        }
-      });
-    }
-  }
-
-  // Replace requested scope with intersected scope
-  scope = scopeIntersection;
-
+  // Compile token scope
+  const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
   const token = utils.createToken({ sub: client.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
   const authTime = new Date();
   const grantType = 'client_credentials';
   const responseParams = {
     expires_in: config.token.expiresIn,
-    scope: scopeIntersection,
+    scope: tokenScope,
     grantType: grantType,
     auth_time: Math.floor(authTime.valueOf() / 1000)
   };
 
   //
   // Pass in a null for user id since there is no user when using this grant type
-  db.accessTokens.save(token, expiration, null, client.id, scope, grantType, authTime)
+  db.accessTokens.save(token, expiration, null, client.id, tokenScope, grantType, authTime)
     .then(() => done(null, token, null, responseParams))
     .catch((err) => done(err));
 }));
@@ -349,37 +300,9 @@ exports.authorization = [
     }
   ),
   (req, res, next) => {
-    // Array to hold intersection of client allowedScope, user role, and scope request
-    const scopeIntersection = [];
-
-    // Validate client and user scope properties
-    if ((req.oauth2.client) && (req.user) &&
-      (req.oauth2.client.allowedScope) && (req.user.role) &&
-      (req.oauth2.client.allowedScope.length > 0) &&
-      (req.user.role.length > 0)) {
-      // If scope not in request, fall back to default and intersect with client and user
-      if ((!req.oauth2.req.scope) || (req.oauth2.req.scope.length === 0)) {
-        if (req.oauth2.client.defaultScope) {
-          req.oauth2.client.defaultScope.forEach((defScope) => {
-            if ((req.oauth2.client.allowedScope.indexOf(defScope) >= 0) &&
-              (req.user.role.indexOf(defScope) >= 0)) {
-              scopeIntersection.push(defScope);
-            }
-          });
-        }
-      } else {
-        // Case of valid scope in request, intersect request scope with client and user
-        req.oauth2.req.scope.forEach((reqScope) => {
-          if ((req.oauth2.client.allowedScope.indexOf(reqScope) >= 0) &&
-          (req.user.role.indexOf(reqScope) >= 0)) {
-            scopeIntersection.push(reqScope);
-          }
-        });
-      }
-    }
     // intercepted scope is saved here for use later to be saved with the authorization code.
-    req.oauth2.req.tokenScope = scopeIntersection;
-
+    req.oauth2.req.tokenScope = intersectReqCliUsrScopes(
+      req.oauth2.req.scope, req.oauth2.client.allowedScope, req.user.role);
     //
     // Render the decision dialog if the client isn't a trusted client
     // TODO:  Make a mechanism so that if this isn't a trusted client, the user can record that
@@ -394,17 +317,11 @@ exports.authorization = [
             callback(null, { allow: true });
           })(req, res, next);
         } else {
-          // List the proposed token scope in the dialog form
-          let scopeString = '';
-          req.oauth2.req.tokenScope.forEach((scope, i) => {
-            if (i > 0) scopeString += ', ';
-            scopeString += scope.toString();
-          });
           res.render('dialog', {
             transactionID: req.oauth2.transactionID,
             user: req.user,
             client: req.oauth2.client,
-            scopeString: scopeString
+            scopeString: toScopeString(req.oauth2.req.tokenScope)
           });
         }
       })
