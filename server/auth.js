@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const db = require('./db');
 const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
@@ -20,7 +17,6 @@ const scope = require('./scope');
  * a user is logged in before asking them to approve the request.
  */
 passport.use(new LocalStrategy((username, password, done) => {
-  if (debuglog) console.log('auth.passport.use local callback (called)');
   db.users.findByUsername(username)
     .then((user) => validate.user(user, password))
     .then((user) => db.users.updateLoginTime(user))
@@ -43,8 +39,6 @@ passport.use(new LocalStrategy((username, password, done) => {
  */
 passport.use(new BasicStrategy({ passReqToCallback: true },
   (req, clientId, clientSecret, done) => {
-    if (debuglog) console.log('auth.passport.use basic callback (called)');
-    if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
       .then((client) => scope.addScopeToPassportReqObj(req, client))
@@ -62,8 +56,6 @@ passport.use(new BasicStrategy({ passReqToCallback: true },
  */
 passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
   (req, clientId, clientSecret, done) => {
-    if (debuglog) console.log('auth.passport.use oauth2-client-password callback (called)');
-    // if (debuglog) console.log('    clientId clientSecret ', clientId, clientSecret);
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
       .then((client) => scope.addScopeToPassportReqObj(req, client))
@@ -84,7 +76,6 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
  */
 
 // passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, done) => {
-//   if (debuglog) console.log('auth.passport.use bearer callback (called)');
 //   db.accessTokens.find(accessToken)
 //     .then((token) => validate.token(token, accessToken))
 //     .then((client) => scope.addScopeToPassportReqObj(req, client))
@@ -106,12 +97,10 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
 // the client by ID from the database.
 
 passport.serializeUser((user, done) => {
-  if (debuglog) console.log('passport.serializeUser (called)');
   done(null, user.id);
 });
 
 passport.deserializeUser((id, done) => {
-  if (debuglog) console.log('passport.deserializeUser (called)');
   db.users.find(id)
     .then((user) => done(null, user))
     .catch((err) => done(err));

@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 /**
  * Register supported grant types.
  *
@@ -40,12 +37,6 @@ const server = oauth2orize.createServer();
  * the requesting user's `role`, and the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, done) => {
-  if (debuglog) console.log('oauth2.server.grant oauthorize.grant.code callback (called --> Promise)');
-  // if (debuglog) console.log('    client ', client);
-  // if (debuglog) console.log('    redirectURI ', redirectURI);
-  // if (debuglog) console.log('    user ', user);
-  // if (debuglog) console.log('    ares ', ares);
-
   // Authorization code length (characters)
   const code = uid2(config.code.length);
   const expiration = new Date(Date.now() + (config.code.expiresIn * 1000));
@@ -74,12 +65,6 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, done) => {
  * the requesting user's `role`, and the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.token((client, user, ares, done) => {
-  if (debuglog) console.log('oauth2.server.grant oauth2orize.grant.token callback (called --> Promise)');
-  // if (debuglog) console.log('    ares ', ares);
-  // if (debuglog) console.log('    client.allowedScope ', client.allowedScope);
-  // if (debuglog) console.log('    client.scope ', client.scope);
-  // if (debuglog) console.log('    user.role ', user.role);
-
   const grantType = 'implicit';
   const token = utils.createToken({ sub: user.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
@@ -112,10 +97,6 @@ server.grant(oauth2orize.grant.token((client, user, ares, done) => {
  *
  */
 server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
-  if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.code callback (called --> Promise)');
-  // if (debuglog) console.log('    client ', client);
-  // if (debuglog) console.log('    code ', code);
-
   const responseParams = {
     expires_in: config.token.expiresIn,
     grant_type: 'authorization_code'
@@ -168,7 +149,6 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
  * the issuing client's allowedScope and scope parameter of the token request
  */
 server.exchange(oauth2orize.exchange.password((client, username, password, scope, done) => {
-  if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.password callback (called --> Promise)');
   const responseParams = {
     expires_in: config.token.expiresIn,
     scope: scope,
@@ -179,9 +159,6 @@ server.exchange(oauth2orize.exchange.password((client, username, password, scope
   db.users.findByUsername(username)
     .then((user) => validate.user(user, password))
     .then((user) => {
-      // if (debuglog) console.log('    scope', scope);
-      // if (debuglog) console.log('    client.allowed.Scope', client.allowedScope);
-      // if (debuglog) console.log('    user.role', user.role);
       // Validate client and user scope properties
       if ((user) && (client) &&
         (client.allowedScope) && (user.role) &&
@@ -245,10 +222,6 @@ server.exchange(oauth2orize.exchange.password((client, username, password, scope
  * the issuing client's allowedScope and scope parameter of the token request
  */
 server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => {
-  if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.clientCredentials callback (called --> Promise)');
-  // if (debuglog) console.log('    client ', client);
-  // if (debuglog) console.log('    scope ', scope);
-
   // Array to hold intersection of client allowedScope, user role, and scope request
   const scopeIntersection = [];
 
@@ -313,7 +286,6 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
  * refresh_token record in the database.
  */
 server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, done) => {
-  if (debuglog) console.log('oauth2.server.exchange oauth2orize.exchange.refreshToken callback (called --> Promise)');
   const responseParams = {
     expires_in: config.token.expiresIn,
     grant_type: 'refresh_token'
@@ -321,7 +293,6 @@ server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, 
   db.refreshTokens.find(refreshToken)
     .then((foundRefreshToken) => validate.refreshToken(foundRefreshToken, refreshToken, client))
     .then((foundRefreshToken) => {
-      if (debuglog) console.log('    foundRefreshToken ', foundRefreshToken);
       responseParams.scope = foundRefreshToken.scope;
       responseParams.auth_time = foundRefreshToken.authTime;
       // replace "authorization_code" with "refresh_token"
@@ -358,15 +329,9 @@ server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, 
  * and subsequently used during exchange of code for token.
  */
 exports.authorization = [
-  (req, res, next) => { if (debuglog) { console.log('oauth2.authorization endpoint [server.authorization()] (entry) '); } next(); },
   login.ensureLoggedIn(),
   server.authorization(
     { idLength: config.decision.idLength }, (clientID, redirectURI, scope, done) => {
-      if (debuglog) console.log('oauth2.authorization server.authorizaton callback (entry))');
-      if (debuglog) console.log('    clientID ' + clientID);
-      if (debuglog) console.log('    redirectURI ' + redirectURI);
-      if (debuglog) console.log('    scope', scope);
-
       db.clients.findByClientId(clientID)
         .then((client) => {
           // For security purposes, it is highly advisable to check that
@@ -387,7 +352,6 @@ exports.authorization = [
     }
   ),
   (req, res, next) => {
-    if (debuglog) console.log('oauth2.authorization server.authorizaton (req, res, next) middleware (called --> Promise)');
     // -----------------------
     // Note: req.oauth2 has:
     //    client:
@@ -397,12 +361,6 @@ exports.authorization = [
     //    info: null
     //    transactionID:
     // -----------------------
-    if (debuglog) console.log('    req.oauth2 ', req.oauth2);
-    // if (debuglog) console.log('    client.defaultScope ', req.oauth2.client.defaultScope);
-    // if (debuglog) console.log('    client.allowedScope ', req.oauth2.client.allowedScope);
-    // if (debuglog) console.log('    client.scope ', req.oauth2.client.scope);
-    // if (debuglog) console.log('    user ' + JSON.stringify(req.user.role));
-    // if (debuglog) console.log('    req ' + JSON.stringify(req.oauth2.req.scope));
 
     // Array to hold intersection of client allowedScope, user role, and scope request
     const scopeIntersection = [];
@@ -473,8 +431,7 @@ exports.authorization = [
   // This handler remove the transaction from session
   server.authorizationErrorHandler(),
   // This handler detect error and handles proper message
-  server.errorHandler(),
-  (req, res, next) => { if (debuglog) { console.log('oauth2.authorization endpoint [server.authorization()] (finished) '); } next(); }
+  server.errorHandler()
 ];
 
 /**
@@ -491,16 +448,12 @@ exports.authorization = [
 //    "cancel": "Deny"
 //  }
 exports.decision = [
-  (req, res, next) => { if (debuglog) { console.log('oauth2.decision endpoint [server.decision()] (entry)'); } next(); },
-  (req, res, next) => { if (debuglog) { console.log(req.body); } next(); },
   login.ensureLoggedIn(),
-
   server.decision(),
   // This handler remove the transaction from session
   server.authorizationErrorHandler(),
   // This handler detect error and handles proper message
-  server.errorHandler(),
-  (req, res, next) => { if (debuglog) { console.log('oauth2.decision endpoint [server.decision()] (entry)'); } next(); }
+  server.errorHandler()
 ];
 
 /**
@@ -515,12 +468,9 @@ exports.decision = [
  * or client_id and client_secret in body of request. Either will work.
  */
 exports.token = [
-  (req, res, next) => { if (debuglog) { console.log('oauth2.token endpoint [sever.token()] (entry)'); } next(); },
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  (req, res, next) => { if (debuglog) { console.log('    req.body', req.body); } next(); },
   server.token(),
-  server.errorHandler(),
-  (req, res, next) => { if (debuglog) { console.log('oauth2.token endpoint [sever.token()] (finished)'); } next(); }
+  server.errorHandler()
 ];
 
 // Register serialialization and deserialization functions.

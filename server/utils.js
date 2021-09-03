@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const fs = require('fs');
 const path = require('path');
 const uuid = require('uuid');

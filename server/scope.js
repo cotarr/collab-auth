@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const config = require('./config');
 const db = require('./db');
 
@@ -16,7 +13,6 @@ const db = require('./db');
  * @returns {Object} The client is returned unchanged.
  */
 exports.addScopeToPassportReqObj = (req, client) => {
-  if (debuglog) console.log('scope.addScopeToPassportReqObj (called)');
   if (!req.locals) req.locals = {};
   if (client.allowedScope) req.locals.clientScope = client.allowedScope;
   return client;

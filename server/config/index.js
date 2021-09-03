@@ -106,5 +106,3 @@ exports.refreshToken = {
 exports.db = {
   timeToCheckExpiredTokens: 3600
 };
-
-if (global.debuglog) console.log('config.index loaded (init)');

@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const passport = require('passport');
 const config = require('./config');
 
@@ -30,7 +27,6 @@ exports.introspect = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   scope.requireScopeForOauthHTTP(['auth.info', 'auth.token', 'auth.admin']),
   (req, res, next) => {
-    if (debuglog) console.log('token.introspect (req, res) middleware (called)');
     if ((req.body) && (req.body.access_token) &&
       (typeof req.body.access_token === 'string') &&
       (req.body.access_token.length > 0)) {
@@ -38,7 +34,6 @@ exports.introspect = [
       db.accessTokens.find(accessToken)
         .then((token) => validate.token(token, accessToken))
         .then((tokenMetadata) => {
-          // if (debuglog) console.log('    tokenMetadata ', tokenMetadata);
           const resJson = {
             active: true,
             revocable: true,
@@ -56,7 +51,6 @@ exports.introspect = [
           if (tokenMetadata.user) {
             resJson.user = tokenMetadata.user;
           }
-          if (debuglog) console.log('    res.json ' + JSON.stringify(resJson, null, 2));
           res.json(resJson);
         })
         .catch(() => {

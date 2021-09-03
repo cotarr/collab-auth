@@ -2,11 +2,6 @@
 
 'use strict';
 
-// True = print console.logs (Global variable available to all modules).
-global.debuglog = 0;
-// node_modules/oauth2orize/ inserted comment visiblity
-global.oa2debuglog = 0;
-
 // Read /.env file and set enviornment variables in process.env
 require('dotenv').config();
 

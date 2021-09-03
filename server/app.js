@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 // Node packages
 const http = require('http');
 const path = require('path');
@@ -24,8 +21,6 @@ const site = require('./site');
 const adminPanel = require('./admin-panel');
 const token = require('./token');
 const checkVhost = require('./check-vhost');
-const debugUtils = require('./debug-utils').router;
-const logsession = require('./debug-utils').logsession;
 
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -147,16 +142,16 @@ require('./auth');
 //   next();
 // });
 
-app.get('/login', logsession, site.loginForm);
-app.post('/login', logsession, site.login);
-app.get('/redirecterror', logsession, site.redirectError);
-app.get('/logout', logsession, site.logout);
+app.get('/login', site.loginForm);
+app.post('/login', site.login);
+app.get('/redirecterror', site.redirectError);
+app.get('/logout', site.logout);
 
-app.get('/dialog/authorize', logsession, oauth2.authorization);
-app.post('/dialog/authorize/decision', logsession, oauth2.decision);
-app.post('/oauth/token', logsession, oauth2.token);
-app.post('/oauth/introspect', logsession, token.introspect);
-app.post('/token/revoke', logsession, token.revoke);
+app.get('/dialog/authorize', oauth2.authorization);
+app.post('/dialog/authorize/decision', oauth2.decision);
+app.post('/oauth/token', oauth2.token);
+app.post('/oauth/introspect', token.introspect);
+app.post('/token/revoke', token.revoke);
 
 // ----------------
 // Change Password
@@ -230,7 +225,6 @@ app.use(function (err, req, res, next) {
 // From time to time we need to clean up any expired tokens, and
 // codes in the database
 setInterval(() => {
-  if (debuglog) console.log('Pruning at ' + new Date().toISOString());
   db.accessTokens.removeExpired()
     .catch((err) => console.error('Error trying to remove expired tokens:', err.stack));
   db.refreshTokens.removeExpired()

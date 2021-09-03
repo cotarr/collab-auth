@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
 const { requireScopeForWebPanel } = require('./scope');
@@ -10,13 +7,9 @@ const { requireScopeForWebPanel } = require('./scope');
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
 /**
- * Render the login.ejs
- * @param   {Object} req - The request
- * @param   {Object} res - The response
- * @returns {undefined}
+ * Render the login Form
  */
 exports.loginForm = (req, res, next) => {
-  if (debuglog) console.log('site.loginForm (called)');
   res.render('login');
 };
 /**
@@ -24,7 +17,6 @@ exports.loginForm = (req, res, next) => {
  * user a `/login` was initiated without a valid redirectURL.
  */
 exports.redirectError = [
-  (req, res, next) => { if (debuglog) { console.log('site.redirectError (called)'); } next(); },
   ensureLoggedIn(),
   (req, res) => {
     res.render('redirecterror', { name: req.user.name });
@@ -36,20 +28,15 @@ exports.redirectError = [
  * POST /login (credentials in body)
  */
 exports.login = [
-  (req, res, next) => { if (debuglog) { console.log('site.login (called)'); } next(); },
   passport.authenticate('local',
     { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login' }
   )
 ];
 
 /**
- * Logout of the system and redirect to root
- * @param   {Object}   req - The request
- * @param   {Object}   res - The response
- * @returns {undefined}
+ * Logout of the system and redirect logout info page
  */
 exports.logout = (req, res) => {
-  if (debuglog) console.log('site.logout (called)');
   req.logout();
   // name empty string for header
   res.render('logout', { name: '' });
@@ -57,9 +44,7 @@ exports.logout = (req, res) => {
 };
 
 /**
- * Change Password Forms
- *
- * Required scope: role=user.password or role=user.admin
+ * Change Password Form
  */
 exports.changePassword = [
   ensureLoggedIn(),
@@ -76,8 +61,6 @@ exports.changePassword = [
 
 /**
  * Change Password POST request handler
- *
- * Required scope: role=user.password or role=user.admin
  */
 exports.changePasswordHandler = [
   ensureLoggedIn(),

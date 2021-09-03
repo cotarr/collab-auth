@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const fs = require('fs');
 
 /**
@@ -45,18 +42,7 @@ try {
  * @param   {String}   id - The unique id of the user to find
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
-
-// TODO rewrite for console.log
-// exports.find = (id) =>
-//   Promise.resolve(users.find((user) => user.id === id));
-exports.find = (id) => {
-  if (debuglog) {
-    console.log('db.users.find (entry)');
-    // console.log('    find(id): ', JSON.stringify(users.find((user) => user.id === id), null, 2));
-    console.log('db.users.find (finished)');
-  }
-  return Promise.resolve(users.find((user) => user.id === id));
-};
+exports.find = (id) => Promise.resolve(users.find((user) => user.id === id));
 
 /**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
@@ -66,14 +52,13 @@ exports.find = (id) => {
  */
 
 // TODO rewrite for console.log
-// exports.findByUsername = (username) =>
-//   Promise.resolve(users.find((user) => user.username === username));
-exports.findByUsername = (username) => {
-  if (debuglog) console.log('db.users.findByUsername (called)');
-  // if (debuglog) console.log('    find(user) ', users.find((user) => user.username === username));
-  return Promise.resolve(users.find((user) => user.username === username));
-};
+exports.findByUsername = (username) =>
+  Promise.resolve(users.find((user) => user.username === username));
 
+/**
+ * Returns an array of all users
+ * @returns {Promise} resolved array if found, otherwise resolves undefined
+ */
 exports.findAll = () => {
   return new Promise((resolve, reject) => {
     const error = false;
@@ -85,6 +70,10 @@ exports.findAll = () => {
   });
 };
 
+/**
+ * Updates the lastLogin column of user record to the current date/time
+ * @returns {Promise} resolved to modified user, otherwise resolves undefined
+ */
 exports.updateLoginTime = (user) => {
   try {
     users.find((userObj) => userObj.id === user.id).lastLogin = new Date().toISOString();
@@ -94,9 +83,3 @@ exports.updateLoginTime = (user) => {
   }
   return user;
 };
-
-if (debuglog) {
-  exports.debug = () => {
-    console.log('users\n' + JSON.stringify(users, null, 2));
-  };
-}

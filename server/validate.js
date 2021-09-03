@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const fs = require('fs');
 const path = require('path');
 const config = require('./config');
@@ -29,7 +26,6 @@ const publicKey = fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'))
  * @returns {undefined}
  */
 validate.logAndThrow = (msg) => {
-  if (debuglog) console.log('logAndThrow ' + msg);
   // if (!suppressTrace) {
   //   console.trace(msg);
   // }
@@ -49,7 +45,6 @@ validate.logAndThrow = (msg) => {
  * @returns {Object} The user if valid
  */
 validate.user = (user, password) => {
-  if (debuglog) console.log('validate.user (called)');
   if (user.loginDisabled) {
     validate.logAndThrow('User login disabled');
     return null; // redundant to throw
@@ -59,7 +54,6 @@ validate.user = (user, password) => {
       validate.logAndThrow('User password does not match');
       return null; // redundant to throw
     }
-    // if (debuglog) console.log('    user ', user);
     return user;
   }
 };
@@ -71,7 +65,6 @@ validate.user = (user, password) => {
  * @returns {Object} The user if valid
  */
 validate.userExists = (user) => {
-  if (debuglog) console.log('validate.userExists (called)');
   if (user == null) {
     validate.logAndThrow('User does not exist');
   }
@@ -87,8 +80,6 @@ validate.userExists = (user) => {
  * @returns {Object} The client if valid
  */
 validate.client = (client, clientSecret) => {
-  if (debuglog) console.log('validate.user (called)');
-  // if (debuglog) console.log('    client clientSecret', client, clientSecret);
   validate.clientExists(client);
   if (client.clientSecret !== clientSecret) {
     validate.logAndThrow('Client secret does not match');
@@ -105,7 +96,6 @@ validate.client = (client, clientSecret) => {
  */
 validate.clientExists = (client) => {
   if (client == null) {
-    if (debuglog) console.log('    client = null');
     validate.logAndThrow('Client does not exist');
   }
   return client;
@@ -120,8 +110,6 @@ validate.clientExists = (client) => {
  * @returns {Promise} Resolved with the user or client associated with the token if valid
  */
 validate.token = (token, accessToken) => {
-  if (debuglog) console.log('validate.token (called)');
-
   // jwt.verify will throw an error upon failure
   const decoded = jwt.verify(accessToken, publicKey);
 
@@ -185,7 +173,6 @@ validate.token = (token, accessToken) => {
  * @returns {Object} The refresh token if valid
  */
 validate.refreshToken = (token, refreshToken, client) => {
-  if (debuglog) console.log('validate.refreshToken (called)');
   utils.verifyToken(refreshToken);
   if (client.id !== token.clientID) {
     validate.logAndThrow('RefreshToken clientID does not match client id given');
@@ -206,8 +193,6 @@ validate.refreshToken = (token, refreshToken, client) => {
  * @returns {Object} The auth code token if valid
  */
 validate.authCode = (code, authCode, client, redirectURI) => {
-  if (debuglog) console.log('validate.authcode (called)');
-  if (debuglog) console.log('    authCode ', authCode);
   if (new Date() > authCode.expirationDate) {
     validate.logAndThrow('AuthCode has expired');
   }
@@ -237,10 +222,8 @@ validate.isRefreshToken = ({ scope }) => scope != null && scope.indexOf('offline
  * @returns {Promise} The resolved refresh token after saved
  */
 validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime }) => {
-  if (debuglog) console.log('validate.generateRefreshToken (called)');
   const refreshToken = utils.createToken({ sub: userID, exp: config.refreshToken.expiresIn });
   const expiration = new Date(Date.now() + (config.refreshToken.expiresIn * 1000));
-  // if (debuglog) console.log('    expiration userID clientID scope', expiration, userID, clientID, scope);
   return db.refreshTokens.save(refreshToken, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => refreshToken);
 };
@@ -255,11 +238,8 @@ validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime 
  * @returns {Promise}  The resolved refresh token after saved
  */
 validate.generateToken = ({ userID, clientID, scope, grantType, authTime }) => {
-  if (debuglog) console.log('validate.generateToken (called)');
   const token = utils.createToken({ sub: userID, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
-  // if (debuglog) console.log('    expiration userID clientID scope', expiration, userID, clientID, scope);
-  // if (debuglog) console.log('    decoded: ', JSON.stringify(utils.decodeToken(token)));
   return db.accessTokens.save(token, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => token);
 };
@@ -273,8 +253,6 @@ validate.generateToken = ({ userID, clientID, scope, grantType, authTime }) => {
  */
 validate.generateTokens = (authCode) => {
   // authcode = { clientID: redirectURI: userID: scope: grantType: authTime: }
-  if (debuglog) console.log('validate.generateTokens (called)');
-  if (debuglog) console.log('    authCode ', authCode);
   if (validate.isRefreshToken(authCode)) {
     return Promise.all([
       validate.generateToken(authCode),
@@ -292,8 +270,6 @@ validate.generateTokens = (authCode) => {
  */
 validate.tokenForHttp = (token) =>
   new Promise((resolve, reject) => {
-    if (debuglog) console.log('validate.tokenForHttp (called)');
-    if (debuglog) console.log('    token ', token);
     try {
       jwt.verify(token, publicKey);
     } catch (err) {
@@ -311,8 +287,6 @@ validate.tokenForHttp = (token) =>
  * @returns {Object} The client if it is a valid client
  */
 validate.tokenExistsForHttp = (token) => {
-  if (debuglog) console.log('validate.tokenExistsForHttp (called)');
-  // if (debuglog) console.log('    token ', token);
   if (token == null) {
     const error = new Error('invalid_token');
     error.status = 400;
