@@ -19,7 +19,6 @@ const config = require('./config/');
  * The pages are simple server side forms.
  * Password authentication is required with user role = user.admin
  */
-
 router.get('/menu',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),

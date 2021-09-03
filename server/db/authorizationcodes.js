@@ -1,8 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 // The authorization codes.
 // You will use these to get the access codes to get to the data in your endpoints as outlined
 // in the RFC The OAuth 2.0 Authorization Framework: Bearer Token Usage
@@ -19,7 +16,6 @@ let codes = Object.create(null);
  * @returns {Promise} resolved with the authorization code if found, otherwise undefined
  */
 exports.find = (code) => {
-  if (debuglog) console.log('db.authorizationcodes.find (called)');
   try {
     return Promise.resolve(codes[code]);
   } catch (error) {
@@ -38,17 +34,7 @@ exports.find = (code) => {
  * @returns {Promise} resolved with the saved token
  */
 exports.save = (code, clientID, redirectURI, userID, expirationDate, scope) => {
-  if (debuglog) console.log('db.authorizationcodes.save (entry)');
   codes[code] = { clientID, redirectURI, userID, expirationDate, scope };
-  if (debuglog) {
-    // console.log('    code: ' + code);
-    // console.log('    clientID: ' + clientID);
-    // console.log('    redirectURI: ' + redirectURI);
-    // console.log('    userID: ' + userID);
-    // console.log('    scope: ' + JSON.stringify(scope));
-    console.log('    Save: \n' + code + ' ' + JSON.stringify(codes[code], null, 2));
-  }
-  if (debuglog) console.log('db.authorizationcodes.save (finished)');
   return Promise.resolve(codes[code]);
 };
 
@@ -58,7 +44,6 @@ exports.save = (code, clientID, redirectURI, userID, expirationDate, scope) => {
  * @returns {Promise} resolved with the deleted value
  */
 exports.delete = (code) => {
-  if (debuglog) console.log('db.authorizationcodes.delete (called)');
   try {
     const deletedToken = codes[code];
     delete codes[code];
@@ -74,7 +59,6 @@ exports.delete = (code) => {
  * @returns {Promise} resolved with an associative of codes that were expired
  */
 exports.removeExpired = () => {
-  if (debuglog) console.log('db.authorizationcodes.removeExpired (called)');
   const keys = Object.keys(codes);
   const expired = keys.reduce((accumulator, key) => {
     if (new Date() > codes[key].expirationDate) {
@@ -92,14 +76,7 @@ exports.removeExpired = () => {
  * @returns {Promise} resolved with all removed authorization codes returned
  */
 exports.removeAll = () => {
-  if (debuglog) console.log('db.authorizationcodes.removeAll (called)');
   const deletedTokens = codes;
   codes = Object.create(null);
   return Promise.resolve(deletedTokens);
 };
-
-if (debuglog) {
-  exports.debug = () => {
-    console.log('authorizationcodes\n' + JSON.stringify(codes, null, 2));
-  };
-}

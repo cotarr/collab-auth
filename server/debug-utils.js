@@ -5,9 +5,6 @@
 
 const debuglog = global.debuglog || false;
 
-const express = require('express');
-const router = express.Router();
-
 // --------------------------------------
 // This function is debugging to console.log
 // various items from request object for each request
@@ -66,31 +63,7 @@ const logsession = (req, res, next) => {
   }
 };
 
-// ------------------------------------------------------------
-// Debug:  the route /debug will write the databases to console
-// ------------------------------------------------------------
-router.get('/debug', (req, res, next) => {
-  if (debuglog) {
-    // * * * token databases * * *
-    const db = require('./db');
-    db.authorizationCodes.debug();
-    db.accessTokens.debug();
-    db.refreshTokens.debug();
-
-    // * * *  client/user databases * * *
-    // db.users.debug();
-    // * * * session * * *
-    // console.log('req.session\n' + JSON.stringify(req.session, null, 2));
-
-    res.send('Done, use back arrow');
-  } else {
-    // if disabled, not found
-    next();
-  }
-});
-
 module.exports = {
-  router,
   logStuff,
   logsession
 };

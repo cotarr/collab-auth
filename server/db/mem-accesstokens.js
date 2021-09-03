@@ -1,9 +1,5 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-if (debuglog) console.log('accesstokens.js loading...');
-
 const jwt = require('jsonwebtoken');
 
 // The access tokens.
@@ -22,7 +18,6 @@ let tokens = Object.create(null);
  * @returns {Promise} resolved with the token if found, otherwise resolved with undefined
  */
 exports.find = (token) => {
-  if (debuglog) console.log('db.accesstokens.find (called)');
   try {
     const id = jwt.decode(token).jti;
     return Promise.resolve(tokens[id]);
@@ -39,28 +34,14 @@ exports.find = (token) => {
  * @param   {Date}    expirationDate - The expiration (required)
  * @param   {String}  userID         - The user ID (required)
  * @param   {String}  clientID       - The client ID (required)
- * @param   {String}  scope          - The scope (optional)
+ * @param   {Array}   scope          - The scope array
+ * @param   {String}  grantType      - The grant type
+ * @param   {String}  authTime       - The time of user password authentication
  * @returns {Promise} resolved with the saved token
  */
 exports.save = (token, expirationDate, userID, clientID, scope, grantType, authTime) => {
-  if (debuglog) console.log('db.accesstokens.save (entry)');
   const id = jwt.decode(token).jti;
   tokens[id] = { userID, expirationDate, clientID, scope, grantType, authTime };
-
-  if (debuglog) {
-    // console.log('    jti: ' + id);
-    // console.log('    token:   ', token);
-    // console.log('    expirationDate: ' + expirationDate);
-    // console.log('    userID: ' + userID);
-    // console.log('    clientID: ' + clientID);
-    // console.log('    scope: ' + scope);
-    // console.log('    algo:    ', Buffer.from(token.split('.')[0], 'base64').toString('utf8'));
-    // console.log('    payload: ', Buffer.from(token.split('.')[1], 'base64').toString('utf8'));
-    // console.log('    decode:  ', JSON.stringify(jwt.decode(token)));
-    console.log('    Save: \n' + id + ' ' + JSON.stringify(tokens[id], null, 2));
-  }
-  if (debuglog) console.log('db.accesstokens.save (finished)');
-
   return Promise.resolve(tokens[id]);
 };
 
@@ -70,7 +51,6 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
  * @returns {Promise} resolved with the deleted token
  */
 exports.delete = (token) => {
-  if (debuglog) console.log('db.accesstokens.delete (called)');
   try {
     const id = jwt.decode(token).jti;
     const deletedToken = tokens[id];
@@ -87,7 +67,6 @@ exports.delete = (token) => {
  * @returns {Promise} resolved with an associative of tokens that were expired
  */
 exports.removeExpired = () => {
-  if (debuglog) console.log('db.accesstokens.removeExpired (called)');
   const keys = Object.keys(tokens);
   const expired = keys.reduce((accumulator, key) => {
     if (new Date() > tokens[key].expirationDate) {
@@ -105,14 +84,7 @@ exports.removeExpired = () => {
  * @returns {Promise} resolved with all removed tokens returned
  */
 exports.removeAll = () => {
-  if (debuglog) console.log('db.accesstokens.removeAll (called)');
   const deletedTokens = tokens;
   tokens = Object.create(null);
   return Promise.resolve(deletedTokens);
 };
-
-if (debuglog) {
-  exports.debug = () => {
-    console.log('accesstokens\n' + JSON.stringify(tokens, null, 2));
-  };
-}

@@ -182,11 +182,6 @@ app.get('/secure', (req, res, next) => {
   }
 });
 
-// Temporary debug utilities
-if (nodeEnv === 'development') {
-  app.use(debugUtils);
-}
-
 // --------------------------------------
 // Static Web server
 //

@@ -1,32 +1,40 @@
 'use strict';
 
-// conditional debug console.log statements
-const debuglog = global.debuglog || false;
-
 const jwt = require('jsonwebtoken');
 const pgPool = require('./pg-pool');
 
+/**
+ * Returns an access token if it finds one, otherwise returns null if one is not found.
+ * @param   {String}  token - The token to decode to get the id of the access token to find.
+ * @returns {Promise} resolved with the token if found, otherwise resolved with undefined
+ */
 exports.find = (token) => {
   const id = jwt.decode(token).jti;
-
-  // not found
-  // const id = 'dd2e3a2e-b7a0-4eeb-9325-bbb0f69be1f5';
-
   const query = {
     text: 'SELECT * FROM accesstokens WHERE id = $1',
     values: [id]
   };
-
-  // Return Promise
   return pgPool.query(query)
     .then((queryResponse) => {
       return queryResponse.rows[0];
     });
 };
 
+/**
+ * Saves a access token, expiration date, user id, client id, and scope. Note: The actual full
+ * access token is never saved.  Instead just the ID of the token is saved.  In case of a database
+ * breach this prevents anyone from stealing the live tokens.
+ * @param   {Object}  token          - The access token (required)
+ * @param   {Date}    expirationDate - The expiration (required)
+ * @param   {String}  userID         - The user ID (required)
+ * @param   {String}  clientID       - The client ID (required)
+ * @param   {Array}   scope          - The scope array
+ * @param   {String}  grantType      - The grant type
+ * @param   {String}  authTime       - The time of user password authentication
+ * @returns {Promise} resolved with the saved token
+ */
 exports.save = (token, expirationDate, userID, clientID, scope, grantType, authTime) => {
   const id = jwt.decode(token).jti;
-
   const query = {
     text: 'INSERT INTO accesstokens ' +
       '("id", "userID", "clientID", "expirationDate", "scope", "grantType", "authTime") ' +
@@ -34,13 +42,16 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
     values: [id, userID, clientID, expirationDate, scope, grantType, authTime]
   };
 
-  // Return Promise
   return pgPool.query(query)
     .then((queryResponse) => {
       return queryResponse.rows[0];
     });
 };
-
+/**
+ * Deletes/Revokes an access token by getting the ID and removing it from the storage.
+ * @param   {String}  token - The token to decode to get the id of the access token to delete.
+ * @returns {Promise} resolved with the deleted token
+ */
 exports.delete = (token) => {
   const id = jwt.decode(token).jti;
   const query = {
@@ -54,17 +65,24 @@ exports.delete = (token) => {
     });
 };
 
+/**
+ * Removes expired access tokens. This is done with SQL query
+ * @returns {Promise} resolved with an associative of tokens that were expired
+ */
 exports.removeExpired = () => {
   const query = {
     text: 'DELETE FROM accesstokens WHERE "expirationDate" < now() RETURNING *'
   };
-  // Return Promise
   return pgPool.query(query)
     .then((queryResponse) => {
       return queryResponse.rows;
     });
 };
 
+/**
+ * Removes all access tokens.
+ * @returns {Promise} resolved with all removed tokens returned
+ */
 exports.removeAll = () => {
   const query = {
     text: 'DELETE FROM accesstokens RETURNING *'
@@ -74,16 +92,4 @@ exports.removeAll = () => {
     .then((queryResponse) => {
       return queryResponse.rows;
     });
-};
-
-if (debuglog) {
-  exports.debug = () => {
-    pgPool.query('SELECT * FROM accesstokens')
-      .then((queryResponse) => {
-        console.log('accesstokens\n', queryResponse.rows);
-      })
-      .catch((err) => {
-        console.error(err.stack);
-      });
-  };
 };
