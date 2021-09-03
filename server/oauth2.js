@@ -31,22 +31,19 @@ const server = oauth2orize.createServer();
  * which is bound to these values, and will be exchanged for an access token.
  *
  * The scope to be included with the requested token is saved here with the
- * authorization code. The scope was created in the authorization endpoint
- * and it was previously saved with the authorization transaction.
- * The scope is the intersection of requesting client's `allowedScope`,
- * the requesting user's `role`, and the `scope` submitted in the authorization request.
+ * authorization code. The scope was created in the authorization endpoint.
+ * The scope was previously saved to `req.oauth2.req.tokenscope` when the
+ * authorization transaction was initiated and appears here as `areq.tokenScope`.
+ * The scope is the intersection of -
+ *    - requesting client's `allowedScope`,
+ *    - requesting user's `role`
+ *    - the `scope` submitted in the authorization request.
  */
-server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, done) => {
+server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, locals, done) => {
   // Authorization code length (characters)
   const code = uid2(config.code.length);
   const expiration = new Date(Date.now() + (config.code.expiresIn * 1000));
-  db.authorizationCodes.save(code, client.id, redirectURI, user.id, expiration, client.scope)
-    //
-    // Description: done(err, code)
-    // Location: oauth2orize/grant/code.js,
-    //     as issued(err, code)
-    //     where code (string) = 'NDAyB2OW'
-    //
+  db.authorizationCodes.save(code, client.id, redirectURI, user.id, expiration, areq.tokenScope)
     .then(() => done(null, code))
     .catch((err) => done(err));
 }));
@@ -59,12 +56,15 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, done) => {
  * duration, etc. as parsed by the application.  The application issues a token,
  * which is bound to these values.
  *
- * The scope was created in the authorization endpoint
- * and it was previously saved with the authorization transaction.
- * The scope is the intersection of requesting client's `allowedScope`,
- * the requesting user's `role`, and the `scope` submitted in the authorization request.
+ * The scope was included with the requested token was created in the authorization endpoint.
+ * The scope was previously saved to `req.oauth2.req.tokenscope` when the
+ * authorization transaction was initiated and appears here as `areq.tokenScope`.
+ * The scope is the intersection of -
+ *    - requesting client's `allowedScope`,
+ *    - requesting user's `role`
+ *    - the `scope` submitted in the authorization request.
  */
-server.grant(oauth2orize.grant.token((client, user, ares, done) => {
+server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) => {
   const grantType = 'implicit';
   const token = utils.createToken({ sub: user.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
@@ -77,7 +77,7 @@ server.grant(oauth2orize.grant.token((client, user, ares, done) => {
     // scope: client.scope,
     // auth_time: Math.floor(authTime.valueOf() / 1000)
   };
-  db.accessTokens.save(token, expiration, user.id, client.id, client.scope, grantType, authTime)
+  db.accessTokens.save(token, expiration, user.id, client.id, areq.tokenScope, grantType, authTime)
     .then(() => done(null, token, responseParams))
     .catch((err) => done(err));
 }));
@@ -90,13 +90,13 @@ server.grant(oauth2orize.grant.token((client, user, ares, done) => {
  * are validated, the application issues an access token on behalf of the user who
  * authorized the code.
  *
- * The scope was created in the authorization endpoint and subsequently saved
- * with the authorization code for use here in creating the token.
- * The scope is the intersection of requesting client's `allowedScope`,
- * the requesting user's `role`, and the `scope` submitted in the authorization request.
- *
+ * The scope was saved to the authorization code in the code.grant above.
+ * The scope is the intersection of -
+ *    - requesting client's `allowedScope`,
+ *    - requesting user's `role`
+ *    - the `scope` submitted in the authorization request.
  */
-server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
+server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, authInfo, done) => {
   const responseParams = {
     expires_in: config.token.expiresIn,
     grant_type: 'authorization_code'
@@ -115,17 +115,7 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
       responseParams.scope = authCode.scope;
       return validate.generateTokens(authCode);
     })
-    //
-    // Description: done(err, accessToken, refreshToken, params)
-    // Location: oauth2orize/exchange/authorizationCode.js,
-    //     as issued(err, accessToken, refreshToken, params)
-    // params is object, made above { expires_in: xxxx }
-    // params is added to json response returning tokens from oauthorize server
-    // response body:  {access_token: x, refresh_token: x, expires_in: x, token_type: Bearer}
-    //                                                     ^^^^^^^^^^
-    //
-    // tokens [accesstoken] or [accessToken, refreshToken]
-    //
+    // tokens is either [accesstoken] or [accessToken, refreshToken]
     .then((tokens) => {
       if (tokens.length === 1) {
         return done(null, tokens[0], null, responseParams);
@@ -145,71 +135,76 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, done) => {
  * from the token request for verification. If these values are validated, the
  * application issues an access token on behalf of the user who authorized the code.
  *
- * The token's scope is formed by the intersection of
- * the issuing client's allowedScope and scope parameter of the token request
+ * The sources of token scope are all visible in this function.
+ * The scope is the intersection of -
+ *    - requesting client's `allowedScope`,
+ *    - requesting user's `role`
+ *    - the `scope` submitted in the authorization request.
  */
-server.exchange(oauth2orize.exchange.password((client, username, password, scope, done) => {
-  const responseParams = {
-    expires_in: config.token.expiresIn,
-    scope: scope,
-    grant_type: 'password'
-  };
-  // Array to hold intersection of client allowedScope, user role, and scope request
-  const scopeIntersection = [];
-  db.users.findByUsername(username)
-    .then((user) => validate.user(user, password))
-    .then((user) => {
-      // Validate client and user scope properties
-      if ((user) && (client) &&
-        (client.allowedScope) && (user.role) &&
-        (client.allowedScope.length > 0) &&
-        (user.role.length > 0)) {
-        // If scope not in request, fall back to default and intersect with client and user
-        if ((!scope) || (scope.length === 0)) {
-          if (client.defaultScope) {
-            client.defaultScope.forEach((defScope) => {
-              if ((client.allowedScope.indexOf(defScope) >= 0) &&
-                (user.role.indexOf(defScope) >= 0)) {
-                scopeIntersection.push(defScope);
+server.exchange(oauth2orize.exchange.password(
+  (client, username, password, scope, body, authInfo, done) => {
+    const responseParams = {
+      expires_in: config.token.expiresIn,
+      scope: scope,
+      grant_type: 'password'
+    };
+    // Array to hold intersection of client allowedScope, user role, and scope request
+    const scopeIntersection = [];
+    db.users.findByUsername(username)
+      .then((user) => validate.user(user, password))
+      .then((user) => {
+        // Validate client and user scope properties
+        if ((user) && (client) &&
+          (client.allowedScope) && (user.role) &&
+          (client.allowedScope.length > 0) &&
+          (user.role.length > 0)) {
+          // If scope not in request, fall back to default and intersect with client and user
+          if ((!scope) || (scope.length === 0)) {
+            if (client.defaultScope) {
+              client.defaultScope.forEach((defScope) => {
+                if ((client.allowedScope.indexOf(defScope) >= 0) &&
+                  (user.role.indexOf(defScope) >= 0)) {
+                  scopeIntersection.push(defScope);
+                }
+              });
+            }
+          } else {
+            // Case of valid scope in request, intersect request scope with client and user
+            scope.forEach((reqScope) => {
+              if ((client.allowedScope.indexOf(reqScope) >= 0) &&
+              (user.role.indexOf(reqScope) >= 0)) {
+                scopeIntersection.push(reqScope);
               }
             });
           }
-        } else {
-          // Case of valid scope in request, intersect request scope with client and user
-          scope.forEach((reqScope) => {
-            if ((client.allowedScope.indexOf(reqScope) >= 0) &&
-            (user.role.indexOf(reqScope) >= 0)) {
-              scopeIntersection.push(reqScope);
-            }
-          });
         }
-      }
-      const authTime = new Date();
-      responseParams.scope = scopeIntersection;
-      responseParams.auth_time = Math.floor(authTime.valueOf() / 1000);
-      return validate.generateTokens({
-        scope: scopeIntersection,
-        userID: user.id,
-        clientID: client.id,
-        grantType: 'password',
-        authTime: authTime
-      });
-    })
-    .then((tokens) => {
-      if (tokens === false) {
-        return done(null, false);
-      }
-      // See above: done(err, accessToken, refreshToken, params)
-      if (tokens.length === 1) {
-        return done(null, tokens[0], null, responseParams);
-      }
-      if (tokens.length === 2) {
-        return done(null, tokens[0], tokens[1], responseParams);
-      }
-      throw new Error('Error exchanging password for tokens');
-    })
-    .catch(() => done(null, false));
-}));
+        const authTime = new Date();
+        responseParams.scope = scopeIntersection;
+        responseParams.auth_time = Math.floor(authTime.valueOf() / 1000);
+        return validate.generateTokens({
+          scope: scopeIntersection,
+          userID: user.id,
+          clientID: client.id,
+          grantType: 'password',
+          authTime: authTime
+        });
+      })
+      .then((tokens) => {
+        if (tokens === false) {
+          return done(null, false);
+        }
+        // See above: done(err, accessToken, refreshToken, params)
+        if (tokens.length === 1) {
+          return done(null, tokens[0], null, responseParams);
+        }
+        if (tokens.length === 2) {
+          return done(null, tokens[0], tokens[1], responseParams);
+        }
+        throw new Error('Error exchanging password for tokens');
+      })
+      .catch(() => done(null, false));
+  }
+));
 
 /**
  * Exchange the client id and password/secret for an access token.
@@ -218,10 +213,13 @@ server.exchange(oauth2orize.exchange.password((client, username, password, scope
  * password/secret from the token request for verification. If these values are validated, the
  * application issues an access token on behalf of the client who authorized the code.
  *
- * The token's scope is formed by the intersection of
- * the issuing client's allowedScope and scope parameter of the token request
+ * For client credentials, there is no user authenticaiton involved with this transation.
+ * Therefore the scope is based solely on the request and client definition.
+ * The scope is the intersection of -
+ *    - requesting client's `allowedScope`,
+ *    - the `scope` submitted in the authorization request.
  */
-server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => {
+server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, authInfo, done) => {
   // Array to hold intersection of client allowedScope, user role, and scope request
   const scopeIntersection = [];
 
@@ -263,14 +261,6 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
   //
   // Pass in a null for user id since there is no user when using this grant type
   db.accessTokens.save(token, expiration, null, client.id, scope, grantType, authTime)
-  //
-  // Description: done(err, accessToken, refreshToken, params)
-  // Location: oauth2orize/exchange/clientCredentials.js,
-  //     as issued(err, accessToken, refreshToken, params)
-  // params is object, made above { expires_in: xxxx }
-  // params is added to json response returning tokens from oauthorize server
-  // response body:  {access_token: x, , expires_in: x, token_type: Bearer}
-  //                                     ^^^^^^^^^^
     .then(() => done(null, token, null, responseParams))
     .catch((err) => done(err));
 }));
@@ -285,27 +275,29 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, done) => 
  * The scope used to create the replacement access_token is retrived from the
  * refresh_token record in the database.
  */
-server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, done) => {
-  console.log();
-  console.log('TODO: oauthorize.exchange.refreshToken not need client auth');
-  console.log();
-  const responseParams = {
-    expires_in: config.token.expiresIn,
-    grant_type: 'refresh_token'
-  };
-  db.refreshTokens.find(refreshToken)
-    .then((foundRefreshToken) => validate.refreshToken(foundRefreshToken, refreshToken, client))
-    .then((foundRefreshToken) => {
-      responseParams.scope = foundRefreshToken.scope;
-      responseParams.auth_time = foundRefreshToken.authTime;
-      // replace "authorization_code" with "refresh_token"
-      foundRefreshToken.grantType = 'refresh_token';
-      return validate.generateToken(foundRefreshToken);
-    })
-    // See above: done(err, accessToken, refreshToken, params)
-    .then((token) => done(null, token, null, responseParams))
-    .catch(() => done(null, false));
-}));
+server.exchange(oauth2orize.exchange.refreshToken(
+  (client, refreshToken, scope, body, authInfo, done) => {
+    console.log();
+    console.log('TODO: oauthorize.exchange.refreshToken not need client auth');
+    console.log();
+    const responseParams = {
+      expires_in: config.token.expiresIn,
+      grant_type: 'refresh_token'
+    };
+    db.refreshTokens.find(refreshToken)
+      .then((foundRefreshToken) => validate.refreshToken(foundRefreshToken, refreshToken, client))
+      .then((foundRefreshToken) => {
+        responseParams.scope = foundRefreshToken.scope;
+        responseParams.auth_time = foundRefreshToken.authTime;
+        // replace "authorization_code" with "refresh_token"
+        foundRefreshToken.grantType = 'refresh_token';
+        return validate.generateToken(foundRefreshToken);
+      })
+      // See above: done(err, accessToken, refreshToken, params)
+      .then((token) => done(null, token, null, responseParams))
+      .catch(() => done(null, false));
+  }
+));
 
 /*
  * User authorization endpoint
@@ -325,16 +317,18 @@ server.exchange(oauth2orize.exchange.refreshToken((client, refreshToken, scope, 
  * first, and rendering the `dialog` view.
  *
  * At this step, the scope of the requsted token is formed.
- * The scope is the intersection of requesting client's `allowedScope`,
- * the requesting user's `role`, and the `scope` submitted in the authorization request.
- * The authorization endpoint adds this scope authroization transaction.
- * The interescted scope will be used later saved with the authorization code
+ * The scope is the intersection of -
+ *    - requesting client's `allowedScope`,
+ *    - requesting user's `role`
+ *    - the `scope` submitted in the authorization request.
+ * The intersected scope is saved to `req.oauth2.req.tokenScope` and it
+ * will be used later to be saved with the authorization code
  * and subsequently used during exchange of code for token.
  */
 exports.authorization = [
   login.ensureLoggedIn(),
-  server.authorization(
-    { idLength: config.decision.idLength }, (clientID, redirectURI, scope, done) => {
+  server.authorization({ idLength: config.decision.idLength },
+    (clientID, redirectURI, scope, grantType, done) => {
       db.clients.findByClientId(clientID)
         .then((client) => {
           // For security purposes, it is highly advisable to check that
@@ -355,16 +349,6 @@ exports.authorization = [
     }
   ),
   (req, res, next) => {
-    // -----------------------
-    // Note: req.oauth2 has:
-    //    client:
-    //    redirectURI:
-    //    req:  (params)
-    //    user:
-    //    info: null
-    //    transactionID:
-    // -----------------------
-
     // Array to hold intersection of client allowedScope, user role, and scope request
     const scopeIntersection = [];
 
@@ -393,9 +377,9 @@ exports.authorization = [
         });
       }
     }
+    // intercepted scope is saved here for use later to be saved with the authorization code.
+    req.oauth2.req.tokenScope = scopeIntersection;
 
-    // Replace requested scope with intersected scope
-    req.oauth2.client.scope = scopeIntersection;
     //
     // Render the decision dialog if the client isn't a trusted client
     // TODO:  Make a mechanism so that if this isn't a trusted client, the user can record that
@@ -406,12 +390,13 @@ exports.authorization = [
         if (client != null && client.trustedClient && client.trustedClient === true) {
           // This is how we short call the decision like the dialog below does
           server.decision({ loadTransaction: false }, (serverReq, callback) => {
+            // o2authorize parse function callback (err, ares, locals)
             callback(null, { allow: true });
           })(req, res, next);
         } else {
           // List the proposed token scope in the dialog form
           let scopeString = '';
-          req.oauth2.client.scope.forEach((scope, i) => {
+          req.oauth2.req.tokenScope.forEach((scope, i) => {
             if (i > 0) scopeString += ', ';
             scopeString += scope.toString();
           });
