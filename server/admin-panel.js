@@ -6,7 +6,7 @@ const router = express.Router();
 const uid2 = require('uid2');
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const db = require('./db');
-const adminValidaton = require('./admin-validation');
+const inputValidation = require('./input-validation');
 const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scope');
 
 const config = require('./config/');
@@ -40,6 +40,9 @@ router.get('/listusers',
   (req, res, next) => {
     db.users.findAll()
       .then((userArray) => {
+        //
+        // Process array of users for display
+        //
         const filteredArray = [];
         userArray.forEach((user, i) => {
           const filteredUser = {
@@ -54,6 +57,17 @@ router.get('/listusers',
           }
           filteredArray.push(filteredUser);
         });
+        //
+        // sort the array
+        //
+        filteredArray.sort((a, b) => {
+          if (a.username.toUpperCase() > b.username.toUpperCase()) return 1;
+          if (a.username.toUpperCase() < b.username.toUpperCase()) return -1;
+          return 0;
+        });
+        //
+        // Render tha page
+        //
         return res.render('list-users', { name: req.user.name, users: filteredArray });
       })
       .catch((err) => {
@@ -126,7 +140,7 @@ router.get('/createuser',
 router.post('/createuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
-  adminValidaton.createUser,
+  inputValidation.createUser,
   (req, res, next) => {
     console.log(req.body);
     return res.redirect('/panel/menu');
@@ -189,7 +203,7 @@ router.get('/edituser',
 router.post('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
-  adminValidaton.editUser,
+  inputValidation.editUser,
   (req, res, next) => {
     console.log(req.body);
     return res.redirect('/panel/listusers');
@@ -242,11 +256,17 @@ router.get('/listclients',
   (req, res, next) => {
     db.clients.findAll()
       .then((clientArray) => {
+        //
+        // Sort the array
+        //
         clientArray.sort((a, b) => {
           if (a.clientId.toUpperCase() > b.clientId.toUpperCase()) return 1;
           if (a.clientId.toUpperCase() < b.clientId.toUpperCase()) return -1;
           return 0;
         });
+        //
+        // Render the page
+        //
         return res.render('list-clients', { name: req.user.name, clients: clientArray });
       })
       .catch((err) => {
@@ -323,7 +343,7 @@ router.get('/createclient',
 router.post('/createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
-  adminValidaton.createClient,
+  inputValidation.createClient,
   (req, res, next) => {
     const client = {
       name: req.body.name,
@@ -412,7 +432,7 @@ router.get('/editclient',
 router.post('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
-  adminValidaton.editClient,
+  inputValidation.editClient,
   (req, res, next) => {
     const client = {
       id: req.body.id,

@@ -105,3 +105,14 @@ exports.refreshToken = {
 exports.db = {
   timeToCheckExpiredTokens: 3600
 };
+
+exports.data = {
+  clientNameMinLength: 1,
+  clientNameMaxLength: 64,
+  clientIdMinLength: 1,
+  clientIdMaxLength: 40,
+  clientSecretMinLength: 8,
+  clientSecretMaxLength: 64,
+  allScopesMaxLength: 1024,
+  allowedRedirectURIMaxLength: 1024
+};
