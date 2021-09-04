@@ -79,7 +79,8 @@ exports.findAll = () => {
   return new Promise((resolve, reject) => {
     const error = false;
     if (!error) {
-      resolve(clients);
+      // Keep memory database immutable
+      resolve(JSON.parse(JSON.stringify(clients)));
     } else {
       reject(error);
     }

@@ -6,7 +6,8 @@ const router = express.Router();
 const uid2 = require('uid2');
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const db = require('./db');
-const { requireScopeForWebPanel } = require('./scope');
+const adminValidaton = require('./admin-validation');
+const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scope');
 
 const config = require('./config/');
 // const nodeEnv = process.env.NODE_ENV || 'development';
@@ -47,7 +48,7 @@ router.get('/listusers',
             name: user.name
           };
           if (user.lastLogin) {
-            filteredUser.lastLogin = user.lastLogin.toISOString();
+            filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {
             filteredUser.lastLogin = '';
           }
@@ -82,12 +83,12 @@ router.get('/viewuser',
             username: user.username,
             name: user.name,
             loginDisabled: user.loginDisabled,
-            role: user.role,
-            updatedAt: user.updatedAt.toISOString(),
-            createdAt: user.createdAt.toISOString()
+            role: toScopeString(user.role),
+            updatedAt: user.updatedAt.toUTCString(),
+            createdAt: user.createdAt.toUTCString()
           };
           if (user.lastLogin) {
-            filteredUser.lastLogin = user.lastLogin.toISOString();
+            filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {
             filteredUser.lastLogin = '';
           }
@@ -113,7 +114,7 @@ router.get('/createuser',
   (req, res, next) => {
     const defaultUser = {
       password: uid2(config.database.defaultUser.randomPasswordLength),
-      role: config.database.defaultUser.role
+      role: toScopeString(config.database.defaultUser.role)
     };
     return res.render('create-user', { name: req.user.name, defaultUser: defaultUser });
   }
@@ -125,9 +126,10 @@ router.get('/createuser',
 router.post('/createuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  adminValidaton.createUser,
   (req, res, next) => {
     console.log(req.body);
-    return res.redirect('/panel/listusers');
+    return res.redirect('/panel/menu');
   }
 );
 
@@ -154,12 +156,12 @@ router.get('/edituser',
             username: user.username,
             name: user.name,
             loginDisabled: user.loginDisabled,
-            role: user.role,
-            updatedAt: user.updatedAt.toISOString(),
-            createdAt: user.createdAt.toISOString()
+            role: toScopeString(user.role),
+            updatedAt: user.updatedAt.toUTCString(),
+            createdAt: user.createdAt.toUTCString()
           };
           if (user.lastLogin) {
-            filteredUser.lastLogin = user.lastLogin.toISOString();
+            filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {
             filteredUser.lastLogin = '';
           }
@@ -168,12 +170,6 @@ router.get('/edituser',
           } else {
             filteredUser.disabled = '';
           }
-          let scopeString = '';
-          user.role.forEach((scope, i) => {
-            if (i > 0) scopeString += ', ';
-            scopeString += scope.toString();
-          });
-          filteredUser.role = scopeString;
           return res.render('edit-user', { name: req.user.name, user: filteredUser });
         })
         .catch((err) => {
@@ -193,6 +189,7 @@ router.get('/edituser',
 router.post('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  adminValidaton.editUser,
   (req, res, next) => {
     console.log(req.body);
     return res.redirect('/panel/listusers');
@@ -245,6 +242,11 @@ router.get('/listclients',
   (req, res, next) => {
     db.clients.findAll()
       .then((clientArray) => {
+        clientArray.sort((a, b) => {
+          if (a.clientId.toUpperCase() > b.clientId.toUpperCase()) return 1;
+          if (a.clientId.toUpperCase() < b.clientId.toUpperCase()) return -1;
+          return 0;
+        });
         return res.render('list-clients', { name: req.user.name, clients: clientArray });
       })
       .catch((err) => {
@@ -279,10 +281,10 @@ router.get('/viewclient',
           name: client.name,
           clientId: client.clientId,
           clientSecret: client.clientSecret,
-          allowedScope: client.allowedScope,
-          allowedRedirectURI: client.allowedRedirectURI,
-          updatedAt: client.updatedAt.toISOString(),
-          createdAt: client.createdAt.toISOString()
+          allowedScope: toScopeString(client.allowedScope),
+          allowedRedirectURI: toScopeString(client.allowedRedirectURI),
+          updatedAt: client.updatedAt.toUTCString(),
+          createdAt: client.createdAt.toUTCString()
         };
 
         if (client.trustedClient) {
@@ -308,8 +310,8 @@ router.get('/createclient',
     const clientDefault = {
       clientSecret: uid2(config.database.defaultClient.randomSecretLength),
       trustedClient: config.database.defaultClient.trustedClient,
-      allowedScope: config.database.defaultClient.allowedScope,
-      allowedRedirectURI: config.database.defaultClient.allowedRedirectURI
+      allowedScope: toScopeString(config.database.defaultClient.allowedScope),
+      allowedRedirectURI: toScopeString(config.database.defaultClient.allowedRedirectURI)
     };
     return res.render('create-client', { name: req.user.name, clientDefault: clientDefault });
   }
@@ -321,14 +323,15 @@ router.get('/createclient',
 router.post('/createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  adminValidaton.createClient,
   (req, res, next) => {
     const client = {
       name: req.body.name,
       clientId: req.body.clientId,
       clientSecret: req.body.clientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
-      allowedScope: req.body.allowedScope.split(','),
-      allowedRedirectURI: req.body.allowedRedirectURI.split(',')
+      allowedScope: toScopeArray(req.body.allowedScope),
+      allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
     };
     db.clients.save(client)
       .then((createdClient) => {
@@ -379,10 +382,10 @@ router.get('/editclient',
             name: client.name,
             clientId: client.clientId,
             clientSecret: client.clientSecret,
-            allowedScope: client.allowedScope,
-            allowedRedirectURI: client.allowedRedirectURI,
-            updatedAt: client.updatedAt.toISOString(),
-            createdAt: client.createdAt.toISOString()
+            allowedScope: toScopeString(client.allowedScope),
+            allowedRedirectURI: toScopeString(client.allowedRedirectURI),
+            updatedAt: client.updatedAt.toUTCString(),
+            createdAt: client.createdAt.toUTCString()
           };
 
           if (client.trustedClient) {
@@ -409,14 +412,15 @@ router.get('/editclient',
 router.post('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  adminValidaton.editClient,
   (req, res, next) => {
     const client = {
       id: req.body.id,
       name: req.body.name,
       clientSecret: req.body.clientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
-      allowedScope: req.body.allowedScope.split(','),
-      allowedRedirectURI: req.body.allowedRedirectURI.split(',')
+      allowedScope: toScopeArray(req.body.allowedScope),
+      allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
     };
     db.clients.update(client)
       .then((createdClient) => {

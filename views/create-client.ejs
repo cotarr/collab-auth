@@ -15,15 +15,15 @@
           <table class="account-table" border="1" cellpadding="5px">
             <tr>
               <td><label for "name">Name</label></td>
-              <td><input type="text" name="name" autocomplete="OFF" required /></td>
+              <td><input class="input" type="text" name="name" autocomplete="OFF" required /></td>
             </tr>
             <tr>
               <td><label for "clientId">Client ID</label></td>
-              <td><input type="text" name="clientId" autocomplete="OFF" required /></td>
+              <td><input class="input" type="text" name="clientId" autocomplete="OFF" required /></td>
             </tr>
             <tr>
               <td><label for="clientSecret">Client Secret</label></td>
-              <td><input type="text" name="clientSecret" value="<%= clientDefault.clientSecret %>"/></td>
+              <td><input class="input" type="text" name="clientSecret" value="<%= clientDefault.clientSecret %>"/></td>
             </tr>
             <tr>
               <td><label for "trustedClient">Trusted Client</label></td>
@@ -41,7 +41,7 @@
           <div class="div-height-20"></div>
           <div>
             <button class="button" type="submit" value="Submit">Submit</button>
-            <a href="/panel/listusers"><button class="button lm-20" type="button">Cancel</button></a>
+            <a href="/panel/menu"><button class="button lm-20" type="button">Cancel</button></a>
           </div>
         </fieldset>
       </form>

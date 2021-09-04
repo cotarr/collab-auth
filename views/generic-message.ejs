@@ -10,9 +10,14 @@
     <%- include('menu-header') %>
     <div class="scrollable-div">
       <h2><%= title %></h2>
+      <div class="content-area">
+        <p>
+          <%= message %>
+        </p>
+      </div>
       <p>
-        <%= message %>
-      </p>
+        Press [Continue] to navigate back to the main web page.
+      <p>
       <div>
         <a href="/panel/menu"><button class="button" type="button">Continue</button></a>
       </div>

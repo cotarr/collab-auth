@@ -194,3 +194,21 @@ exports.toScopeString = (scopeArray) => {
   });
   return scopeString;
 };
+
+/**
+ * Convert comma delimited string to scopes array removing whitespace
+ * @param   {String} scopeArray - Comma delimited string
+ * @returns {Array} Returns aray of scope strings
+ */
+exports.toScopeArray = (scopeString) => {
+  let cleanString = '';
+  const scopeStringLength = scopeString.length;
+  for (let i = 0; i < scopeStringLength; i++) {
+    if ((scopeString.charCodeAt(i) !== 32) &&
+      (scopeString.charCodeAt(i) !== 10) &&
+      (scopeString.charCodeAt(i) !== 13)) {
+      cleanString += scopeString.charAt(i);
+    }
+  }
+  return cleanString.split(',');
+};
