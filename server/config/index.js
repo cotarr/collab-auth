@@ -113,6 +113,12 @@ exports.data = {
   clientIdMaxLength: 40,
   clientSecretMinLength: 8,
   clientSecretMaxLength: 64,
+  userNameMinLength: 1,
+  userNameMaxLength: 64,
+  userUsernameMinLength: 1,
+  userUsernameMaxLength: 40,
+  userPasswordMinLength: 8,
+  userPasswordMaxLength: 64,
   allScopesMaxLength: 1024,
   allowedRedirectURIMaxLength: 1024
 };

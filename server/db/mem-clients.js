@@ -48,7 +48,11 @@ exports.find = (id) => {
   try {
     let client = clients.find((client) => client.id === id);
     // make sure database remains immutable on emulated read
-    if (client) client = JSON.parse(JSON.stringify(client));
+    if (client) {
+      client = JSON.parse(JSON.stringify(client));
+      client.updatedAt = new Date(client.updatedAt);
+      client.createdAt = new Date(client.createdAt);
+    }
     return Promise.resolve(client);
   } catch (err) {
     return Promise.resolve(undefined);
@@ -64,7 +68,11 @@ exports.findByClientId = (clientId) => {
   try {
     let client = clients.find((client) => client.clientId === clientId);
     // make sure database remains immutable on emulated read
-    if (client) client = JSON.parse(JSON.stringify(client));
+    if (client) {
+      client = JSON.parse(JSON.stringify(client));
+      client.updatedAt = new Date(client.updatedAt);
+      client.createdAt = new Date(client.createdAt);
+    }
     return Promise.resolve(client);
   } catch (err) {
     return Promise.resolve(undefined);
@@ -80,7 +88,12 @@ exports.findAll = () => {
     const error = false;
     if (!error) {
       // Keep memory database immutable
-      resolve(JSON.parse(JSON.stringify(clients)));
+      const clients2 = JSON.parse(JSON.stringify(clients));
+      clients2.forEach((client) => {
+        client.updatedAt = new Date(client.updatedAt);
+        client.createdAt = new Date(client.createdAt);
+      });
+      resolve(clients2);
     } else {
       reject(error);
     }
@@ -116,7 +129,7 @@ exports.save = (client) => {
 /**
  * Modify an existing client record
  * @param   {Object}   client Object containing modified client properties
- * @returns {Promise}  resolved promise with the modifiedclient, otherwise throws error
+ * @returns {Promise}  resolved promise with the modified client, otherwise throws error
  */
 exports.update = (client) => {
   return new Promise((resolve, reject) => {
@@ -133,7 +146,7 @@ exports.update = (client) => {
       foundClient.allowedScope = client.allowedScope;
       foundClient.allowedRedirectURI = client.allowedRedirectURI;
       foundClient.updatedAt = new Date();
-      resolve(client);
+      resolve(foundClient);
     } else {
       reject(err);
     }

@@ -90,7 +90,8 @@ exports.save = (client) => {
           '"trustedClient",' +
           '"allowedScope",' +
           '"allowedRedirectURI",' +
-          '"createdAt","updatedAt") ' +
+          '"updatedAt", ' +
+          '"createdAt") ' +
           'VALUES ($1, $2, $3, $4, $5, $6, now(), now()) RETURNING *',
           values: [
             client.name,
@@ -121,20 +122,20 @@ exports.save = (client) => {
 exports.update = (client) => {
   const updateQuery = {
     text: 'UPDATE authclients SET ' +
-      '"name" = $1, ' +
-      '"clientSecret" = $2, ' +
-      '"trustedClient" = $3, ' +
-      '"allowedScope" = $4, ' +
-      '"allowedRedirectURI" = $5, ' +
+      '"name" = $2, ' +
+      '"clientSecret" = $3, ' +
+      '"trustedClient" = $4, ' +
+      '"allowedScope" = $5, ' +
+      '"allowedRedirectURI" = $6, ' +
       '"updatedAt" = now() ' +
-      'WHERE "id" = $6 AND "deleted" = FALSE RETURNING *',
+      'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
     values: [
+      client.id,
       client.name,
       client.clientSecret,
       client.trustedClient,
       client.allowedScope,
-      client.allowedRedirectURI,
-      client.id
+      client.allowedRedirectURI
     ]
   };
   return pgPool.query(updateQuery)

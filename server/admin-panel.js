@@ -50,6 +50,7 @@ router.get('/listusers',
             username: user.username,
             name: user.name
           };
+          console.log('lastLogin ', typeof user.lastLogin, user.lastLogin);
           if (user.lastLogin) {
             filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {
@@ -83,6 +84,7 @@ router.get('/listusers',
 router.get('/viewuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  inputValidation.viewByUUID,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.users.find(req.query.id)
@@ -142,8 +144,26 @@ router.post('/createuser',
   requireScopeForWebPanel('user.admin'),
   inputValidation.createUser,
   (req, res, next) => {
-    console.log(req.body);
-    return res.redirect('/panel/menu');
+    const user = {
+      name: req.body.name,
+      username: req.body.username,
+      password: req.body.newpassword1,
+      loginDisabled: (req.body.loginDisabled === 'on') || false,
+      role: toScopeArray(req.body.role)
+    };
+    db.users.save(user)
+      .then((createdUser) => {
+        if (createdUser == null) {
+          throw new Error('Error saving user');
+        } else {
+          return res.render('generic-message', {
+            name: req.user.name,
+            title: 'Ceate New User',
+            message: 'New user record successfully saved.'
+          });
+        }
+      })
+      .catch((err) => next(err));
   }
 );
 
@@ -155,6 +175,7 @@ router.post('/createuser',
 router.get('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  inputValidation.viewByUUID,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.users.find(req.query.id)
@@ -205,11 +226,28 @@ router.post('/edituser',
   requireScopeForWebPanel('user.admin'),
   inputValidation.editUser,
   (req, res, next) => {
-    console.log(req.body);
-    return res.redirect('/panel/listusers');
+    const user = {
+      id: req.body.id,
+      name: req.body.name,
+      password: req.body.newpassword1,
+      loginDisabled: (req.body.loginDisabled === 'on') || false,
+      role: toScopeArray(req.body.role)
+    };
+    db.users.update(user)
+      .then((createdUser) => {
+        if (createdUser == null) {
+          throw new Error('Error saving user');
+        } else {
+          return res.render('generic-message', {
+            name: req.user.name,
+            title: 'Edit User',
+            message: 'Modified user record successfully saved.'
+          });
+        }
+      })
+      .catch((err) => next(err));
   }
 );
-
 /**
  * Delete user record endpoint
  *
@@ -222,6 +260,7 @@ router.post('/edituser',
 router.get('/deleteuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  inputValidation.deleteByUUID,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.users.find(req.query.id)
@@ -236,9 +275,18 @@ router.get('/deleteuser',
         .catch((err) => next(err));
     } else if ((req.query) && (Object.keys(req.query).length === 2) &&
       ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
-      // TODO delete the record
-      console.log('Delete req.query ', req.query);
-      res.redirect('/panel/menu');
+      db.users.delete(req.query.id)
+        .then((deletedUser) => {
+          if (deletedUser == null) {
+            throw new Error('Error deleting user');
+          } else {
+            return res.render('generic-message', {
+              name: req.user.name,
+              title: 'Delete User',
+              message: 'User successfully deleted.'
+            });
+          }
+        });
     } else {
       const err = new Error('Invalid query parameters');
       err.status = 400;
@@ -283,6 +331,7 @@ router.get('/listclients',
 router.get('/viewclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  inputValidation.viewByUUID,
   (req, res, next) => {
     if ((!req.query) || (!req.query.id)) {
       // 404 not found
@@ -365,17 +414,7 @@ router.post('/createclient',
           });
         }
       })
-      .catch((err) => {
-        if (err.message === 'clientId already exists') {
-          return res.render('generic-message', {
-            name: req.user.name,
-            title: 'Bad Request',
-            message: 'clientId already exists'
-          });
-        } else {
-          return next(err);
-        }
-      });
+      .catch((err) => next(err));
   }
 );
 
@@ -387,6 +426,7 @@ router.post('/createclient',
 router.get('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  inputValidation.viewByUUID,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.clients.find(req.query.id)
@@ -454,17 +494,7 @@ router.post('/editclient',
           });
         }
       })
-      .catch((err) => {
-        if (err.message === 'clientId already exists') {
-          return res.render('generic-message', {
-            name: req.user.name,
-            title: 'Bad Request',
-            message: 'clientId already exists'
-          });
-        } else {
-          return next(err);
-        }
-      });
+      .catch((err) => next(err));
   }
 );
 
@@ -480,6 +510,7 @@ router.post('/editclient',
 router.get('/deleteclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  inputValidation.deleteByUUID,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.clients.find(req.query.id)
