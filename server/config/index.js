@@ -58,6 +58,15 @@ exports.database = {
   }
 };
 
+exports.oauth2 = {
+  disableTokenGrant: (process.env.OAUTH2_DISABLE_TOKEN_GRANT === 'true') || false,
+  disableCodeGrant: (process.env.OAUTH2_DISABLE_CODE_GRANT === 'true') || false,
+  disableClientGrant: (process.env.OAUTH2_DISABLE_CLIENT_GRANT === 'true') || false,
+  disablePasswordGrant: (process.env.OAUTH2_DISABLE_PASSWORD_GRANT === 'true') || false,
+  disableRefreshTokenGrant: (process.env.OAUTH2_DISABLE_REFRESH_TOKEN_GRANT === 'true') || false
+
+};
+
 /**
  * Configuration of access tokens.
  *

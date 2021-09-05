@@ -17,6 +17,7 @@ const passport = require('passport');
 const utils = require('./utils');
 const { intersectReqCliUsrScopes, intersectReqCliScopes, toScopeString } = require('./scope');
 const validate = require('./validate');
+const inputValidation = require('./input-validation');
 const uid2 = require('uid2');
 
 // create OAuth 2.0 server
@@ -41,6 +42,12 @@ const server = oauth2orize.createServer();
  *    - the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, locals, done) => {
+  // Check if code grant is disabled in the config
+  if (config.oauth2.disableCodeGrant) {
+    const err = new Error('grant_type code (code grant) is disabled');
+    return done(err);
+  }
+
   // Authorization code length (characters)
   const code = uid2(config.code.length);
   const expiration = new Date(Date.now() + (config.code.expiresIn * 1000));
@@ -66,6 +73,12 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, loca
  *    - the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) => {
+  // Check if implicit grant is disabled in the config
+  if (config.oauth2.disableTokenGrant) {
+    const err = new Error('response_type token (implicit grant) is disabled');
+    return done(err);
+  }
+
   const grantType = 'implicit';
   const token = utils.createToken({ sub: user.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
@@ -98,6 +111,12 @@ server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) =>
  *    - the `scope` submitted in the authorization request.
  */
 server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, authInfo, done) => {
+  // Check if code grant is disabled in the config
+  if (config.oauth2.disableCodeGrant) {
+    const err = new Error('grant_type code (code grant) is disabled');
+    return done(err);
+  }
+
   const responseParams = {
     expires_in: config.token.expiresIn,
     grant_type: 'authorization_code'
@@ -144,6 +163,11 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, auth
  */
 server.exchange(oauth2orize.exchange.password(
   (client, username, password, scope, body, authInfo, done) => {
+    // Check if password grant is disabled in the config
+    if (config.oauth2.disablePasswordGrant) {
+      const err = new Error('grant_type password (password grant) is disabled');
+      return done(err);
+    }
     const responseParams = {
       expires_in: config.token.expiresIn,
       scope: scope,
@@ -196,6 +220,12 @@ server.exchange(oauth2orize.exchange.password(
  *    - the `scope` submitted in the authorization request.
  */
 server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, authInfo, done) => {
+  // Check if client_credentials grant is disabled in the config
+  if (config.oauth2.disableClientGrant) {
+    const err = new Error('grant_type client_credentials (client grant) is disabled');
+    return done(err);
+  }
+
   // Compile token scope
   const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
   const token = utils.createToken({ sub: client.id, exp: config.token.expiresIn });
@@ -228,6 +258,11 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
  */
 server.exchange(oauth2orize.exchange.refreshToken(
   (client, refreshToken, scope, body, authInfo, done) => {
+    // Check if refresh_token grant is disabled in the config
+    if (config.oauth2.disableRefreshTokenGrant) {
+      const err = new Error('grant_type refresh_token (Refresh token grant) is disabled');
+      return done(err);
+    }
     console.log();
     console.log('TODO: oauthorize.exchange.refreshToken not need client auth');
     console.log();
@@ -278,6 +313,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
  */
 exports.authorization = [
   login.ensureLoggedIn(),
+  inputValidation.dialogAuthorization,
   server.authorization({ idLength: config.decision.idLength },
     (clientID, redirectURI, scope, grantType, done) => {
       db.clients.findByClientId(clientID)
@@ -374,6 +410,7 @@ exports.decision = [
  */
 exports.token = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
+  inputValidation.oauthToken,
   server.token(),
   server.errorHandler()
 ];

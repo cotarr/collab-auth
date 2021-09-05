@@ -375,3 +375,59 @@ exports.editClient = [
   // handle errors
   handleError
 ]; // editClient
+
+exports.dialogAuthorization = [
+  // Required Query Keys
+  query([
+    'redirect_uri',
+    'response_type',
+    'client_id',
+    'scope'], 'Required query values')
+    .exists(),
+  query('response_type')
+    .custom(function (value, { req }) {
+      if ((value === 'token') && (config.oauth2.disableTokenGrant)) {
+        throw new Error('response_type token (implicit grant) is disabled');
+      }
+      if ((value === 'code') && (config.oauth2.disableCodeGrant)) {
+        throw new Error('response_type code (code grant) is disabled');
+      }
+      if ((value !== 'code') && (value !== 'token')) {
+        throw new Error('Invalid OAuth2 response_type');
+      }
+      return true;
+    }),
+  // handle errors
+  handleError
+];
+
+exports.oauthToken = [
+  (req, res, next) => {
+    console.log('body ', req.body);
+    next();
+  },
+  body('grant_type')
+    .custom(function (value, { req }) {
+      if ((value === 'authorization_code') && (config.oauth2.disableCodeGrant)) {
+        throw new Error('grant_type code (code grant) is disabled');
+      }
+      if ((value === 'client_credentials') && (config.oauth2.disableClientGrant)) {
+        throw new Error('grant_type client_credentials (client grant) is disabled');
+      }
+      if ((value === 'password') && (config.oauth2.disablePasswordGrant)) {
+        throw new Error('grant_type password (password grant) is disabled');
+      }
+      if ((value === 'refresh_token') && (config.oauth2.disableRefreshTokenGrant)) {
+        throw new Error('grant_type refresh_token (Refresh token grant) is disabled');
+      }
+      if ((value !== 'authorization_code') &&
+        (value !== 'client_credentials') &&
+        (value !== 'password') &&
+        (value !== 'refresh_token')) {
+        throw new Error('Invalid OAuth2 grant_type');
+      }
+      return true;
+    }),
+  // handle errors
+  handleError
+];
