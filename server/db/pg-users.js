@@ -48,7 +48,7 @@ exports.findByUsername = (username) => {
 
 /**
  * Returns an array of all users
- * @returns {Promise} resolved array if found, otherwise resolves undefined
+ * @returns {Promise} resolved array if found, otherwise resolves emtpy array
  */
 exports.findAll = () => {
   const query = {
@@ -169,7 +169,7 @@ exports.update = (user) => {
   return pgPool.query(updateQuery)
     .then((queryResponse) => {
       if (queryResponse.rows[0] == null) {
-        throw new Error('User record not found');
+        throw new Error('Error modifying user record');
       } else {
         return queryResponse.rows[0];
       }
@@ -211,7 +211,7 @@ exports.delete = (id) => {
   return pgPool.query(query)
     .then((queryResponse) => {
       if (queryResponse.rows[0] == null) {
-        throw new Error('User record not found');
+        throw new Error('Error deleting user record');
       } else {
         return queryResponse.rows[0];
       }

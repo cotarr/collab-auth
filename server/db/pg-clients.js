@@ -57,7 +57,7 @@ exports.findByClientId = (clientId) => {
 
 /**
  * Returns an array of client objects, otherwise returns empty array
- * @returns {Promise} resolved promise with the array if found, otherwise error
+ * @returns {Promise} resolved promise with the array if found, otherwise resolves empty array
  */
 exports.findAll = () => {
   const query = {
@@ -110,7 +110,11 @@ exports.save = (client) => {
       }
     })
     .then((queryResponse) => {
-      return queryResponse.rows[0];
+      if (queryResponse.rows[0] == null) {
+        throw new Error('Error creating client record');
+      } else {
+        return queryResponse.rows[0];
+      }
     });
 };
 
@@ -140,7 +144,11 @@ exports.update = (client) => {
   };
   return pgPool.query(updateQuery)
     .then((queryResponse) => {
-      return queryResponse.rows[0];
+      if (queryResponse.rows[0] == null) {
+        throw new Error('Error modifying client record');
+      } else {
+        return queryResponse.rows[0];
+      }
     });
 };
 
@@ -157,6 +165,10 @@ exports.delete = (id) => {
   };
   return pgPool.query(query)
     .then((queryResponse) => {
-      return queryResponse.rows[0];
+      if (queryResponse.rows[0] == null) {
+        throw new Error('Error deleting client record');
+      } else {
+        return queryResponse.rows[0];
+      }
     });
 };
