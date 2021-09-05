@@ -5,10 +5,12 @@
  * server. These represent users of different client applications that can connect to the
  * authorization server. At a minimum you need the required properties of
  *
- * id       : A unique numeric id of your user
- * username : The user name of the user
- * password : The password of your user
- * name     : The name of your user
+ * id:            A unique numeric id of your user
+ * username:      The user name of the user
+ * password:       The password of your user
+ * name:          The name of your user
+ * loginDisabled: If exists and set to true, prevents password authentication for user.
+ * role:          Array of scope strings allowed to user permissions
  */
 
 const fs = require('fs');
@@ -168,6 +170,12 @@ exports.update = (user) => {
   });
 };
 
+/**
+ * Modify password for existing user by user id
+ * @param   {String}  id String containing UUID for record
+ * @param   {String}  password String containing new password entry
+ * @returns {Promise} resolved promise with the modified user, otherwise throws error
+ */
 exports.updatePassword = (id, password) => {
   return new Promise((resolve, reject) => {
     let err = false;
