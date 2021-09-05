@@ -77,6 +77,11 @@ exports.updateLoginTime = (user) => {
     });
 };
 
+/**
+ * Save a new user record to the database
+ * @param   {Object}   user Object containing new created user properties
+ * @returns {Promise}  resolved promise created use, otherwise user exist throws error
+ */
 exports.save = (user) => {
   const uidQuery = {
     text: 'SELECT * FROM authusers WHERE "username" = $1 AND "deleted" = FALSE',
@@ -113,10 +118,19 @@ exports.save = (user) => {
       }
     })
     .then((queryResponse) => {
-      return queryResponse.rows[0];
+      if (queryResponse.rows[0] == null) {
+        throw new Error('Error creating user record');
+      } else {
+        return queryResponse.rows[0];
+      }
     });
 };
 
+/**
+ * Modify an existing user record
+ * @param   {Object}   user Object containing modified user properties
+ * @returns {Promise}  resolved promise with the modified user, otherwise throws error
+ */
 exports.update = (user) => {
   let updateQuery;
   if ((user.password) && (user.password.length > 0)) {
@@ -154,7 +168,32 @@ exports.update = (user) => {
   }
   return pgPool.query(updateQuery)
     .then((queryResponse) => {
-      return queryResponse.rows[0];
+      if (queryResponse.rows[0] == null) {
+        throw new Error('User record not found');
+      } else {
+        return queryResponse.rows[0];
+      }
+    });
+};
+
+exports.updatePassword = (id, password) => {
+  const updateQuery = {
+    text: 'UPDATE authusers SET ' +
+      '"password" = $2, ' +
+      '"updatedAt" = now() ' +
+      'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
+    values: [
+      id,
+      password
+    ]
+  };
+  return pgPool.query(updateQuery)
+    .then((queryResponse) => {
+      if (queryResponse.rows[0] == null) {
+        throw new Error('User record not found');
+      } else {
+        return queryResponse.rows[0];
+      }
     });
 };
 
@@ -171,6 +210,10 @@ exports.delete = (id) => {
   };
   return pgPool.query(query)
     .then((queryResponse) => {
-      return queryResponse.rows[0];
+      if (queryResponse.rows[0] == null) {
+        throw new Error('User record not found');
+      } else {
+        return queryResponse.rows[0];
+      }
     });
 };

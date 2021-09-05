@@ -50,7 +50,6 @@ router.get('/listusers',
             username: user.username,
             name: user.name
           };
-          console.log('lastLogin ', typeof user.lastLogin, user.lastLogin);
           if (user.lastLogin) {
             filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {

@@ -25,24 +25,37 @@ try {
 // console.log(JSON.stringify(users, null, 2));
 
 /**
+ * Returns a deep copy of user object (internal function)
+ *
+ * This prevents downstream use of retrieved objects
+ * from making unintended changes to RAM database.
+ * JSON parse errors to be trapped in parent function
+ *
+ * @param   {Object} user User object
+ * @returns {Object} New deep copy user object
+ */
+const _deepCopyUser = (user) => {
+  // Use stringify to maintain RAM database as immutable
+  const copiedUser = JSON.parse(JSON.stringify(user));
+  // convert to JS Date format
+  if (copiedUser.lastLogin) copiedUser.lastLogin = new Date(Date(copiedUser.lastLogin));
+  copiedUser.updatedAt = new Date(Date(copiedUser.updatedAt));
+  copiedUser.createdAt = new Date(Date(copiedUser.createdAt));
+  return copiedUser;
+};
+
+/**
  * Returns a user if it finds one, otherwise returns null if a user is not found.
  * @param   {String}   id - The unique id of the user to find
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
 exports.find = (id) => {
-  try {
-    let user = users.find((user) => user.id === id);
-    // make sure database remains immutable on database emulated read
-    if (user) {
-      user = JSON.parse(JSON.stringify(user));
-      if (user.lastLogin) user.lastLogin = new Date(Date(user.lastLogin));
-      user.updatedAt = new Date(Date(user.updatedAt));
-      user.createdAt = new Date(Date(user.createdAt));
-    }
-    return Promise.resolve(user);
-  } catch (err) {
-    return Promise.resolve(undefined);
-  }
+  return new Promise((resolve) => {
+    const foundUser = users.find((user) => user.id === id);
+    // Stringify a deep copy to maintain RAM database as immutable
+    const safeUser = (foundUser) ? _deepCopyUser(foundUser) : undefined;
+    resolve(safeUser);
+  });
 };
 
 /**
@@ -51,19 +64,12 @@ exports.find = (id) => {
  * @returns {Promise} resolved user if found, otherwise resolves undefined
  */
 exports.findByUsername = (username) => {
-  try {
-    let user = users.find((user) => user.username === username);
-    // make sure database remains immutable on emulated read
-    if (user) {
-      user = JSON.parse(JSON.stringify(user));
-      if (user.lastLogin) user.lastLogin = new Date(user.lastLogin);
-      user.updatedAt = new Date(user.updatedAt);
-      user.createdAt = new Date(user.createdAt);
-    }
-    return Promise.resolve(user);
-  } catch (err) {
-    return Promise.resolve(undefined);
-  }
+  return new Promise((resolve) => {
+    const foundUser = users.find((user) => user.username === username);
+    // Stringify a deep copy to maintain RAM database as immutable
+    const safeUser = (foundUser) ? _deepCopyUser(foundUser) : undefined;
+    resolve(safeUser);
+  });
 };
 
 /**
@@ -71,20 +77,15 @@ exports.findByUsername = (username) => {
  * @returns {Promise} resolved array if found, otherwise resolves undefined
  */
 exports.findAll = () => {
-  return new Promise((resolve, reject) => {
-    const error = false;
-    if (!error) {
-      // Keep memory database immutable
-      const users2 = JSON.parse(JSON.stringify(users));
-      users2.forEach((user) => {
-        if (user.lastLogin) user.lastLogin = new Date(user.lastLogin);
-        user.updatedAt = new Date(user.updatedAt);
-        user.createdAt = new Date(user.createdAt);
+  return new Promise((resolve) => {
+    const allUsers = [];
+    if (users.length > 0) {
+      users.forEach((user) => {
+        // Stringify a deep copy to maintain RAM database as immutable
+        allUsers.push(_deepCopyUser(user));
       });
-      resolve(users2);
-    } else {
-      reject(error);
     }
+    resolve(allUsers);
   });
 };
 
@@ -93,38 +94,43 @@ exports.findAll = () => {
  * @returns {Promise} resolved to modified user, otherwise resolves undefined
  */
 exports.updateLoginTime = (user) => {
-  return new Promise((resolve, reject) => {
-    try {
-      const edited = users.find((userObj) => userObj.id === user.id);
-      edited.lastLogin = new Date().toISOString();
-      resolve(edited);
-    } catch (err) {
-      reject(err);
+  return new Promise((resolve) => {
+    const foundUser = users.find((userObj) => userObj.id === user.id);
+    if (foundUser) {
+      // This modifies RAM database
+      foundUser.lastLogin = new Date().toISOString();
     }
+    // Stringify a deep copy to maintain RAM database as immutable
+    const safeUser = (foundUser) ? _deepCopyUser(foundUser) : undefined;
+    resolve(safeUser);
   });
 };
 
 /**
  * Save a new user record to the database
- * @param   {Object}   user Object containing user properties
- * @returns {Promise}  resolved promise with the user if found, otherwise throws error
+ * @param   {Object}   user Object containing new created user properties
+ * @returns {Promise}  resolved promise created use, otherwise user exist throws error
  */
 exports.save = (user) => {
   return new Promise((resolve, reject) => {
     let err = false;
-    const foundUser = users.find((cli) => cli.username === user.username);
+    // Check for pre-existing users, error
+    const foundUser = users.find((usr) => usr.username === user.username);
     if (!(foundUser == null)) {
       err = new Error('username already exists');
       err.status = 400;
-      throw err;
     }
     if (!err) {
+      // Create new user and save to RAM database
       user.id = uuid.v4();
       user.lastLogin = null;
       user.createdAt = new Date();
       user.updatedAt = new Date();
       users.push(user);
-      resolve(user);
+
+      // Stringify a deep copy to maintain RAM database as immutable
+      const safeUser = _deepCopyUser(user);
+      resolve(safeUser);
     } else {
       reject(err);
     }
@@ -139,13 +145,13 @@ exports.save = (user) => {
 exports.update = (user) => {
   return new Promise((resolve, reject) => {
     let err = false;
-    const foundUser = users.find((cli) => cli.id === user.id);
+    const foundUser = users.find((usr) => usr.id === user.id);
     if (foundUser == null) {
       err = new Error('user not found');
       err.status = 400;
-      throw err;
     }
     if (!err) {
+      // write changes to RAM database
       foundUser.name = user.name;
       foundUser.password = user.userSecret;
       foundUser.loginDisabled = user.loginDisabled;
@@ -154,7 +160,32 @@ exports.update = (user) => {
         foundUser.password = user.password;
       }
       foundUser.updatedAt = new Date();
-      resolve(foundUser);
+
+      // Stringify a deep copy to maintain RAM database as immutable
+      const safeUser = _deepCopyUser(foundUser);
+      resolve(safeUser);
+    } else {
+      reject(err);
+    }
+  });
+};
+
+exports.updatePassword = (id, password) => {
+  return new Promise((resolve, reject) => {
+    let err = false;
+    const foundUser = users.find((usr) => usr.id === id);
+    if (foundUser == null) {
+      err = new Error('user not found');
+      err.status = 400;
+    }
+    if (!err) {
+      // write changes to RAM database
+      foundUser.password = password;
+      foundUser.updatedAt = new Date();
+
+      // Stringify a deep copy to maintain RAM database as immutable
+      const safeUser = _deepCopyUser(foundUser);
+      resolve(safeUser);
     } else {
       reject(err);
     }
@@ -178,10 +209,14 @@ exports.delete = (id) => {
     if (arrayIndex === -1) {
       err = new Error('user not found');
       err.status = 400;
-      throw err;
     }
     if (!err) {
-      resolve(users.splice(arrayIndex, 1));
+      // Modify RAM database
+      const deletedUser = users.splice(arrayIndex, 1);
+
+      // Deep copy for consistancy with above functions
+      const safeUser = _deepCopyUser(deletedUser);
+      resolve(safeUser);
     } else {
       reject(err);
     }
