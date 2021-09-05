@@ -51,7 +51,7 @@ validate.user = (user, password) => {
   } else {
     validate.userExists(user);
     if (user.password !== password) {
-      validate.logAndThrow('User password does not match');
+      validate.logAndThrow('User password not correct');
       return null; // redundant to throw
     }
     return user;
@@ -69,6 +69,25 @@ validate.userExists = (user) => {
     validate.logAndThrow('User does not exist');
   }
   return user;
+};
+
+/**
+ * Compares cookie/session authenticated username in http request to string username
+ * This is used for change password form to make sure matches user
+ * @param   {Object} req - Express request object
+ * @param   {String} username username from passport change form
+ * @returns {Promise} Promise resolving to useraname as String
+ */
+validate.usernameMatchesSession = (req, username) => {
+  return new Promise((resolve, reject) => {
+    if ((req.user) && (req.user.username) && (req.user.username === username)) {
+      resolve(username);
+    } else {
+      const err = new Error('Not current user');
+      err.status = 400;
+      reject(err);
+    }
+  });
 };
 
 /**

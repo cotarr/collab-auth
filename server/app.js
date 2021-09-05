@@ -11,6 +11,7 @@ const express = require('express');
 const session = require('express-session');
 // const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const oauth2 = require('./oauth2');
+const auth = require('./auth');
 const passport = require('passport');
 const logger = require('morgan');
 const helmet = require('helmet');
@@ -146,17 +147,12 @@ app.get('/login', site.loginForm);
 app.post('/login', site.login);
 app.get('/redirecterror', site.redirectError);
 app.get('/logout', site.logout);
-
+app.get('/changepassword', site.changePassword);
 app.get('/dialog/authorize', oauth2.authorization);
 app.post('/dialog/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/introspect', token.introspect);
 app.post('/token/revoke', token.revoke);
-
-// ----------------
-// Change Password
-// ----------------
-app.get('/changepassword', site.changePassword);
 app.post('/changepassword', site.changePasswordHandler);
 
 // --------------------------------------------------

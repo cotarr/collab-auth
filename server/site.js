@@ -1,8 +1,14 @@
 'use strict';
 
+// NPM modules
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
+
+// Custom modules
+const db = require('./db');
 const { requireScopeForWebPanel } = require('./scope');
+const validate = require('./validate');
+const inputValidation = require('./input-validation');
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -28,6 +34,7 @@ exports.redirectError = [
  * POST /login (credentials in body)
  */
 exports.login = [
+  inputValidation.loginRequest,
   passport.authenticate('local',
     { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login' }
   )
@@ -61,12 +68,31 @@ exports.changePassword = [
 
 /**
  * Change Password POST request handler
+ *
+ * User password is for passport local Strategy
+ *    req.body.username
+ *    req.body.oldpassword
+ *    req.body.newpassword1
+ *    req.body.newpassword2
  */
 exports.changePasswordHandler = [
   ensureLoggedIn(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
+  inputValidation.changePassword,
   (req, res, next) => {
-    const message = 'Your password has been successfully changed. ';
-    res.render('change-password-message', { name: req.user.name, passwordMessage: message });
+    console.log(req.body);
+    validate.usernameMatchesSession(req, req.body.username)
+      .then((username) => db.users.findByUsername(username))
+      .then((user) => validate.user(user, req.body.oldpassword))
+      .then((user) => db.users.updateLoginTime(user))
+      .then((user) => db.users.updatePassword(user.id, req.body.newpassword1))
+      .then((user) => validate.userExists(user))
+      .then((user) => {
+        const message = 'Your password has been successfully changed. ';
+        res.render('change-password-message', { name: req.user.name, passwordMessage: message });
+      })
+      .catch((err) => {
+        next(err);
+      });
   }
 ];

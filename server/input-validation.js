@@ -57,6 +57,30 @@ const handleError = (req, res, next) => {
     next();
   }
 };
+
+/**
+ * Change user password POST request
+ *
+ * Array of middleware functions for input validation
+ */
+exports.loginRequest = [
+  // Required Body Keys
+  body([
+    'username',
+    'password'], 'Required values')
+    .exists(),
+  //
+  // Validate Required keys
+  //
+  body('username', 'Invalid string length')
+    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
+  body('username', 'Invalid characters in string')
+    .isWhitelisted(idAllowedChars),
+  body('password', 'Invalid string length')
+    .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
+  handleError
+]; // Change Password
+
 /**
  * Validate input for ?id=UUID.v4
  */
@@ -81,11 +105,6 @@ exports.deleteByUUID = [
  * Array of middleware functions for input validation
  */
 exports.createUser = [
-  // (req, res, next) => {
-  //   console.log('body ', req.body);
-  //   next();
-  // },
-
   // Forbidden body keys
   body([
     'id',
@@ -136,11 +155,6 @@ exports.createUser = [
  * Array of middleware functions for input validation
  */
 exports.editUser = [
-  // (req, res, next) => {
-  //   console.log('body ', req.body);
-  //   next();
-  // },
-
   // Forbidden body keys
   body([
     'updatedAt',
@@ -175,7 +189,7 @@ exports.editUser = [
         }
         if (value.length < config.data.userPasswordMinLength) {
           throw new Error(
-            'Password minimum ' + config.data.userPasswordMinLength.toString() + 'characters');
+            'Password minimum ' + config.data.userPasswordMinLength.toString() + ' characters');
         }
         if (value.length > config.data.userPasswordMaxLength) {
           throw new Error('Invalid string length');
@@ -208,16 +222,65 @@ exports.editUser = [
 ]; // editUser
 
 /**
+ * Change user password POST request
+ *
+ * Array of middleware functions for input validation
+ */
+exports.changePassword = [
+  // Required Body Keys
+  body([
+    'username',
+    'oldpassword',
+    'newpassword1',
+    'newpassword2'], 'Required values')
+    .exists(),
+  //
+  // Validate Required keys
+  //
+  body('username', 'Invalid string length')
+    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
+  body('username', 'Invalid characters in string')
+    .isWhitelisted(idAllowedChars),
+  body('oldpassword', 'Invalid string length')
+    .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
+  body('newpassword1')
+    .custom(function (value, { req }) {
+      if ((value) && (value.length > 0)) {
+        if (!req.body.newpassword2 || (req.body.newpassword2.length === 0)) {
+          throw new Error('New password requires two entries');
+        }
+        if (value.length !== req.body.newpassword2.length) {
+          throw new Error('Password mismatch');
+        }
+        if (value !== req.body.newpassword2) {
+          throw new Error('Password mismatch');
+        }
+        if (value.length < config.data.userPasswordMinLength) {
+          throw new Error(
+            'Password minimum ' + config.data.userPasswordMinLength.toString() + ' characters');
+        }
+        if (value.length > config.data.userPasswordMaxLength) {
+          throw new Error('Invalid string length');
+        }
+        // Check for repeat passwords disabled
+        if ((req.body.oldpassword) && (value === req.body.oldpassword)) {
+          throw new Error('New password must be different');
+        }
+      }
+      return true;
+    }),
+  body('newpassword2', 'Invalid string length')
+    .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
+  // handle errors
+  handleError
+]; // Change Password
+
+/**
  * Create Client POST request
  *
  * Array of middleware functions for input validation
  */
 exports.createClient = [
-  // (req, res, next) => {
-  //   console.log('body ', req.body);
-  //   next();
-  // },
-
   // Forbidden body keys
   body([
     'id',
@@ -268,11 +331,6 @@ exports.createClient = [
 ]; // createClient
 
 exports.editClient = [
-  // (req, res, next) => {
-  //   console.log('body ', req.body);
-  //   next();
-  // },
-
   // Forbidden body keys
   body([
     'updatedAt',

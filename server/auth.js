@@ -7,7 +7,12 @@ const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 // const { Strategy: BearerStrategy } = require('passport-http-bearer');
 const validate = require('./validate');
-const scope = require('./scope');
+const { addScopeToPassportReqObj } = require('./scope');
+
+// -----------------------------------------------------
+// Part 1 of 2
+// Local strategy for direct user login to web server
+// -----------------------------------------------------
 
 /**
  * LocalStrategy ('local')
@@ -23,6 +28,11 @@ passport.use(new LocalStrategy((username, password, done) => {
     .then((user) => done(null, user))
     .catch(() => done(null, false));
 }));
+
+// --------------------------------------------
+// Part 2 of 2
+// OAuth2 Strategies for server connections
+// --------------------------------------------
 
 /**
  * BasicStrategy & ClientPasswordStrategy
@@ -41,7 +51,7 @@ passport.use(new BasicStrategy({ passReqToCallback: true },
   (req, clientId, clientSecret, done) => {
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
-      .then((client) => scope.addScopeToPassportReqObj(req, client))
+      .then((client) => addScopeToPassportReqObj(req, client))
       .then((client) => done(null, client))
       .catch(() => done(null, false));
   }
@@ -58,7 +68,7 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
   (req, clientId, clientSecret, done) => {
     db.clients.findByClientId(clientId)
       .then((client) => validate.client(client, clientSecret))
-      .then((client) => scope.addScopeToPassportReqObj(req, client))
+      .then((client) => addScopeToPassportReqObj(req, client))
       .then((client) => done(null, client))
       .catch(() => done(null, false));
   }
@@ -78,7 +88,7 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
 // passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, done) => {
 //   db.accessTokens.find(accessToken)
 //     .then((token) => validate.token(token, accessToken))
-//     .then((client) => scope.addScopeToPassportReqObj(req, client))
+//     .then((client) => addScopeToPassportReqObj(req, client))
 //     .then((client) => done(null, client))
 //     .catch(() => done(null, false));
 // }));
