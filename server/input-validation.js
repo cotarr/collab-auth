@@ -402,10 +402,10 @@ exports.dialogAuthorization = [
 ];
 
 exports.oauthToken = [
-  (req, res, next) => {
-    console.log('body ', req.body);
-    next();
-  },
+  // (req, res, next) => {
+  //   console.log('body ', req.body);
+  //   next();
+  // },
   body('grant_type')
     .custom(function (value, { req }) {
       if ((value === 'authorization_code') && (config.oauth2.disableCodeGrant)) {
