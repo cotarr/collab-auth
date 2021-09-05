@@ -40,23 +40,36 @@ clients.forEach((client) => {
 // console.log(JSON.stringify(clients, null, 2));
 
 /**
+ * Returns a deep copy of client object (internal function)
+ *
+ * This prevents downstream use of retrieved objects
+ * from making unintended changes to RAM database.
+ * JSON parse errors to be trapped in parent function
+ *
+ * @param   {Object} user Client object
+ * @returns {Object} New deep copy client object
+ */
+const _deepCopyClient = (client) => {
+  // Use stringify to maintain RAM database as immutable
+  const copiedClient = JSON.parse(JSON.stringify(client));
+  // convert to JS Date format
+  copiedClient.updatedAt = new Date(Date(copiedClient.updatedAt));
+  copiedClient.createdAt = new Date(Date(copiedClient.createdAt));
+  return copiedClient;
+};
+
+/**
  * Returns a client if it finds one, otherwise returns null if a client is not found.
  * @param   {String}   id   - The unique id of the client to find
  * @returns {Promise}  resolved promise with the client if found, otherwise undefined
  */
 exports.find = (id) => {
-  try {
-    let client = clients.find((client) => client.id === id);
-    // make sure database remains immutable on emulated read
-    if (client) {
-      client = JSON.parse(JSON.stringify(client));
-      client.updatedAt = new Date(client.updatedAt);
-      client.createdAt = new Date(client.createdAt);
-    }
-    return Promise.resolve(client);
-  } catch (err) {
-    return Promise.resolve(undefined);
-  }
+  return new Promise((resolve) => {
+    const foundClient = clients.find((client) => client.id === id);
+    // Stringify a deep copy to maintain RAM database as immutable
+    const safeClient = (foundClient) ? _deepCopyClient(foundClient) : undefined;
+    resolve(safeClient);
+  });
 };
 
 /**
@@ -65,18 +78,12 @@ exports.find = (id) => {
  * @returns {Promise} resolved promise with the client if found, otherwise undefined
  */
 exports.findByClientId = (clientId) => {
-  try {
-    let client = clients.find((client) => client.clientId === clientId);
-    // make sure database remains immutable on emulated read
-    if (client) {
-      client = JSON.parse(JSON.stringify(client));
-      client.updatedAt = new Date(client.updatedAt);
-      client.createdAt = new Date(client.createdAt);
-    }
-    return Promise.resolve(client);
-  } catch (err) {
-    return Promise.resolve(undefined);
-  }
+  return new Promise((resolve) => {
+    const foundClient = clients.find((client) => client.clientId === clientId);
+    // Stringify a deep copy to maintain RAM database as immutable
+    const safeClient = (foundClient) ? _deepCopyClient(foundClient) : undefined;
+    resolve(safeClient);
+  });
 };
 
 /**
@@ -84,19 +91,13 @@ exports.findByClientId = (clientId) => {
  * @returns {Promise} resolved promise with the array if found, otherwise error
  */
 exports.findAll = () => {
-  return new Promise((resolve, reject) => {
-    const error = false;
-    if (!error) {
-      // Keep memory database immutable
-      const clients2 = JSON.parse(JSON.stringify(clients));
-      clients2.forEach((client) => {
-        client.updatedAt = new Date(client.updatedAt);
-        client.createdAt = new Date(client.createdAt);
-      });
-      resolve(clients2);
-    } else {
-      reject(error);
-    }
+  return new Promise((resolve) => {
+    const allClients = [];
+    clients.forEach((client) => {
+      // Stringify a deep copy to maintain RAM database as immutable
+      allClients.push(_deepCopyClient(client));
+    });
+    resolve(allClients);
   });
 };
 
@@ -108,18 +109,22 @@ exports.findAll = () => {
 exports.save = (client) => {
   return new Promise((resolve, reject) => {
     let err = false;
+    // Check for pre-existing clients, error
     const foundClient = clients.find((cli) => cli.clientId === client.clientId);
     if (!(foundClient == null)) {
-      err = new Error('clientId already exists');
+      err = new Error('clientname already exists');
       err.status = 400;
-      throw err;
     }
     if (!err) {
+      // Create new client and save to RAM database
       client.id = uuid.v4();
       client.createdAt = new Date();
       client.updatedAt = new Date();
       clients.push(client);
-      resolve(client);
+
+      // Stringify a deep copy to maintain RAM database as immutable
+      const safeClient = _deepCopyClient(client);
+      resolve(safeClient);
     } else {
       reject(err);
     }
@@ -138,15 +143,18 @@ exports.update = (client) => {
     if (foundClient == null) {
       err = new Error('client not found');
       err.status = 400;
-      throw err;
     }
     if (!err) {
+      // write changes to RAM database
       foundClient.name = client.name;
       foundClient.clientSecret = client.clientSecret;
       foundClient.allowedScope = client.allowedScope;
       foundClient.allowedRedirectURI = client.allowedRedirectURI;
       foundClient.updatedAt = new Date();
-      resolve(foundClient);
+
+      // Stringify a deep copy to maintain RAM database as immutable
+      const safeClient = _deepCopyClient(foundClient);
+      resolve(safeClient);
     } else {
       reject(err);
     }
@@ -170,10 +178,14 @@ exports.delete = (id) => {
     if (arrayIndex === -1) {
       err = new Error('client not found');
       err.status = 400;
-      throw err;
     }
     if (!err) {
-      resolve(clients.splice(arrayIndex, 1));
+      // Modify RAM database
+      const deletedClient = clients.splice(arrayIndex, 1);
+
+      // Deep copy for consistancy with above functions
+      const safeClient = _deepCopyClient(deletedClient);
+      resolve(safeClient);
     } else {
       reject(err);
     }

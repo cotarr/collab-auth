@@ -79,12 +79,10 @@ exports.findByUsername = (username) => {
 exports.findAll = () => {
   return new Promise((resolve) => {
     const allUsers = [];
-    if (users.length > 0) {
-      users.forEach((user) => {
-        // Stringify a deep copy to maintain RAM database as immutable
-        allUsers.push(_deepCopyUser(user));
-      });
-    }
+    users.forEach((user) => {
+      // Stringify a deep copy to maintain RAM database as immutable
+      allUsers.push(_deepCopyUser(user));
+    });
     resolve(allUsers);
   });
 };
