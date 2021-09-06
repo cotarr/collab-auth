@@ -9,9 +9,7 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const express = require('express');
 const session = require('express-session');
-// const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const oauth2 = require('./oauth2');
-const auth = require('./auth');
 const passport = require('passport');
 const logger = require('morgan');
 const helmet = require('helmet');
@@ -20,7 +18,6 @@ const helmet = require('helmet');
 const db = require('./db');
 const site = require('./site');
 const adminPanel = require('./admin-panel');
-const token = require('./token');
 const checkVhost = require('./check-vhost');
 
 const config = require('./config');
@@ -41,12 +38,6 @@ console.log('Access log: (console)');
 const logFormat = ':date[iso] :remote-addr :status :method :http-version :req[host]:url';
 const logOptions = {};
 app.use(logger(logFormat, logOptions));
-
-// ------------------
-// debug logging
-// ------------------
-// const logStuff = require('./debug-utils').logStuff;
-// app.use(logStuff);
 
 // ---------------
 // clean headers
@@ -151,8 +142,8 @@ app.get('/changepassword', site.changePassword);
 app.get('/dialog/authorize', oauth2.authorization);
 app.post('/dialog/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
-app.post('/oauth/introspect', token.introspect);
-app.post('/token/revoke', token.revoke);
+app.post('/oauth/introspect', oauth2.introspect);
+app.post('/token/revoke', oauth2.revoke);
 app.post('/changepassword', site.changePasswordHandler);
 
 // --------------------------------------------------

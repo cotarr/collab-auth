@@ -9,16 +9,20 @@
  * the grant for an access token.
 */
 
+// NPM packages
+const login = require('connect-ensure-login');
+const passport = require('passport');
+const oauth2orize = require('oauth2orize');
+const uid2 = require('uid2');
+
+// Custom modules
 const config = require('./config');
 const db = require('./db');
-const login = require('connect-ensure-login');
-const oauth2orize = require('oauth2orize');
-const passport = require('passport');
 const utils = require('./utils');
-const { intersectReqCliUsrScopes, intersectReqCliScopes, toScopeString } = require('./scope');
+const { intersectReqCliUsrScopes, intersectReqCliScopes } = require('./scope');
+const { requireScopeForOauthHTTP, toScopeString } = require('./scope');
 const validate = require('./validate');
 const inputValidation = require('./input-validation');
-const uid2 = require('uid2');
 
 // create OAuth 2.0 server
 const server = oauth2orize.createServer();
@@ -263,9 +267,6 @@ server.exchange(oauth2orize.exchange.refreshToken(
       const err = new Error('grant_type refresh_token (Refresh token grant) is disabled');
       return done(err);
     }
-    console.log();
-    console.log('TODO: oauthorize.exchange.refreshToken not need client auth');
-    console.log();
     const responseParams = {
       expires_in: config.token.expiresIn,
       grant_type: 'refresh_token'
@@ -287,6 +288,8 @@ server.exchange(oauth2orize.exchange.refreshToken(
 
 /*
  * User authorization endpoint
+ *
+ * /dialog/authorization
  *
  * `authorization` middleware accepts a `validate` callback which is
  * responsible for validating the client making the authorization request.  In
@@ -378,26 +381,32 @@ exports.authorization = [
 /**
  * User decision endpoint
  *
+ * /dialog/authorization/decision
+ *
  * `decision` middleware processes a user's decision to allow or deny access
  * requested by a client application.  Based on the grant type requested by the
  * client, the above grant middleware configured above will be invoked to send
  * a response.
+ *
+ * To cancel decision, form should post body with cancel: 'Deny'
+ *   body: {
+ *     "transaction_id": "xxxxxxxxx",
+ *     "cancel": "Deny"
+ *  }
+ *
+ * authorizationErrorHandler removes transaction from session
  */
-// To cancel decision, form should post body with cancel: 'Deny'
-//  body: {
-//    "transaction_id": "xxxxxxxxx",
-//    "cancel": "Deny"
-//  }
 exports.decision = [
   login.ensureLoggedIn(),
+  inputValidation.dialogAuthDecision,
   server.decision(),
-  // This handler remove the transaction from session
   server.authorizationErrorHandler(),
-  // This handler detect error and handles proper message
   server.errorHandler()
 ];
 
 /**
+ * /oauth/token
+ *
  * Token endpoint
  *
  * `token` middleware handles client requests to exchange authorization grants
@@ -415,19 +424,145 @@ exports.token = [
   server.errorHandler()
 ];
 
-// Register serialialization and deserialization functions.
-//
-// When a client redirects a user to user authorization endpoint, an
-// authorization transaction is initiated.  To complete the transaction, the
-// user must authenticate and approve the authorization request.  Because this
-// may involve multiple HTTPS request/response exchanges, the transaction is
-// stored in the session.
-//
-// An application must supply serialization functions, which determine how the
-// client object is serialized into the session.  Typically this will be a
-// simple matter of serializing the client's ID, and deserializing by finding
-// the client by ID from the database.
+/**
+ * This endpoint is for revoking tokens.
+ *
+ * /token/revoke
+ *
+ * Accepts either access_token, refresh_token, or both
+ *
+ *    POST request
+ *
+ *    Authorization: client credentials
+ *    Accepts Authorizaton header with base64 encoded client credentials,
+ *    or alternately, it accepts client_id and client_secret in body of POST
+ *
+ *    req.body {
+ *      access_token: 'xxxx',
+ *      refresh_token: 'xxxx'
+ *    }
+ */
+exports.revoke = [
+  passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
+  requireScopeForOauthHTTP(['auth.token', 'auth.admin']),
+  (req, res, next) => {
+    if (req.body.access_token) {
+      validate.tokenForHttp(req.body.access_token)
+        .then(() => db.accessTokens.delete(req.body.access_token))
+        .then((deletedAccessToken) => validate.tokenExistsForHttp(deletedAccessToken))
+        .then(() => {
+          if (req.body.refresh_token) {
+            // case of both access token and refresh token
+            validate.tokenForHttp(req.body.refresh_token)
+              .then(() => db.refreshTokens.delete(req.body.refresh_token))
+              .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken));
+          } else {
+            // else, case of only access_token, but not refresh token
+            return {};
+          }
+        })
+        .then(() => {
+          return res.json({});
+        })
+        .catch((err) => {
+          res.status(err.status);
+          res.json({ error: err.message });
+        });
+    } else {
+      // case of missing access_token, checkfor refresh_token
+      if (req.body.refresh_token) {
+        validate.tokenForHttp(req.body.refresh_token)
+          .then(() => db.refreshTokens.delete(req.body.refresh_token))
+          .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken))
+          .then(() => res.json({}))
+          .catch((err) => {
+            res.status(err.status);
+            res.json({ error: err.message });
+          });
+      } else {
+        const err = new Error('invalid_token');
+        err.status = 400;
+        res.status(err.status);
+        res.json({ error: err.message });
+      }
+    }
+  }
+]; // exports.revoke
 
+/**
+ * This endpoint is for verifying a token and returning token information
+ *
+ * /oauth/introspect
+ *
+ * The introspect array contains an array of middlewares.
+ *
+ * 1) Authenticate HTTP request using passport with client credentials
+ * 2) Check client's scope to see if introspect request is permitted
+ * 3) Lookup token in database to make sure not revoked, returning stored token data
+ * 4) Validate token signature, token's issuing client, and token's requesting user
+ *      Validate() compiles and returns token meta data
+ *        decoded: payload of decoded JWT token
+ *        token:   stored token database contents
+ *        client:  Client that issued token
+ *        user:
+ * 5) Return JSON object containing token information, or else return error
+ */
+exports.introspect = [
+  passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
+  requireScopeForOauthHTTP(['auth.info', 'auth.token', 'auth.admin']),
+  (req, res, next) => {
+    if ((req.body) && (req.body.access_token) &&
+      (typeof req.body.access_token === 'string') &&
+      (req.body.access_token.length > 0)) {
+      const accessToken = req.body.access_token;
+      db.accessTokens.find(accessToken)
+        .then((token) => validate.token(token, accessToken))
+        .then((tokenMetadata) => {
+          if (tokenMetadata == null) {
+            throw new Error('invalid_token');
+          }
+          const resJson = {
+            active: true,
+            revocable: true,
+            issuer: config.site.authURL + '/oauth/token',
+            jti: tokenMetadata.decoded.jti,
+            sub: tokenMetadata.decoded.sub,
+            exp: tokenMetadata.decoded.exp,
+            iat: tokenMetadata.decoded.iat,
+            grant_type: tokenMetadata.token.grantType,
+            expires_in: Math.floor((tokenMetadata.token.expirationDate.getTime() - Date.now()) / 1000),
+            auth_time: Math.floor(tokenMetadata.token.authTime.valueOf() / 1000),
+            scope: tokenMetadata.token.scope,
+            client: tokenMetadata.client
+          };
+          if (tokenMetadata.user) {
+            resJson.user = tokenMetadata.user;
+          }
+          res.json(resJson);
+        })
+        .catch(() => {
+          res.status(401).send('Unauthorized');
+        });
+    } else {
+      res.status(401).send('Unauthorized');
+    }
+  }
+];
+
+/**
+ * Register serialialization and deserialization functions.
+ *
+ * When a client redirects a user to user authorization endpoint, an
+ * authorization transaction is initiated.  To complete the transaction, the
+ * user must authenticate and approve the authorization request.  Because this
+ * may involve multiple HTTPS request/response exchanges, the transaction is
+ * stored in the session.
+ *
+ * An application must supply serialization functions, which determine how the
+ * client object is serialized into the session.  Typically this will be a
+ * simple matter of serializing the client's ID, and deserializing by finding
+ * the client by ID from the database.
+ */
 server.serializeClient((client, done) => done(null, client.id));
 
 server.deserializeClient((id, done) => {

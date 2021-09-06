@@ -192,7 +192,9 @@ validate.token = (token, accessToken) => {
  * @returns {Object} The refresh token if valid
  */
 validate.refreshToken = (token, refreshToken, client) => {
-  utils.verifyToken(refreshToken);
+  // jwt.verify will throw an error upon failure
+  jwt.verify(refreshToken, publicKey);
+
   if (client.id !== token.clientID) {
     validate.logAndThrow('RefreshToken clientID does not match client id given');
   }

@@ -145,7 +145,6 @@ exports.createUser = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('role', 'Invalid characters in string')
     .isWhitelisted(scopeAllowedChars),
-  // handle errors
   handleError
 ]; // createUser
 
@@ -217,7 +216,6 @@ exports.editUser = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('role', 'Invalid characters in string')
     .isWhitelisted(scopeAllowedChars),
-  // handle errors
   handleError
 ]; // editUser
 
@@ -271,7 +269,6 @@ exports.changePassword = [
     }),
   body('newpassword2', 'Invalid string length')
     .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
-  // handle errors
   handleError
 ]; // Change Password
 
@@ -326,7 +323,6 @@ exports.createClient = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('allowedRedirectURI', 'Invalid characters in string')
     .isWhitelisted(uriAllowedChars),
-  // handle errors
   handleError
 ]; // createClient
 
@@ -372,7 +368,6 @@ exports.editClient = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('allowedRedirectURI', 'Invalid characters in string')
     .isWhitelisted(uriAllowedChars),
-  // handle errors
   handleError
 ]; // editClient
 
@@ -397,9 +392,30 @@ exports.dialogAuthorization = [
       }
       return true;
     }),
-  // handle errors
   handleError
 ];
+
+exports.dialogAuthDecision = [
+  body('transaction_id').exists()
+    .isLength({ min: 1, max: 64 }),
+  handleError
+];
+
+/**
+ *                client code pass token refresh
+ *  grant_type       x     x    x          x
+ *  scope            x          x
+ *  username                    x
+ *  password                    x
+ *  client_id        x     x    x          x
+ *  client_secret    x     x    x          x
+ *  code                   x
+ *  redirect_uri           x               x
+ *  refresh_token                          x
+ *
+ * Alternately: client_id and cient_secret can be
+ * supplied as base64 Basic authorization header.
+ */
 
 exports.oauthToken = [
   // (req, res, next) => {
@@ -428,6 +444,5 @@ exports.oauthToken = [
       }
       return true;
     }),
-  // handle errors
   handleError
 ];
