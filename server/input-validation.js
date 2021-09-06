@@ -59,11 +59,83 @@ const handleError = (req, res, next) => {
 };
 
 /**
+ * Middleware to check input for extraneous keys.
+ *
+ * check all keys in query object, extraneous keyes are error
+ *
+ * Accepts req.query or req.body or req.params as checkObject
+ * modifies req object
+ * returns null
+ *  location = string with 'query', 'params', or 'body'.
+ *  location = array with values optional: ['query', 'params', 'body'];
+ *
+ * Calling function:
+ *     function(req, res, next) {
+ *       checkExtraneousKeys(req, allowedKeys, location);
+ *       next();
+ *     },
+ */
+const checkExtraneousKeys = function (allowKeys, location) {
+  return (req, res, next) => {
+    let locationArray = [];
+    if (Array.isArray(location)) {
+      locationArray = location;
+    }
+    if (typeof location === 'string') {
+      locationArray.push(location);
+    }
+
+    if (!req.locals) req.locals = {};
+    if (!req.locals.errors) req.locals.errors = [];
+
+    function checkKeys (checkObject, locationString) {
+      const keys = Object.keys(checkObject);
+      for (const key of keys) {
+        if (allowKeys.indexOf(key) < 0) {
+          req.locals.errors.push({
+            msg: 'Invalid param',
+            param: key,
+            location: locationString
+          });
+        }
+      }
+    }
+
+    if (locationArray.indexOf('query') >= 0) {
+      checkKeys(req.query, 'query');
+    }
+
+    if (locationArray.indexOf('params') >= 0) {
+      checkKeys(req.params, 'params');
+    }
+
+    if (locationArray.indexOf('body') >= 0) {
+      checkKeys(req.body, 'body');
+    }
+
+    if (locationArray.indexOf('noquery') >= 0) {
+      const queryKeys = Object.keys(req.query);
+      for (const key of queryKeys) {
+        req.locals.errors.push({
+          msg: 'Invalid param',
+          param: key,
+          location: 'query'
+        });
+      } // next key
+    } // if noquery
+    next();
+  };
+};
+
+/**
  * Change user password POST request
  *
  * Array of middleware functions for input validation
  */
 exports.loginRequest = [
+  checkExtraneousKeys([
+    'username',
+    'password'], 'body'),
   // Required Body Keys
   body([
     'username',
@@ -85,7 +157,7 @@ exports.loginRequest = [
  * Validate input for ?id=UUID.v4
  */
 exports.viewByUUID = [
-  query(['id'], 'Required values').exists(),
+  query('id', 'Required values').exists(),
   query('id', 'Invalid UUID.v4').isUUID(4),
   handleError
 ]; // viewByUUID
@@ -94,7 +166,7 @@ exports.viewByUUID = [
  * Validate input for ?id=UUID.v4
  */
 exports.deleteByUUID = [
-  query(['id'], 'Required values').exists(),
+  query('id', 'Required values').exists(),
   query('id', 'Invalid UUID.v4').isUUID(4),
   handleError
 ]; // deleteByUUID
@@ -105,6 +177,11 @@ exports.deleteByUUID = [
  * Array of middleware functions for input validation
  */
 exports.createUser = [
+  checkExtraneousKeys([
+    'username',
+    'newpassword1',
+    'name',
+    'role'], 'body'),
   // Forbidden body keys
   body([
     'id',
@@ -154,6 +231,11 @@ exports.createUser = [
  * Array of middleware functions for input validation
  */
 exports.editUser = [
+  checkExtraneousKeys([
+    'id',
+    'newpassword1',
+    'name',
+    'role'], 'body'),
   // Forbidden body keys
   body([
     'updatedAt',
@@ -225,6 +307,11 @@ exports.editUser = [
  * Array of middleware functions for input validation
  */
 exports.changePassword = [
+  checkExtraneousKeys([
+    'username',
+    'oldpassword',
+    'newpassword1',
+    'newpassword2'], 'body'),
   // Required Body Keys
   body([
     'username',
@@ -278,6 +365,12 @@ exports.changePassword = [
  * Array of middleware functions for input validation
  */
 exports.createClient = [
+  checkExtraneousKeys([
+    'name',
+    'clientId',
+    'clientSecret',
+    'allowedScope',
+    'allowedRedirectURI'], 'body'),
   // Forbidden body keys
   body([
     'id',
@@ -327,6 +420,12 @@ exports.createClient = [
 ]; // createClient
 
 exports.editClient = [
+  checkExtraneousKeys([
+    'id',
+    'name',
+    'clientSecret',
+    'allowedScope',
+    'allowedRedirectURI'], 'body'),
   // Forbidden body keys
   body([
     'updatedAt',
@@ -372,6 +471,11 @@ exports.editClient = [
 ]; // editClient
 
 exports.dialogAuthorization = [
+  checkExtraneousKeys([
+    'redirect_uri',
+    'response_type',
+    'client_id',
+    'scope'], 'query'),
   // Required Query Keys
   query([
     'redirect_uri',
@@ -396,8 +500,8 @@ exports.dialogAuthorization = [
 ];
 
 exports.dialogAuthDecision = [
-  body('transaction_id').exists()
-    .isLength({ min: 1, max: 64 }),
+  checkExtraneousKeys(['transaction_id'], 'body'),
+  body('transaction_id').exists().isLength({ min: 1, max: 64 }),
   handleError
 ];
 
@@ -416,12 +520,17 @@ exports.dialogAuthDecision = [
  * Alternately: client_id and cient_secret can be
  * supplied as base64 Basic authorization header.
  */
-
 exports.oauthToken = [
-  // (req, res, next) => {
-  //   console.log('body ', req.body);
-  //   next();
-  // },
+  checkExtraneousKeys([
+    'grant_type',
+    'scope',
+    'username',
+    'password',
+    'client_id',
+    'client_secret',
+    'code',
+    'redirect_uri',
+    'refresh_token'], 'body'),
   body('grant_type')
     .custom(function (value, { req }) {
       if ((value === 'authorization_code') && (config.oauth2.disableCodeGrant)) {
@@ -447,20 +556,20 @@ exports.oauthToken = [
   handleError
 ];
 
-exports.oauthIntrospect = [
-  // (req, res, next) => {
-  //   console.log('body ', req.body);
-  //   next();
-  // },
-  body('access_token', 'Required values').exists(),
+exports.oauthTokenRevoke = [
+  checkExtraneousKeys([
+    'access_token',
+    'refresh_token',
+    'client_id',
+    'client_secret'], 'body'),
   handleError
 ];
 
 exports.oauthIntrospect = [
-  (req, res, next) => {
-    console.log('body ', req.body);
-    next();
-  },
+  checkExtraneousKeys([
+    'access_token',
+    'client_id',
+    'client_secret'], 'body'),
   body('access_token', 'Required values').exists(),
   handleError
 ];
