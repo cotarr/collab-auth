@@ -48,9 +48,9 @@ const handleError = (req, res, next) => {
   //
   // return the error
   if (allErrors.length > 0) {
-    return res.status(422).json({
-      status: 422,
-      message: 'Unprocessable Entity',
+    return res.status(400).json({
+      status: 400,
+      message: 'Bad Request',
       errors: allErrors
     });
   } else {
@@ -444,5 +444,23 @@ exports.oauthToken = [
       }
       return true;
     }),
+  handleError
+];
+
+exports.oauthIntrospect = [
+  // (req, res, next) => {
+  //   console.log('body ', req.body);
+  //   next();
+  // },
+  body('access_token', 'Required values').exists(),
+  handleError
+];
+
+exports.oauthIntrospect = [
+  (req, res, next) => {
+    console.log('body ', req.body);
+    next();
+  },
+  body('access_token', 'Required values').exists(),
   handleError
 ];

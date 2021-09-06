@@ -143,7 +143,7 @@ app.get('/dialog/authorize', oauth2.authorization);
 app.post('/dialog/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/introspect', oauth2.introspect);
-app.post('/token/revoke', oauth2.revoke);
+app.post('/oauth/token/revoke', oauth2.revoke);
 app.post('/changepassword', site.changePasswordHandler);
 
 // --------------------------------------------------

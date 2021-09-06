@@ -427,7 +427,7 @@ exports.token = [
 /**
  * This endpoint is for revoking tokens.
  *
- * /token/revoke
+ * /oauth/token/revoke
  *
  * Accepts either access_token, refresh_token, or both
  *
@@ -510,6 +510,7 @@ exports.revoke = [
 exports.introspect = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   requireScopeForOauthHTTP(['auth.info', 'auth.token', 'auth.admin']),
+  inputValidation.oauthIntrospect,
   (req, res, next) => {
     if ((req.body) && (req.body.access_token) &&
       (typeof req.body.access_token === 'string') &&
