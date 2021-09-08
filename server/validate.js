@@ -1,37 +1,11 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
 const config = require('./config');
 const db = require('./db');
-const utils = require('./utils');
-const jwt = require('jsonwebtoken');
+const jwtUtils = require('./jwt-utils');
 
 /** Validate object to attach all functions to  */
 const validate = Object.create(null);
-
-/** Suppress tracing for things like unit testing */
-// const suppressTrace = process.env.OAUTHRECIPES_SURPRESS_TRACE === 'true';
-
-/** Private certificate used for signing JSON WebTokens */
-// const privateKey = fs.readFileSync(path.join(__dirname, 'certs/privatekey.pem'));
-
-/** Public certificate used for verification.  Note: you could also use the private key */
-const publicKey = fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'));
-
-/**
- * Log the message and throw it as an Error
- * @param   {String} msg - Message to log and throw
- * @throws  {Error}  The given message as an error
- * @returns {undefined}
- */
-validate.logAndThrow = (msg) => {
-  // if (!suppressTrace) {
-  //   console.trace(msg);
-  // }
-  console.log(msg);
-  throw new Error(msg);
-};
 
 /**
  * Given a user and a password this will return the user if it exists and the password matches,
@@ -46,13 +20,13 @@ validate.logAndThrow = (msg) => {
  */
 validate.user = (user, password) => {
   if (user.loginDisabled) {
-    validate.logAndThrow('User login disabled');
-    return null; // redundant to throw
+    console.log('User login disabled');
+    throw new Error('User login disabled');
   } else {
     validate.userExists(user);
     if (user.password !== password) {
-      validate.logAndThrow('User password not correct');
-      return null; // redundant to throw
+      console.log('User password not correct');
+      throw new Error('User password not correct');
     }
     return user;
   }
@@ -66,7 +40,8 @@ validate.user = (user, password) => {
  */
 validate.userExists = (user) => {
   if (user == null) {
-    validate.logAndThrow('User does not exist');
+    console.log('User does not exist');
+    throw new Error('User does not exist');
   }
   return user;
 };
@@ -101,8 +76,8 @@ validate.usernameMatchesSession = (req, username) => {
 validate.client = (client, clientSecret) => {
   validate.clientExists(client);
   if (client.clientSecret !== clientSecret) {
-    validate.logAndThrow('Client secret does not match');
-    return null; // redundant to throw
+    console.log('Client secret does not match');
+    throw new Error('Client secret does not match');
   }
   return client;
 };
@@ -115,36 +90,46 @@ validate.client = (client, clientSecret) => {
  */
 validate.clientExists = (client) => {
   if (client == null) {
-    validate.logAndThrow('Client does not exist');
+    console.log('Client does not exist');
+    throw new Error('Client does not exist');
   }
   return client;
 };
 
 /**
- * Given a token and accessToken this will return either the user or the client associated with
- * the token if valid.  Otherwise this will throw.
+ * Given a token and accessToken this will compile and return a set of
+ * token metaData associated with the token.
+ *
+ * This will throw error if
+ *   Token signature fails verification
+ *   If user or client token, Client not found in db lookup (maybe client was deleted)
+ *   If user token, User was not found in db lookup (maybe user deleted)
+ *   if user token, loginDisabled is true
+ *
+ * Note: this is the client that belongs to the token, not the client
+ * performing the request.
+ *
  * @param   {Object}  token       - The token
  * @param   {Object}  accessToken - The access token
  * @throws  {Error}   If the token is not valid
- * @returns {Promise} Resolved with the user or client associated with the token if valid
+ * @returns {Promise} Resolved with the compiled token meta data (tokenMetaData)
  */
 validate.token = (token, accessToken) => {
-  // jwt.verify will throw an error upon failure
-  const decoded = jwt.verify(accessToken, publicKey);
+  // Verify will throw an error upon failure
+  const decoded = jwtUtils.verifyToken(accessToken);
 
   // Build data object to return, additional data added in below before sending
-  const verifyData = {
+  const tokenMetaData = {
     decoded: decoded,
     token: token
   };
-
   // 1) Find client in database
   return db.clients.find(token.clientID)
     // 2) Not null
     .then((client) => validate.clientExists(client))
     // 3) Add client data to object
     .then((client) => {
-      verifyData.client = {
+      tokenMetaData.client = {
         id: client.id,
         clientId: client.clientId,
         name: client.name
@@ -170,35 +155,19 @@ validate.token = (token, accessToken) => {
     .then((user) => {
       // 7) if user, add user data to object
       if (token.userID) {
-        verifyData.user = {
+        if (user.loginDisabled) {
+          console.log('User login disabled');
+          throw new Error('User login disabled');
+        }
+        tokenMetaData.user = {
           id: user.id,
           username: user.username,
           name: user.name
         };
       }
       // 8) return response object as Promise
-      return Promise.resolve(verifyData);
+      return Promise.resolve(tokenMetaData);
     });
-};
-
-/**
- * Given a refresh token and client this will return the refresh token if it exists and the client
- * id's match otherwise this will throw an error
- * throw an error
- * @param   {Object} token        - The token record from the DB
- * @param   {Object} refreshToken - The raw refresh token
- * @param   {Object} client       - The client profile
- * @throws  {Error}  If the refresh token does not exist or the client id's don't match
- * @returns {Object} The refresh token if valid
- */
-validate.refreshToken = (token, refreshToken, client) => {
-  // jwt.verify will throw an error upon failure
-  jwt.verify(refreshToken, publicKey);
-
-  if (client.id !== token.clientID) {
-    validate.logAndThrow('RefreshToken clientID does not match client id given');
-  }
-  return token;
 };
 
 /**
@@ -215,13 +184,16 @@ validate.refreshToken = (token, refreshToken, client) => {
  */
 validate.authCode = (code, authCode, client, redirectURI) => {
   if (new Date() > authCode.expirationDate) {
-    validate.logAndThrow('AuthCode has expired');
+    console.log('AuthCode has expired');
+    throw new Error('AuthCode has expired');
   }
   if (client.id !== authCode.clientID) {
-    validate.logAndThrow('AuthCode clientID does not match client id given');
+    console.log('AuthCode clientID does not match client id given');
+    throw new Error('AuthCode clientID does not match client id given');
   }
   if (redirectURI !== authCode.redirectURI) {
-    validate.logAndThrow('AuthCode redirectURI does not match redirectURI given');
+    console.log('AuthCode redirectURI does not match redirectURI given');
+    throw new Error('AuthCode redirectURI does not match redirectURI given');
   }
   return authCode;
 };
@@ -250,7 +222,7 @@ validate.isRefreshToken = ({ scope }) => {
  * @returns {Promise} The resolved refresh token after saved
  */
 validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime }) => {
-  const refreshToken = utils.createToken({ sub: userID, exp: config.refreshToken.expiresIn });
+  const refreshToken = jwtUtils.createToken({ sub: userID, exp: config.refreshToken.expiresIn });
   const expiration = new Date(Date.now() + (config.refreshToken.expiresIn * 1000));
   return db.refreshTokens.save(refreshToken, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => refreshToken);
@@ -266,7 +238,7 @@ validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime 
  * @returns {Promise}  The resolved refresh token after saved
  */
 validate.generateToken = ({ userID, clientID, scope, grantType, authTime }) => {
-  const token = utils.createToken({ sub: userID, exp: config.token.expiresIn });
+  const token = jwtUtils.createToken({ sub: userID, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
   return db.accessTokens.save(token, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => token);
@@ -291,52 +263,23 @@ validate.generateTokens = (authCode) => {
 };
 
 /**
- * Given a token this will resolve a promise with the token if it is not null and the expiration
- * date has not been exceeded.  Otherwise this will throw a HTTP error.
- * @param   {Object}  token - The token to check
- * @returns {Promise} Resolved with the token if it is a valid token otherwise rejected with error
- */
-validate.tokenForHttp = (token) =>
-  new Promise((resolve, reject) => {
-    try {
-      jwt.verify(token, publicKey);
-    } catch (err) {
-      const error = new Error('invalid_token');
-      error.status = 400;
-      reject(error);
-    }
-    resolve(token);
-  });
-/**
- * Given a token this will return the token if it is not null and not empty object.
- * Otherwise this will throw a HTTP error.
- * @param   {Object} token - The token to check
- * @throws  {Error}  If the client is null or if {}
- * @returns {Object} The client if it is a valid client
- */
-validate.tokenExistsForHttp = (token) => {
+* Given a token this will return the token if it is not null and not empty object.
+* Otherwise this will throw a HTTP error.
+* In the case of error, if optional log string is provided, send to console
+* @param   {Object} token - The token to check
+* @param   {String} logMessage - Optional, log the error with this string
+* @throws  {Error}  If the client is null or if {}
+* @returns {Object} The client if it is a valid client
+*/
+validate.tokenNotNull = (token, logMessage) => {
+  // console.log('tokenNotNull ', token);
   if (token == null) {
+    if (logMessage) console.log(logMessage);
     const error = new Error('invalid_token');
     error.status = 400;
     throw error;
   }
   return token;
-};
-
-/**
- * Given a client this will return the client if it is not null. Otherwise this will throw a
- * HTTP error.
- * @param   {Object} client - The client to check
- * @throws  {Error}  If the client is null
- * @returns {Object} The client if it is a valid client
- */
-validate.clientExistsForHttp = (client) => {
-  if (client == null) {
-    const error = new Error('invalid_token');
-    error.status = 400;
-    throw error;
-  }
-  return client;
 };
 
 module.exports = validate;

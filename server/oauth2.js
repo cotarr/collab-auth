@@ -18,7 +18,7 @@ const uid2 = require('uid2');
 // Custom modules
 const config = require('./config');
 const db = require('./db');
-const utils = require('./utils');
+const jwtUtils = require('./jwt-utils');
 const { intersectReqCliUsrScopes, intersectReqCliScopes } = require('./scope');
 const { requireScopeForOauthHTTP, toScopeString } = require('./scope');
 const validate = require('./validate');
@@ -84,7 +84,7 @@ server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) =>
   }
 
   const grantType = 'implicit';
-  const token = utils.createToken({ sub: user.id, exp: config.token.expiresIn });
+  const token = jwtUtils.createToken({ sub: user.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
   const authTime = new Date();
   // Note responseParams returned in redirect URL query parameter
@@ -232,7 +232,7 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
 
   // Compile token scope
   const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
-  const token = utils.createToken({ sub: client.id, exp: config.token.expiresIn });
+  const token = jwtUtils.createToken({ sub: client.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
   const authTime = new Date();
   const grantType = 'client_credentials';
@@ -272,13 +272,23 @@ server.exchange(oauth2orize.exchange.refreshToken(
       grant_type: 'refresh_token'
     };
     db.refreshTokens.find(refreshToken)
-      .then((foundRefreshToken) => validate.refreshToken(foundRefreshToken, refreshToken, client))
-      .then((foundRefreshToken) => {
-        responseParams.scope = foundRefreshToken.scope;
-        responseParams.auth_time = foundRefreshToken.authTime;
-        // replace "authorization_code" with "refresh_token"
-        foundRefreshToken.grantType = 'refresh_token';
-        return validate.generateToken(foundRefreshToken);
+      .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
+      .then((token) => validate.token(token, refreshToken))
+      .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed validation'))
+      .then((tokenMetaData) => {
+        // verify, only client that issues the refresh token may renew it
+        // client parameter comes from passport client authorization
+        // tokenMetaData.client comes from issued token lookup in database
+        if (client.id === tokenMetaData.client.id) {
+          responseParams.scope = tokenMetaData.token.scope;
+          responseParams.auth_time = tokenMetaData.token.authTime;
+          // replace "authorization_code" with "refresh_token"
+          tokenMetaData.token.grantType = 'refresh_token';
+          return validate.generateToken(tokenMetaData.token);
+        } else {
+          console.log('Error, refresh_token wrong client');
+          throw new Error('refresh_token client ID not match');
+        }
       })
       // See above: done(err, accessToken, refreshToken, params)
       .then((token) => done(null, token, null, responseParams))
@@ -445,17 +455,31 @@ exports.token = [
 exports.revoke = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
   requireScopeForOauthHTTP(['auth.token', 'auth.admin']),
+  inputValidation.oauthTokenRevoke,
   (req, res, next) => {
-    if (req.body.access_token) {
-      validate.tokenForHttp(req.body.access_token)
-        .then(() => db.accessTokens.delete(req.body.access_token))
-        .then((deletedAccessToken) => validate.tokenExistsForHttp(deletedAccessToken))
+    if ((req.body) && (req.body.access_token) &&
+      (typeof req.body.access_token === 'string') &&
+      (req.body.access_token.length > 0)) {
+      // Case of access token found in body of request
+      const accessToken = req.body.access_token;
+      db.accessTokens.find(accessToken)
+        .then((token) => validate.tokenNotNull(token, 'access_token not found'))
+        .then((token) => validate.token(token, accessToken))
+        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'access_token failed validation'))
+        .then(() => db.accessTokens.delete(accessToken))
+        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting access_token'))
         .then(() => {
-          if (req.body.refresh_token) {
-            // case of both access token and refresh token
-            validate.tokenForHttp(req.body.refresh_token)
-              .then(() => db.refreshTokens.delete(req.body.refresh_token))
-              .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken));
+          if ((req.body) && (req.body.refresh_token) &&
+            (typeof req.body.refresh_token === 'string') &&
+            (req.body.refresh_token.length > 0)) {
+            // Case of refresh_token found in addition to previous access token
+            const refreshToken = req.body.refresh_token;
+            return db.refreshTokens.find(refreshToken)
+              .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
+              .then((token) => validate.token(token, refreshToken))
+              .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed validation'))
+              .then(() => db.refreshTokens.delete(refreshToken))
+              .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting refresh token'));
           } else {
             // else, case of only access_token, but not refresh token
             return {};
@@ -465,21 +489,26 @@ exports.revoke = [
           return res.json({});
         })
         .catch((err) => {
-          res.status(err.status);
-          res.json({ error: err.message });
+          return res.status(err.status).json({ error: err.message });
         });
     } else {
-      // case of missing access_token, checkfor refresh_token
-      if (req.body.refresh_token) {
-        validate.tokenForHttp(req.body.refresh_token)
-          .then(() => db.refreshTokens.delete(req.body.refresh_token))
-          .then((deletedRefreshToken) => validate.tokenExistsForHttp(deletedRefreshToken))
-          .then(() => res.json({}))
+      if ((req.body) && (req.body.refresh_token) &&
+        (typeof req.body.refresh_token === 'string') &&
+        (req.body.access_refresh.length > 0)) {
+        // case of missing access_token, revoke only the refresh token
+        const refreshToken = req.body.refresh_token;
+        db.refreshTokens.find(refreshToken)
+          .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
+          .then((token) => validate.token(token, refreshToken))
+          .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed valiation'))
+          .then(() => db.refreshTokens.delete(refreshToken))
+          .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting refresh_token'))
           .catch((err) => {
             res.status(err.status);
             res.json({ error: err.message });
           });
       } else {
+        // Case of no valid tokens found, access_token or refresh_token
         const err = new Error('invalid_token');
         err.status = 400;
         res.status(err.status);
@@ -517,27 +546,26 @@ exports.introspect = [
       (req.body.access_token.length > 0)) {
       const accessToken = req.body.access_token;
       db.accessTokens.find(accessToken)
+        .then((token) => validate.tokenNotNull(token, 'access_token not found'))
         .then((token) => validate.token(token, accessToken))
-        .then((tokenMetadata) => {
-          if (tokenMetadata == null) {
-            throw new Error('invalid_token');
-          }
+        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'access_token validaiton failed'))
+        .then((tokenMetaData) => {
           const resJson = {
             active: true,
             revocable: true,
             issuer: config.site.authURL + '/oauth/token',
-            jti: tokenMetadata.decoded.jti,
-            sub: tokenMetadata.decoded.sub,
-            exp: tokenMetadata.decoded.exp,
-            iat: tokenMetadata.decoded.iat,
-            grant_type: tokenMetadata.token.grantType,
-            expires_in: Math.floor((tokenMetadata.token.expirationDate.getTime() - Date.now()) / 1000),
-            auth_time: Math.floor(tokenMetadata.token.authTime.valueOf() / 1000),
-            scope: tokenMetadata.token.scope,
-            client: tokenMetadata.client
+            jti: tokenMetaData.decoded.jti,
+            sub: tokenMetaData.decoded.sub,
+            exp: tokenMetaData.decoded.exp,
+            iat: tokenMetaData.decoded.iat,
+            grant_type: tokenMetaData.token.grantType,
+            expires_in: Math.floor((tokenMetaData.token.expirationDate.getTime() - Date.now()) / 1000),
+            auth_time: Math.floor(tokenMetaData.token.authTime.valueOf() / 1000),
+            scope: tokenMetaData.token.scope,
+            client: tokenMetaData.client
           };
-          if (tokenMetadata.user) {
-            resJson.user = tokenMetadata.user;
+          if (tokenMetaData.user) {
+            resJson.user = tokenMetaData.user;
           }
           res.json(resJson);
         })

@@ -181,6 +181,7 @@ exports.createUser = [
     'username',
     'newpassword1',
     'name',
+    'loginDisabled',
     'role'], 'body'),
   // Forbidden body keys
   body([
@@ -234,7 +235,9 @@ exports.editUser = [
   checkExtraneousKeys([
     'id',
     'newpassword1',
+    'newpassword2',
     'name',
+    'loginDisabled',
     'role'], 'body'),
   // Forbidden body keys
   body([
@@ -553,6 +556,7 @@ exports.oauthToken = [
       }
       return true;
     }),
+  body('refresh_token', 'Invalid JWT Token').optional().isJWT(),
   handleError
 ];
 
@@ -562,6 +566,8 @@ exports.oauthTokenRevoke = [
     'refresh_token',
     'client_id',
     'client_secret'], 'body'),
+  body('access_token', 'Invalid JWT Token').optional().isJWT(),
+  body('refresh_token', 'Invalid JWT Token').optional().isJWT(),
   handleError
 ];
 
@@ -571,5 +577,6 @@ exports.oauthIntrospect = [
     'client_id',
     'client_secret'], 'body'),
   body('access_token', 'Required values').exists(),
+  body('access_token', 'Invalid JWT Token').isJWT(),
   handleError
 ];

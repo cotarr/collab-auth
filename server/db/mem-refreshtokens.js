@@ -5,7 +5,7 @@
 // in the RFC The OAuth 2.0 Authorization Framework: Bearer Token Usage
 // (http://tools.ietf.org/html/rfc6750)
 
-const jwt = require('jsonwebtoken');
+const jwtUtils = require('../jwt-utils');
 
 /**
  * Tokens in-memory data structure which stores all of the refresh tokens
@@ -19,7 +19,7 @@ let tokens = Object.create(null);
  */
 exports.find = (token) => {
   try {
-    const id = jwt.decode(token).jti;
+    const id = jwtUtils.decodeToken(token).jti;
     return Promise.resolve(tokens[id]);
   } catch (error) {
     return Promise.resolve(undefined);
@@ -41,7 +41,7 @@ exports.find = (token) => {
  * @returns {Promise} resolved with the saved token
  */
 exports.save = (token, expirationDate, userID, clientID, scope, grantType, authTime) => {
-  const id = jwt.decode(token).jti;
+  const id = jwtUtils.decodeToken(token).jti;
   tokens[id] = { userID, expirationDate, clientID, scope, grantType, authTime };
   return Promise.resolve(tokens[id]);
 };
@@ -53,7 +53,7 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
  */
 exports.delete = (token) => {
   try {
-    const id = jwt.decode(token).jti;
+    const id = jwtUtils.decodeToken(token).jti;
     const deletedToken = tokens[id];
     delete tokens[id];
     return Promise.resolve(deletedToken);

@@ -1,6 +1,6 @@
 'use strict';
 
-const jwt = require('jsonwebtoken');
+const jwtUtils = require('../jwt-utils');
 const pgPool = require('./pg-pool');
 
 /**
@@ -11,7 +11,7 @@ const pgPool = require('./pg-pool');
 exports.find = (token) => {
   // catch JWT decode errors
   try {
-    const id = jwt.decode(token).jti;
+    const id = jwtUtils.decodeToken(token).jti;
     const query = {
       text: 'SELECT * FROM accesstokens WHERE id = $1',
       values: [id]
@@ -41,7 +41,7 @@ exports.find = (token) => {
 exports.save = (token, expirationDate, userID, clientID, scope, grantType, authTime) => {
   // catch JWT decode errors
   try {
-    const id = jwt.decode(token).jti;
+    const id = jwtUtils.decodeToken(token).jti;
     const query = {
       text: 'INSERT INTO accesstokens ' +
         '("id", "userID", "clientID", "expirationDate", "scope", "grantType", "authTime") ' +
@@ -64,7 +64,7 @@ exports.save = (token, expirationDate, userID, clientID, scope, grantType, authT
 exports.delete = (token) => {
   // catch JWT decode errors
   try {
-    const id = jwt.decode(token).jti;
+    const id = jwtUtils.decodeToken(token).jti;
     const query = {
       text: 'DELETE FROM accesstokens WHERE "id" = $1 RETURNING *',
       values: [id]

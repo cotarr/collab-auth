@@ -5,6 +5,8 @@ const path = require('path');
 const uuid = require('uuid');
 const jwt = require('jsonwebtoken');
 
+// const config = require('./config/');
+
 /** Private certificate used for signing JSON WebTokens */
 const privateKey = fs.readFileSync(path.join(__dirname, 'certs/privatekey.pem'));
 
@@ -16,19 +18,26 @@ const publicKey = fs.readFileSync(path.join(__dirname, 'certs/certificate.pem'))
  * the signed JWT.  For more options and other things you can change this to, please see:
  * https://github.com/auth0/node-jsonwebtoken
  *
- * @param  {Number} exp - The number of seconds for this token to expire.  By default it will be 60
- *                        minutes (3600 seconds) if nothing is passed in.
- * @param  {String} sub - The subject or identity of the token.
+ * payload.exp - (Optional) seconds to token expiration time
+ * payload.sub - Subject, user ID (UUID), or if client token, client ID (UUID)
+ * payload.jti - Json Token ID (UUID generated here)
+ *
+ * @param  {Object} payload JWT Token payload
  * @return {String} The JWT Token
  */
-exports.createToken = ({ exp = 3600, sub = '' } = {}) => {
-  const token = jwt.sign({
+exports.createToken = (payload) => {
+  const payloadData = {
     jti: uuid.v4(),
-    sub,
-    exp: Math.floor(Date.now() / 1000) + exp
-  }, privateKey, {
-    algorithm: 'RS256'
-  });
+    sub: payload.sub
+  };
+  const token = jwt.sign(
+    payloadData,
+    privateKey,
+    {
+      algorithm: 'RS256',
+      expiresIn: payload.exp
+    }
+  );
   return token;
 };
 
@@ -38,10 +47,12 @@ exports.createToken = ({ exp = 3600, sub = '' } = {}) => {
  * @throws  {Error} Error if the token could not be verified
  * @returns {Object} The token decoded and verified
  */
-// temp comment out for debug
 exports.verifyToken = (token) => jwt.verify(token, publicKey);
 
 /**
  * Decode JWT token
+ * @param   {String} token - The token to verify
+ * @throws  {Error} Error if the token could not be decoded
+ * @returns {Object} The token decoded and verified
  */
 exports.decodeToken = (token) => jwt.decode(token);

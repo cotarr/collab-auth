@@ -5,7 +5,6 @@ const passport = require('passport');
 const { Strategy: LocalStrategy } = require('passport-local');
 const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
-// const { Strategy: BearerStrategy } = require('passport-http-bearer');
 const validate = require('./validate');
 const { addScopeToPassportReqObj } = require('./scope');
 
@@ -73,25 +72,6 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
       .catch(() => done(null, false));
   }
 ));
-
-/**
- * BearerStrategy ('bearer')
- *
- * This strategy is used to authenticate either users or clients based on an access token
- * (aka a bearer token).  If a user, they must have previously authorized a client
- * application, which is issued an access token to make requests on behalf of
- * the authorizing user.
- *
- * Currently not required, disabled as comment
- */
-
-// passport.use(new BearerStrategy({ passReqToCallback: true }, (req, accessToken, done) => {
-//   db.accessTokens.find(accessToken)
-//     .then((token) => validate.token(token, accessToken))
-//     .then((client) => addScopeToPassportReqObj(req, client))
-//     .then((client) => done(null, client))
-//     .catch(() => done(null, false));
-// }));
 
 // Register serialialization and deserialization functions.
 //
