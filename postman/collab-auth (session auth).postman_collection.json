@@ -115,7 +115,7 @@
 			"response": []
 		},
 		{
-			"name": "/menu (expect fail)",
+			"name": "/panel/menu (fail)",
 			"event": [
 				{
 					"listen": "test",
@@ -141,11 +141,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{auth_host}}/menu",
+					"raw": "{{auth_host}}/panel/menu",
 					"host": [
 						"{{auth_host}}"
 					],
 					"path": [
+						"panel",
 						"menu"
 					]
 				}
@@ -153,7 +154,7 @@
 			"response": []
 		},
 		{
-			"name": "/account (expect fail)",
+			"name": "/panel/listusers (fail)",
 			"event": [
 				{
 					"listen": "test",
@@ -179,12 +180,575 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{auth_host}}/account",
+					"raw": "{{auth_host}}/panel/listusers",
 					"host": [
 						"{{auth_host}}"
 					],
 					"path": [
-						"account"
+						"panel",
+						"listusers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/listclients (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/listclients",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"listclients"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/viewuser (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/viewuser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"viewuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/viewclient (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/viewclient",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"viewclient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/createuser (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/createuser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"createuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/creatclient (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/createclient",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"createclient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/createuser (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/createuser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"createuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/createclient (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/createclient",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"createclient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/edituser (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/edituser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"edituser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/editclient (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/editclient",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"editclient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/edituser (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/edituser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"edituser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/editclient (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/editclient",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"editclient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/deleteuser (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/deleteuser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"deleteuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/deleteclient (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/deleteclient",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"deleteclient"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/removealltokens (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/removealltokens",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"removealltokens"
 					]
 				}
 			},
@@ -261,44 +825,6 @@
 					],
 					"path": [
 						"changepassword"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "/listeditusers (expect fail)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 302\", function () {",
-							"    pm.response.to.have.status(302);",
-							"});",
-							"",
-							"pm.test(\"Content-Type header is application/json\", () => {",
-							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "{{auth_host}}/listeditusers",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"listeditusers"
 					]
 				}
 			},

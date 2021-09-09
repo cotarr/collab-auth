@@ -548,6 +548,20 @@
 						"key": "Accept",
 						"value": "application/json",
 						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic Ym9iQHh4eHh4eHh4eHh4eHg=",
+						"description": "Bad client secret\n",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic Ym9ieHh4eEBzZWNyZXQ=",
+						"description": "Unknown user",
+						"type": "text",
+						"disabled": true
 					}
 				],
 				"body": {

@@ -266,6 +266,7 @@
 					"script": {
 						"exec": [
 							"",
+							"",
 							"// Case of untrusted client",
 							"pm.test('Extract transaction code', function () {",
 							"  // get response body as string (find the one with the nonce)",
@@ -293,7 +294,7 @@
 							"      pm.globals.set('access_token', accessToken);",
 							"      pm.globals.set('refresh_token', null);",
 							"      // If client property trustedClient = true, decision step is skipped",
-							"      postman.setNextRequest('/introspect (access_token)')",
+							"      postman.setNextRequest('/oauth/introspect')",
 							"    }",
 							"});",
 							""
