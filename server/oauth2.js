@@ -23,7 +23,8 @@ const {
   toScopeString,
   intersectReqCliUsrScopes,
   intersectReqCliScopes,
-  requireScopeForOauthHTTP
+  requireScopeForOauthHTTP,
+  clientScopePrecheckForTokenHTTP
 } = require('./scope');
 const validate = require('./validate');
 const inputValidation = require('./input-validation');
@@ -50,14 +51,15 @@ const server = oauth2orize.createServer();
  *    - the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, locals, done) => {
-  // Check if code grant is disabled in the config (hard error, prechecked in input validation)
+  // Check if code grant is disabled in the config
+  // This is pre-checked in input validation to inhibit a hard error here
   if (config.oauth2.disableCodeGrant) {
     const err = new Error('grant_type code (code grant) is disabled');
     return done(err);
   }
-
   // Check if scope is sufficient (2 places, also in exchange code)
-  if ((areq.tokenScope == null) || (areq.tokenScope.indexOf('auth.token') < 0)) {
+  // This is pre-checked in in authorization endpoint middleware to inhibit a hard error here
+  if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.token') < 0)) {
     const err = new Error('Code grant requires scope: auth.token');
     return done(err);
   }
@@ -87,14 +89,16 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, loca
  *    - the `scope` submitted in the authorization request.
  */
 server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) => {
-  // Check if implicit grant is disabled in the config (hard error, prechecked in input validation)
+  // Check if implicit grant is disabled in the config
+  // This is pre-checked in input validation to inhibit a hard error here
   if (config.oauth2.disableTokenGrant) {
     const err = new Error('response_type token (implicit grant) is disabled');
     return done(err);
   }
 
   // Check if scope is sufficient
-  if ((areq.tokenScope == null) || (areq.tokenScope.indexOf('auth.token') < 0)) {
+  // This is pre-checked in the authorization endpoint middleware to inhibit a hard error here
+  if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.token') < 0)) {
     const err = new Error('Token grant (Implicit grant) requires scope: auth.token');
     return done(err);
   }
@@ -131,9 +135,17 @@ server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) =>
  *    - the `scope` submitted in the authorization request.
  */
 server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, authInfo, done) => {
-  // Check if code grant is disabled in the config (hard error, prechecked in input validation)
+  // Check if code grant is disabled in the config
+  // This is pre-checked in input validation to inhibit a hard error here
   if (config.oauth2.disableCodeGrant) {
     const err = new Error('grant_type code (code grant) is disabled');
+    return done(err);
+  }
+
+  // Check if scope is sufficient
+  // This is pre-checked in authorization endpoint middleware to inhibit hard error here
+  if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.token') < 0)) {
+    const err = new Error('Exchange code (Code grant) requires scope: auth.token');
     return done(err);
   }
 
@@ -149,11 +161,6 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, auth
     .then((authCode) => validate.authCode(code, authCode, client, redirectURI))
     // authcode { clientID: redirectURI: userID: scope: }
     .then((authCode) => {
-      // Check if scope is sufficient (2 places, also in code grant)
-      if ((authCode.scope == null) || (authCode.scope.indexOf('auth.token') < 0)) {
-        const err = new Error('Exchange code (Code grant) requires scope: auth.token');
-        return done(err);
-      }
       authCode.grantType = 'authorization_code';
       authCode.authTime = new Date();
       responseParams.auth_time = Math.floor(authCode.authTime.valueOf() / 1000);
@@ -188,9 +195,17 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, auth
  */
 server.exchange(oauth2orize.exchange.password(
   (client, username, password, scope, body, authInfo, done) => {
-    // Check if password grant disabled in the config (hard error, prechecked in input validation)
+    // Check if password grant disabled in the config
+    // This is pre-checked in input validation to inhibit a hard error here
     if (config.oauth2.disablePasswordGrant) {
       const err = new Error('grant_type password (password grant) is disabled');
+      return done(err);
+    }
+
+    // Check if scope is sufficient
+    // This is pre-checked in token endpoint middleware to inhibit hard error here
+    if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.token') < 0)) {
+      const err = new Error('Password grant requires scope: auth.token');
       return done(err);
     }
 
@@ -204,13 +219,6 @@ server.exchange(oauth2orize.exchange.password(
       .then((user) => {
         // Compile token scope
         const tokenScope = intersectReqCliUsrScopes(scope, client.allowedScope, user.role);
-
-        // Check if scope is sufficient
-        if ((tokenScope == null) || (tokenScope.indexOf('auth.token') < 0)) {
-          const err = new Error('Password grant requires scope: auth.token');
-          return done(err);
-        }
-
         responseParams.scope = tokenScope;
         const authTime = new Date();
         responseParams.auth_time = Math.floor(authTime.valueOf() / 1000);
@@ -253,23 +261,22 @@ server.exchange(oauth2orize.exchange.password(
  *    - the `scope` submitted in the authorization request.
  */
 server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, authInfo, done) => {
-  // Check if client grant is disabled in the config (hard error, prechecked in input validation)
+  // Check if client grant is disabled in the config
+  // This is pre-checked in input validation to inhibit a hard error here
   if (config.oauth2.disableClientGrant) {
     const err = new Error('grant_type client_credentials (client grant) is disabled');
     return done(err);
   }
 
-  console.log('scope ', scope);
-  console.log('allowedScope ', client.allowedScope);
-  // Compile token scope
-  const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
-  console.log(tokenScope);
   // Check if scope is sufficient
-  if ((tokenScope == null) || (tokenScope.indexOf('auth.client') < 0)) {
+  // This is pre-checked in token endpoint middleware to inhibit hard error here
+  if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.client') < 0)) {
     const err = new Error('Client credentials grant requires scope: auth.client');
     return done(err);
   }
 
+  // Compile token scope
+  const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
   const token = jwtUtils.createToken({ sub: client.id, exp: config.token.expiresIn });
   const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
   const authTime = new Date();
@@ -300,11 +307,20 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
  */
 server.exchange(oauth2orize.exchange.refreshToken(
   (client, refreshToken, scope, body, authInfo, done) => {
-    // Check refresh_token grant disabled in the config (hard error, prechecked in input validation)
+    // Check refresh_token grant disabled in the config
+    // This is pre-checked in input validation to inhibit a hard error here
     if (config.oauth2.disableRefreshTokenGrant) {
       const err = new Error('grant_type refresh_token (Refresh token grant) is disabled');
       return done(err);
     }
+
+    // Check if scope is sufficient
+    // This is pre-checked in token endpoint middleware to inhibit hard error here
+    if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.token') < 0)) {
+      const err = new Error('Refresh token grant requires scope: auth.token');
+      return done(err);
+    }
+
     const responseParams = {
       expires_in: config.token.expiresIn,
       grant_type: 'refresh_token'
@@ -314,12 +330,6 @@ server.exchange(oauth2orize.exchange.refreshToken(
       .then((token) => validate.token(token, refreshToken))
       .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed validation'))
       .then((tokenMetaData) => {
-        // Check if scope is sufficient
-        if ((tokenMetaData.token.scope == null) ||
-          (tokenMetaData.token.scope.indexOf('auth.token') < 0)) {
-          const err = new Error('Refresh token grant requires scope: auth.token');
-          return done(err);
-        }
         // verify, only client that issues the refresh token may renew it
         // client parameter comes from passport client authorization
         // tokenMetaData.client comes from issued token lookup in database
@@ -403,6 +413,21 @@ exports.authorization = [
     // the clients then they will have to re-consent.
     db.clients.findByClientId(req.query.client_id)
       .then((client) => {
+        // check if client has sufficient scope to request tokens
+        // The /dialog/authorization can not be pre-checked for scope restrictions in
+        // the inputValidation because the client has not been looked up in the database
+        // at that point, it the scope is being checked here as middleware.
+        // This is a pre-check. The oauth2oize callback will enforce it during processing.
+        if ((client.allowedScope == null) ||
+          (client.allowedScope.indexOf('auth.token') < 0)) {
+          const err = new Error('Oauth2 authorizaton requires scope: auth.token');
+          err.status = 400;
+          throw err;
+        } else {
+          return client;
+        }
+      })
+      .then((client) => {
         if (client != null && client.trustedClient && client.trustedClient === true) {
           // This is how we short call the decision like the dialog below does
           server.decision({ loadTransaction: false }, (serverReq, callback) => {
@@ -411,6 +436,7 @@ exports.authorization = [
           })(req, res, next);
         } else {
           res.render('dialog', {
+            // Insert transaction code to form for processing by /dialog/authorization/decision
             transactionID: req.oauth2.transactionID,
             user: req.user,
             client: req.oauth2.client,
@@ -418,13 +444,7 @@ exports.authorization = [
           });
         }
       })
-      .catch(() =>
-        res.render('dialog', {
-          transactionID: req.oauth2.transactionID,
-          user: req.user,
-          client: req.oauth2.client
-        })
-      );
+      .catch((err) => next(err));
   },
   // This handler remove the transaction from session
   server.authorizationErrorHandler(),
@@ -447,6 +467,8 @@ exports.authorization = [
  *     "transaction_id": "xxxxxxxxx",
  *     "cancel": "Deny"
  *  }
+ *
+ * There is no check restriction here because it is protected by transaction code.
  *
  * authorizationErrorHandler removes transaction from session
  */
@@ -475,8 +497,8 @@ exports.decision = [
  */
 exports.token = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  requireScopeForOauthHTTP(['auth.token', 'auth-client']),
   inputValidation.oauthToken,
+  clientScopePrecheckForTokenHTTP(['auth.token'], ['auth.client']),
   server.token(),
   server.errorHandler()
 ];
@@ -503,8 +525,8 @@ exports.token = [
  */
 exports.revoke = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  requireScopeForOauthHTTP(['auth.token', 'auth-client']),
   inputValidation.oauthTokenRevoke,
+  requireScopeForOauthHTTP(['auth.token', 'auth-client']),
   (req, res, next) => {
     if ((req.body) && (req.body.access_token) &&
       (typeof req.body.access_token === 'string') &&
@@ -589,8 +611,8 @@ exports.revoke = [
  */
 exports.introspect = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
-  requireScopeForOauthHTTP(['auth.info', 'auth.token', 'auth.client']),
   inputValidation.oauthIntrospect,
+  requireScopeForOauthHTTP(['auth.info', 'auth.token', 'auth.client']),
   (req, res, next) => {
     if ((req.body) && (req.body.access_token) &&
       (typeof req.body.access_token === 'string') &&

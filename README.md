@@ -1,12 +1,15 @@
 # collab-auth
 
-
+Description: TBD
 
 This is one of 3 repositories
 
-- collab-auth (Oauth2 Authorization Provider, redirect login, tokens)
-- collab-frontend (Web server, reverse proxy, html content)
-- collab-backend-api (Mock REST API using tokens to authorize requests)
+|                        Repository                                  |                   Description                         |
+| ------------------------------------------------------------------ | ----------------------------------------------------- |
+| collab-auth                                                        | Oauth2 Authorization Provider, redirect login, tokens |
+| [collab-frontend](https://github.com/cotarr/collab-frontend)       | Mock Web server, reverse proxy, html content          |
+| [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
+
 
 ### Security Note
 
@@ -56,18 +59,18 @@ PGSSLMODE=disable
 
 ### Scopes
 
-| Scope         | Permission              | Component  |
-| ------------- | :---------------------- | :--------- |
-| auth.none     | No access               | OAuth2 API |
-| auth.info     | Check token status      | OAuth2 API |
-| auth.client   | Issue client tokens     | OAuth2 API |
-| auth.token    | Issue user tokens       | OAuth2 API |
-| auth.admin    | ( Reserved for future)  | OAuth2 API |
-| user.none     | No access               | Web control panel |
-| user.password | Change own password     | Web control panel |
-| user.admin    | Edit any record         | Web control panel |
-| api.read      | API read-only requests  | Mock REST API |
-| api.write     | API write requests      | Mock REST API |
+| Scope         | Permission                               | Component  |
+| ------------- | :--------------------------------------- | :--------- |
+| auth.none     | No access                                | OAuth2 API |
+| auth.info     | Client permission to check token status  | OAuth2 API |
+| auth.client   | Client permission to issue client tokens | OAuth2 API |
+| auth.token    | Client permission to Issue user tokens   | OAuth2 API |
+| auth.admin    | ( Reserved for future)                   | OAuth2 API |
+| user.none     | No access                                | Web control panel |
+| user.password | Change own password                      | Web control panel |
+| user.admin    | Edit any user or client record           | Web control panel |
+| api.read      | API read requests (client && user)       | Mock REST API |
+| api.write     | API write requests (client && user)      | Mock REST API |
 
 ### User configuration
 

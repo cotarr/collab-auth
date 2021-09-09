@@ -6,7 +6,6 @@
     "clientSecret": "ssh-secret",
     "trustedClient": false,
     "allowedScope": [
-      "offline_access",
       "auth.none",
       "auth.token",
       "api.read",

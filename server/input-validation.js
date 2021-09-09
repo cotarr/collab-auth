@@ -19,9 +19,9 @@ const uriAllowedChars =
   'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:\\"\'/%._-?&';
 
 /**
- * Middleware error handler
+ * Middleware error handler (web Interface)
  */
-const handleError = (req, res, next) => {
+const handleErrorHTTP = (req, res, next) => {
   const allErrors = [];
 
   // First, errors from express-validator
@@ -48,7 +48,51 @@ const handleError = (req, res, next) => {
   //
   // return the error
   if (allErrors.length > 0) {
-    return res.status(400).json({
+    return res.status(422).json({
+      status: 422,
+      message: 'Unprocessable Entity',
+      errors: allErrors
+    });
+  } else {
+    next();
+  }
+};
+
+/**
+ * Middleware error handler (oauth API Interface)
+ * Includes WWW-Authenticate header
+ */
+const handleErrorOauth = (req, res, next) => {
+  const allErrors = [];
+
+  // First, errors from express-validator
+  const validatorErrors = validationResult(req).array();
+  for (const err of validatorErrors) {
+    //
+    // This is an authorization server, so the value
+    // property is deleted to prevent logging or returning credentials
+    delete err.value;
+    allErrors.push(err);
+  }
+  // Second add custom errors from req.locals.errors
+  if (!req.locals) req.locals = {};
+  if (!req.locals.errors) req.locals.errors = [];
+  const customErrors = req.locals.errors;
+
+  for (const err of customErrors) {
+    allErrors.push(err);
+  }
+  //
+  // For now, errors are handled as an API would be.
+  // This means web user will see the error.
+  // TODO handle errors with user friendly web page
+  //
+  // return the error
+  if (allErrors.length > 0) {
+    // WWW-Authenticate Response Header rfc2617 Section-3.2.1
+    const wwwError = 'Bearer realm=user@' + config.site.ownHost +
+    ' error="Bad Request", error_description="Input validation failed"';
+    return res.set('WWW-Authenticate', wwwError).status(400).json({
       status: 400,
       message: 'Bad Request',
       errors: allErrors
@@ -150,25 +194,27 @@ exports.loginRequest = [
     .isWhitelisted(idAllowedChars),
   body('password', 'Invalid string length')
     .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
-  handleError
+  handleErrorHTTP
 ]; // Change Password
 
 /**
  * Validate input for ?id=UUID.v4
  */
 exports.viewByUUID = [
+  checkExtraneousKeys(['id'], 'query'),
   query('id', 'Required values').exists(),
   query('id', 'Invalid UUID.v4').isUUID(4),
-  handleError
+  handleErrorHTTP
 ]; // viewByUUID
 
 /**
  * Validate input for ?id=UUID.v4
  */
 exports.deleteByUUID = [
+  checkExtraneousKeys(['id', 'confirm'], 'query'),
   query('id', 'Required values').exists(),
   query('id', 'Invalid UUID.v4').isUUID(4),
-  handleError
+  handleErrorHTTP
 ]; // deleteByUUID
 
 /**
@@ -223,7 +269,7 @@ exports.createUser = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('role', 'Invalid characters in string')
     .isWhitelisted(scopeAllowedChars),
-  handleError
+  handleErrorHTTP
 ]; // createUser
 
 /**
@@ -301,7 +347,7 @@ exports.editUser = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('role', 'Invalid characters in string')
     .isWhitelisted(scopeAllowedChars),
-  handleError
+  handleErrorHTTP
 ]; // editUser
 
 /**
@@ -359,7 +405,7 @@ exports.changePassword = [
     }),
   body('newpassword2', 'Invalid string length')
     .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
-  handleError
+  handleErrorHTTP
 ]; // Change Password
 
 /**
@@ -419,7 +465,7 @@ exports.createClient = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('allowedRedirectURI', 'Invalid characters in string')
     .isWhitelisted(uriAllowedChars),
-  handleError
+  handleErrorHTTP
 ]; // createClient
 
 exports.editClient = [
@@ -427,6 +473,7 @@ exports.editClient = [
     'id',
     'name',
     'clientSecret',
+    'trustedClient',
     'allowedScope',
     'allowedRedirectURI'], 'body'),
   // Forbidden body keys
@@ -470,7 +517,7 @@ exports.editClient = [
     .isLength({ max: config.data.allScopesMaxLength }),
   body('allowedRedirectURI', 'Invalid characters in string')
     .isWhitelisted(uriAllowedChars),
-  handleError
+  handleErrorHTTP
 ]; // editClient
 
 exports.dialogAuthorization = [
@@ -499,13 +546,13 @@ exports.dialogAuthorization = [
       }
       return true;
     }),
-  handleError
+  handleErrorOauth
 ];
 
 exports.dialogAuthDecision = [
   checkExtraneousKeys(['transaction_id'], 'body'),
   body('transaction_id').exists().isLength({ min: 1, max: 64 }),
-  handleError
+  handleErrorOauth
 ];
 
 /**
@@ -534,6 +581,7 @@ exports.oauthToken = [
     'code',
     'redirect_uri',
     'refresh_token'], 'body'),
+  // TODO more validation advisable
   body('grant_type')
     .custom(function (value, { req }) {
       if ((value === 'authorization_code') && (config.oauth2.disableCodeGrant)) {
@@ -557,7 +605,7 @@ exports.oauthToken = [
       return true;
     }),
   body('refresh_token', 'Invalid JWT Token').optional().isJWT(),
-  handleError
+  handleErrorOauth
 ];
 
 exports.oauthTokenRevoke = [
@@ -568,7 +616,7 @@ exports.oauthTokenRevoke = [
     'client_secret'], 'body'),
   body('access_token', 'Invalid JWT Token').optional().isJWT(),
   body('refresh_token', 'Invalid JWT Token').optional().isJWT(),
-  handleError
+  handleErrorOauth
 ];
 
 exports.oauthIntrospect = [
@@ -578,5 +626,5 @@ exports.oauthIntrospect = [
     'client_secret'], 'body'),
   body('access_token', 'Required values').exists(),
   body('access_token', 'Invalid JWT Token').isJWT(),
-  handleError
+  handleErrorOauth
 ];

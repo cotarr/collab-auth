@@ -199,16 +199,17 @@ validate.authCode = (code, authCode, client, redirectURI) => {
 };
 
 /**
- * I mimic openid connect's offline scope to determine if we send a refresh token or not
- *
- * If grant_type refresh_token disabled in the config, fail
+ * This is a place where new refresh_tokens can be disabled independant of
+ * the access_token. THe scope parameter can be used exclude refresh_token
+ * based on scope. THis is currently disabled by commenting out the line.
  *
  * @param   {Array}   scope - The scope to check if is a refresh token if it has 'offline_access'
  * @returns {Boolean} true If the scope is offline_access, otherwise false
  */
 validate.isRefreshToken = ({ scope }) => {
   return ((scope != null) &&
-    (scope.indexOf('offline_access') === 0) &&
+    // disabled
+    // (scope.indexOf('offline_access') === 0) &&
     (!config.oauth2.disableRefreshTokenGrant));
 };
 

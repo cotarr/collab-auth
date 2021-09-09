@@ -37,21 +37,17 @@ exports.database = {
     randomSecretLength: 24,
     trustedClient: false,
     allowedScope: [
-      'offline_access',
       'auth.none',
       'auth.info',
       'auth.token',
       'api.read',
-      'api.write',
-      'api.admin'
+      'api.write'
     ],
     allowedRedirectURI: ['http://localhost:3000/login/callback']
   },
   defaultUser: {
     randomPasswordLength: 12,
     role: [
-      'offline_access',
-      'auth.token',
       'api.read',
       'user.password'
     ]

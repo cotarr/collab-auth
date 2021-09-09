@@ -6,10 +6,10 @@
     "name": "Bob Smith",
     "loginDisabled": false,
     "role": [
-      "offline_access",
       "auth.token",
       "api.read",
-      "user.password"
+      "user.admin"
+    ],
     ],
     "lastLogin": null,
     "createdAt": "2021-08-22T18:38:29.250Z",
@@ -22,7 +22,6 @@
     "name": "Joe Davis",
     "loginDisabled": false,
     "role": [
-      "offline_access",
       "auth.token",
       "api.read",
       "user.password"

@@ -18,7 +18,7 @@ Note: auth_host must be different domain from frontend and backend
 - client_id      (abc123)
 - client_secret  (ssh-secret)
 - client_base64  (YWJjMTIzOnNzaC1zZWNyZXQ=)
-- scopes         (offline_access auth.token api.read)
+- scopes         (auth.token api.read)
 
 ## collection: "colab-auth (code grant)"
 
@@ -60,10 +60,3 @@ This in not a test suite. Do to run it in order.
 ## Collection: "collab-auth (session auth)"
 
 Used to check cookie on auth server web access.
-
-
-## Notes
-
-When initiating request in (1) and (4) /dialog/authorize,
-the setting for "scope=offline_access" will tell
-the auth server to add a refresh token.

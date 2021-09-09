@@ -60,7 +60,6 @@ exports.requireScopeForOauthHTTP = (requiredScope) => {
       if (scopeFound) {
         return next();
       } else {
-        // Case where bearer token fail /introspect due to denied client allowedScope
         // WWW-Authenticate Response Header rfc2617 Section-3.2.1
         const wwwError = 'Bearer realm=user@' + config.site.ownHost +
         ' error="Bad Request", error_description="Client credentials insufficient scope"';
@@ -73,6 +72,90 @@ exports.requireScopeForOauthHTTP = (requiredScope) => {
     }
   }; // (req, res, next) => ...
 }; // requireScopeForOauthHTTP()
+
+/**
+ * Middleware for enforcing client scope /oauth/token route (pre-check)
+ *
+ * This scope is checked and bloced in the oauth2orize callback.
+ * However, errors are difficult to trap in the callback, so
+ * the scope is also pre-checked here to make elegant errors messages.
+ *
+ * Express req object required params: req.locals.clientScope
+ *
+ * Two clientScope parameters contains allowedScopes for
+ *  Case 1: user token:  code grant, password grant, and refresh_token grant
+ *  Case 2: client token: client_credentials grant
+ *  Note: implicit gran does not pass through this route
+ *
+ * This value is parsed by the above addScopeToPassportReqObj function to be included
+ * into the passport client authorization strategy, where req.locals.clientScope is added.
+ *
+ * If scope found, passes next(), else returns HTTP error
+ */
+exports.clientScopePrecheckForTokenHTTP = (requiredUserScope, requiredClientScope) => {
+  if ((requiredUserScope == null) ||
+    ((typeof requiredUserScope !== 'string') &&
+    (!Array.isArray(requiredUserScope)))) {
+    throw new Error('clientScopePrecheckForTokenHTTP requires string or array');
+  }
+  if (typeof requiredUserScope === 'string') {
+    requiredUserScope = [requiredUserScope];
+  }
+  if ((requiredClientScope == null) ||
+    ((typeof requiredClientScope !== 'string') &&
+    (!Array.isArray(requiredClientScope)))) {
+    throw new Error('clientScopePrecheckForTokenHTTP requires string or array');
+  }
+  if (typeof requiredClientScope === 'string') {
+    requiredClientScope = [requiredClientScope];
+  }
+  return (req, res, next) => {
+    if ((req.locals) && (req.locals.clientScope) &&
+      (Array.isArray(req.locals.clientScope) &&
+      (req.locals.clientScope.length > 0))) {
+      if ((req.body.grant_type) &&
+        ((req.body.grant_type === 'authorization_code') ||
+        (req.body.grant_type === 'password') ||
+        (req.body.grant_type === 'refresh_token'))) {
+        let scopeFound = false;
+        requiredUserScope.forEach((scopeString) => {
+          if (req.locals.clientScope.indexOf(scopeString) >= 0) scopeFound = true;
+        });
+        if (scopeFound) {
+          return next();
+        } else {
+          // WWW-Authenticate Response Header rfc2617 Section-3.2.1
+          const wwwError = 'Bearer realm=user@' + config.site.ownHost +
+          ' error="Bad Request", error_description="Client credentials insufficient scope"';
+          return res.set('WWW-Authenticate', wwwError)
+            .status(400)
+            .send('Status 400, Bad Request, Client credentials insufficient scope');
+        }
+      } else if ((req.body.grant_type) && (req.body.grant_type === 'client_credentials')) {
+        let scopeFound = false;
+        requiredClientScope.forEach((scopeString) => {
+          if (req.locals.clientScope.indexOf(scopeString) >= 0) scopeFound = true;
+        });
+        if (scopeFound) {
+          return next();
+        } else {
+          // WWW-Authenticate Response Header rfc2617 Section-3.2.1
+          const wwwError = 'Bearer realm=user@' + config.site.ownHost +
+          ' error="Bad Request", error_description="Client credentials insufficient scope"';
+          return res.set('WWW-Authenticate', wwwError)
+            .status(400)
+            .send('Status 400, Bad Request, Client credentials insufficient scope');
+        }
+      } else {
+        // This should not occur due to scope validation
+        throw new Error('Error, Scope not found in request object');
+      }
+    } else {
+      // This should not occur, they are inserted by passport middleware
+      throw new Error('Error, Scope not found in request object');
+    }
+  };
+};
 
 /**
  * Middleware for enforcing Web Panel Scope Restrictions
