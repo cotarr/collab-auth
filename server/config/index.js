@@ -16,7 +16,11 @@ exports.nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 exports.site = {
   vhost: process.env.SITE_VHOST || '*',
   authURL: process.env.SITE_AUTH_URL || 'http://127.0.0.1:3500',
-  ownHost: process.env.SITE_OWN_HOST || '127.0.0.1:3500'
+  ownHost: process.env.SITE_OWN_HOST || '127.0.0.1:3500',
+  // Example: "mailto:security@example.com",
+  securityContact: process.env.SITE_SECURITY_CONTACT || '',
+  // Example: "Fri, 1 Apr 2022 08:00:00 -0600"
+  securityExpires: process.env.SITE_SECURITY_EXPIRES || ''
 };
 
 exports.server = {

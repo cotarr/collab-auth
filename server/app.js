@@ -20,6 +20,8 @@ const site = require('./site');
 const adminPanel = require('./admin-panel');
 const checkVhost = require('./check-vhost');
 const logConfig = require('./log-config');
+const securityContact = require('./security-contact');
+const robotPolicy = require('./robot-policy');
 
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -65,6 +67,12 @@ app.use(helmet.contentSecurityPolicy({
 //   /status    Is the server alive?
 //
 app.get('/status', (req, res) => res.json({ status: 'ok' }));
+
+// Route for security.txt
+app.get('/.well-known/security.txt', securityContact);
+
+// Route for robot policy
+app.get('/robots.txt', robotPolicy);
 
 //
 // From this point, all requests must match domain name
