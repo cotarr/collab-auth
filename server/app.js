@@ -50,14 +50,16 @@ app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
 // CSP Content Security Policy
 // ----------------------------------------
 app.use(helmet.contentSecurityPolicy({
+  useDefaults: true,
   directives:
     {
       defaultSrc: ["'none'"],
-      scriptSrc: ["'none'"],
       connectSrc: ["'self'"],
-      styleSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      imgSrc: ["'self'"],
       mediaSrc: ["'none'"],
-      imgSrc: ["'self'"]
+      scriptSrc: ["'none'"],
+      styleSrc: ["'self'"]
     }
 }));
 
