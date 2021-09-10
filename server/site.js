@@ -16,7 +16,7 @@ const inputValidation = require('./input-validation');
  * Render the login Form
  */
 exports.loginForm = (req, res, next) => {
-  res.render('login');
+  res.set('Cache-Control', 'no-store').render('login');
 };
 /**
  * redirectError an informational web page to inform the
@@ -25,7 +25,7 @@ exports.loginForm = (req, res, next) => {
 exports.redirectError = [
   ensureLoggedIn(),
   (req, res) => {
-    res.render('redirecterror', { name: req.user.name });
+    res.set('Cache-Control', 'no-store').render('redirecterror', { name: req.user.name });
   }
 ];
 
@@ -46,7 +46,7 @@ exports.login = [
 exports.logout = (req, res) => {
   req.logout();
   // name empty string for header
-  res.render('logout', { name: '' });
+  res.set('Cache-Control', 'no-store').render('logout', { name: '' });
   // res.redirect('/');
 };
 
@@ -59,9 +59,11 @@ exports.changePassword = [
   (req, res, next) => {
     if ((req.query) && (req.query.cancel) && (req.query.cancel === 'yes')) {
       const message = 'Your password change request has been cancelled.';
-      res.render('change-password-message', { name: req.user.name, passwordMessage: message });
+      res.set('Cache-Control', 'no-store').render('change-password-message',
+        { name: req.user.name, passwordMessage: message });
     } else {
-      res.render('change-password', { name: req.user.name, username: req.user.username });
+      res.set('Cache-Control', 'no-store').render('change-password',
+        { name: req.user.name, username: req.user.username });
     }
   }
 ];
@@ -89,7 +91,8 @@ exports.changePasswordHandler = [
       .then((user) => validate.userExists(user))
       .then((user) => {
         const message = 'Your password has been successfully changed. ';
-        res.render('change-password-message', { name: req.user.name, passwordMessage: message });
+        res.set('Cache-Control', 'no-store').render('change-password-message',
+          { name: req.user.name, passwordMessage: message });
       })
       .catch((err) => {
         next(err);

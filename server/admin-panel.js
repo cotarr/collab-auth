@@ -27,7 +27,8 @@ router.get('/menu',
     // Warning message if running Memory Store RAM database
     let visibility = '';
     if (config.database.disableInMemoryDb) visibility = 'hidden';
-    res.render('menu-admin', { name: req.user.name, visibility: visibility });
+    res.set('Cache-Control', 'no-store').render('menu-admin',
+      { name: req.user.name, visibility: visibility });
   }
 );
 
@@ -68,7 +69,8 @@ router.get('/listusers',
         //
         // Render tha page
         //
-        return res.render('list-users', { name: req.user.name, users: filteredArray });
+        return res.set('Cache-Control', 'no-store').render('list-users',
+          { name: req.user.name, users: filteredArray });
       })
       .catch((err) => {
         return next(err);
@@ -107,7 +109,8 @@ router.get('/viewuser',
           } else {
             filteredUser.lastLogin = '';
           }
-          return res.render('view-user', { name: req.user.name, user: filteredUser });
+          return res.set('Cache-Control', 'no-store').render('view-user',
+            { name: req.user.name, user: filteredUser });
         })
         .catch((err) => {
           return next(err);
@@ -131,7 +134,8 @@ router.get('/createuser',
       password: uid2(config.database.defaultUser.randomPasswordLength),
       role: toScopeString(config.database.defaultUser.role)
     };
-    return res.render('create-user', { name: req.user.name, defaultUser: defaultUser });
+    return res.set('Cache-Control', 'no-store').render('create-user',
+      { name: req.user.name, defaultUser: defaultUser });
   }
 );
 
@@ -155,7 +159,7 @@ router.post('/createuser',
         if (createdUser == null) {
           throw new Error('Error saving user');
         } else {
-          return res.render('generic-message', {
+          return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Ceate New User',
             message: 'New user record successfully saved.'
@@ -204,7 +208,8 @@ router.get('/edituser',
           } else {
             filteredUser.disabled = '';
           }
-          return res.render('edit-user', { name: req.user.name, user: filteredUser });
+          return res.set('Cache-Control', 'no-store').render('edit-user',
+            { name: req.user.name, user: filteredUser });
         })
         .catch((err) => {
           return next(err);
@@ -237,7 +242,7 @@ router.post('/edituser',
         if (createdUser == null) {
           throw new Error('Error saving user');
         } else {
-          return res.render('generic-message', {
+          return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Edit User',
             message: 'Modified user record successfully saved.'
@@ -269,7 +274,8 @@ router.get('/deleteuser',
             err.status = 400;
             return next(err);
           }
-          return res.render('confirm-delete-user', { name: req.user.name, deleteId: req.query.id });
+          return res.set('Cache-Control', 'no-store').render('confirm-delete-user',
+            { name: req.user.name, deleteId: req.query.id });
         })
         .catch((err) => next(err));
     } else if ((req.query) && (Object.keys(req.query).length === 2) &&
@@ -279,7 +285,7 @@ router.get('/deleteuser',
           if (deletedUser == null) {
             throw new Error('Error deleting user');
           } else {
-            return res.render('generic-message', {
+            return res.set('Cache-Control', 'no-store').render('generic-message', {
               name: req.user.name,
               title: 'Delete User',
               message: 'User successfully deleted.'
@@ -314,7 +320,8 @@ router.get('/listclients',
         //
         // Render the page
         //
-        return res.render('list-clients', { name: req.user.name, clients: clientArray });
+        return res.set('Cache-Control', 'no-store').render('list-clients',
+          { name: req.user.name, clients: clientArray });
       })
       .catch((err) => {
         return next(err);
@@ -360,7 +367,8 @@ router.get('/viewclient',
         } else {
           filteredClient.trustedClient = 'No';
         }
-        return res.render('view-client', { name: req.user.name, aclient: filteredClient });
+        return res.set('Cache-Control', 'no-store').render('view-client',
+          { name: req.user.name, aclient: filteredClient });
       })
       .catch((err) => {
         return next(err);
@@ -381,7 +389,8 @@ router.get('/createclient',
       allowedScope: toScopeString(config.database.defaultClient.allowedScope),
       allowedRedirectURI: toScopeString(config.database.defaultClient.allowedRedirectURI)
     };
-    return res.render('create-client', { name: req.user.name, clientDefault: clientDefault });
+    return res.set('Cache-Control', 'no-store').render('create-client',
+      { name: req.user.name, clientDefault: clientDefault });
   }
 );
 
@@ -406,7 +415,7 @@ router.post('/createclient',
         if (createdClient == null) {
           throw new Error('Error saving client');
         } else {
-          return res.render('generic-message', {
+          return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Ceate New Client',
             message: 'New client record successfully saved.'
@@ -452,7 +461,8 @@ router.get('/editclient',
           } else {
             filteredClient.trustedClient = '';
           }
-          return res.render('edit-client', { name: req.user.name, aclient: filteredClient });
+          return res.set('Cache-Control', 'no-store').render('edit-client',
+            { name: req.user.name, aclient: filteredClient });
         })
         .catch((err) => {
           return next(err);
@@ -486,7 +496,7 @@ router.post('/editclient',
         if (createdClient == null) {
           throw new Error('Error saving client');
         } else {
-          return res.render('generic-message', {
+          return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Edit Client',
             message: 'Modified client record successfully saved.'
@@ -519,7 +529,8 @@ router.get('/deleteclient',
             err.status = 400;
             return next(err);
           }
-          return res.render('confirm-delete-client', { name: req.client.name, deleteId: req.query.id });
+          return res.set('Cache-Control', 'no-store').render('confirm-delete-client',
+            { name: req.client.name, deleteId: req.query.id });
         })
         .catch((err) => next(err));
     } else if ((req.query) && (Object.keys(req.query).length === 2) &&
@@ -529,7 +540,7 @@ router.get('/deleteclient',
           if (deletedClient == null) {
             throw new Error('Error deleting client');
           } else {
-            return res.render('generic-message', {
+            return res.set('Cache-Control', 'no-store').render('generic-message', {
               name: req.user.name,
               title: 'Delete Client',
               message: 'Client successfully deleted.'
@@ -564,7 +575,7 @@ router.get('/removealltokens',
       db.accessTokens.removeAll()
         .then(() => db.refreshTokens.removeAll())
         .then(() => db.sessions.removeAll())
-        .then(() => res.render('generic-message', {
+        .then(() => res.set('Cache-Control', 'no-store').render('generic-message', {
           name: req.user.name,
           title: 'Clear Auth',
           message: 'Access tokens and refresh tokens have been removed form the database. ' +
@@ -572,7 +583,7 @@ router.get('/removealltokens',
         }))
         .catch((err) => next(err));
     } else {
-      res.render('confirm-remove', { name: req.user.name });
+      res.set('Cache-Control', 'no-store').render('confirm-remove', { name: req.user.name });
     }
   }
 );

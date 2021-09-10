@@ -435,7 +435,7 @@ exports.authorization = [
             callback(null, { allow: true });
           })(req, res, next);
         } else {
-          res.render('dialog', {
+          res.set('Cache-Control', 'no-store').render('dialog', {
             // Insert transaction code to form for processing by /dialog/authorization/decision
             transactionID: req.oauth2.transactionID,
             user: req.user,
@@ -559,9 +559,7 @@ exports.revoke = [
         .then(() => {
           return res.json({});
         })
-        .catch((err) => {
-          return res.status(err.status).json({ error: err.message });
-        });
+        .catch((err) => next(err));
     } else {
       if ((req.body) && (req.body.refresh_token) &&
         (typeof req.body.refresh_token === 'string') &&
@@ -574,16 +572,12 @@ exports.revoke = [
           .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed valiation'))
           .then(() => db.refreshTokens.delete(refreshToken))
           .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting refresh_token'))
-          .catch((err) => {
-            res.status(err.status);
-            res.json({ error: err.message });
-          });
+          .catch((err) => next(err));
       } else {
         // Case of no valid tokens found, access_token or refresh_token
         const err = new Error('invalid_token');
         err.status = 400;
-        res.status(err.status);
-        res.json({ error: err.message });
+        next(err);
       }
     }
   }
@@ -643,10 +637,10 @@ exports.introspect = [
           res.json(resJson);
         })
         .catch(() => {
-          res.status(401).send('Unauthorized');
+          res.set('Content-Type', 'text/plain').status(401).send('Unauthorized');
         });
     } else {
-      res.status(401).send('Unauthorized');
+      res.set('Content-Type', 'text/plain').status(401).send('Unauthorized');
     }
   }
 ];

@@ -53,7 +53,7 @@ app.use(helmet.contentSecurityPolicy({
   directives:
     {
       defaultSrc: ["'none'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'none'"],
       connectSrc: ["'self'"],
       styleSrc: ["'self'"],
       mediaSrc: ["'none'"],
@@ -177,7 +177,7 @@ console.log('Serving static files from ' + path.join(__dirname, '../public'));
 // ---------------------------------
 //       T E S T   E R R O R
 // ---------------------------------
-app.use('/error', (req, res, next) => { throw new Error('Test error'); });
+// app.use('/error', (req, res, next) => { throw new Error('Test error'); });
 
 // ---------------------------------
 //    E R R O R   H A N D L E R S
