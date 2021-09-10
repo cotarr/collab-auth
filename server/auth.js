@@ -7,6 +7,7 @@ const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 const validate = require('./validate');
 const { addScopeToPassportReqObj } = require('./scope');
+const logUtils = require('./log-utils');
 
 // -----------------------------------------------------
 // Part 1 of 2
@@ -20,12 +21,16 @@ const { addScopeToPassportReqObj } = require('./scope');
  * Anytime a request is made to authorize an application, we must ensure that
  * a user is logged in before asking them to approve the request.
  */
-passport.use(new LocalStrategy((username, password, done) => {
+passport.use(new LocalStrategy({ passReqToCallback: true }, (req, username, password, done) => {
   db.users.findByUsername(username)
     .then((user) => validate.user(user, password))
     .then((user) => db.users.updateLoginTime(user))
+    .then((user) => logUtils.logPassportLocalLogin(req, user))
     .then((user) => done(null, user))
-    .catch(() => done(null, false));
+    .catch((err) => {
+      logUtils.logPassportLocalError(req, err);
+      return done(null, false);
+    });
 }));
 
 // --------------------------------------------

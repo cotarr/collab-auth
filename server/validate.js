@@ -19,13 +19,12 @@ const validate = Object.create(null);
  * @returns {Object} The user if valid
  */
 validate.user = (user, password) => {
-  if (user.loginDisabled) {
+  if ((user != null) && (user.loginDisabled)) {
     console.log('User login disabled');
     throw new Error('User login disabled');
   } else {
     validate.userExists(user);
     if (user.password !== password) {
-      console.log('User password not correct');
       throw new Error('User password not correct');
     }
     return user;
@@ -40,7 +39,6 @@ validate.user = (user, password) => {
  */
 validate.userExists = (user) => {
   if (user == null) {
-    console.log('User does not exist');
     throw new Error('User does not exist');
   }
   return user;

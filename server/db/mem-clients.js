@@ -181,11 +181,11 @@ exports.delete = (id) => {
       err.status = 400;
     }
     if (!err) {
-      // Modify RAM database
+      // Modify RAM database, splice returns array
       const deletedClient = clients.splice(arrayIndex, 1);
 
       // Deep copy for consistancy with above functions
-      const safeClient = _deepCopyClient(deletedClient);
+      const safeClient = _deepCopyClient(deletedClient[0]);
       resolve(safeClient);
     } else {
       reject(err);

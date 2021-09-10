@@ -8,6 +8,7 @@ const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const db = require('./db');
 const inputValidation = require('./input-validation');
 const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scope');
+const logUtils = require('./log-utils');
 
 const config = require('./config/');
 // const nodeEnv = process.env.NODE_ENV || 'development';
@@ -159,6 +160,8 @@ router.post('/createuser',
         if (createdUser == null) {
           throw new Error('Error saving user');
         } else {
+          const message = req.user.username + ' created new user: ' + createdUser.username;
+          logUtils.adminLogActivity(req, message);
           return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Ceate New User',
@@ -238,10 +241,12 @@ router.post('/edituser',
       role: toScopeArray(req.body.role)
     };
     db.users.update(user)
-      .then((createdUser) => {
-        if (createdUser == null) {
+      .then((editedUser) => {
+        if (editedUser == null) {
           throw new Error('Error saving user');
         } else {
+          const message = req.user.username + ' edited user: ' + editedUser.username;
+          logUtils.adminLogActivity(req, message);
           return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Edit User',
@@ -285,6 +290,8 @@ router.get('/deleteuser',
           if (deletedUser == null) {
             throw new Error('Error deleting user');
           } else {
+            const message = req.user.username + ' deleted user: ' + deletedUser.username;
+            logUtils.adminLogActivity(req, message);
             return res.set('Cache-Control', 'no-store').render('generic-message', {
               name: req.user.name,
               title: 'Delete User',
@@ -415,6 +422,8 @@ router.post('/createclient',
         if (createdClient == null) {
           throw new Error('Error saving client');
         } else {
+          const message = req.user.username + ' created new client: ' + createdClient.clientId;
+          logUtils.adminLogActivity(req, message);
           return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Ceate New Client',
@@ -492,10 +501,12 @@ router.post('/editclient',
       allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
     };
     db.clients.update(client)
-      .then((createdClient) => {
-        if (createdClient == null) {
+      .then((editedClient) => {
+        if (editedClient == null) {
           throw new Error('Error saving client');
         } else {
+          const message = req.user.username + ' edited client: ' + editedClient.clientId;
+          logUtils.adminLogActivity(req, message);
           return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
             title: 'Edit Client',
@@ -540,6 +551,8 @@ router.get('/deleteclient',
           if (deletedClient == null) {
             throw new Error('Error deleting client');
           } else {
+            const message = req.user.username + ' deleted client: ' + deletedClient.clientId;
+            logUtils.adminLogActivity(req, message);
             return res.set('Cache-Control', 'no-store').render('generic-message', {
               name: req.user.name,
               title: 'Delete Client',
@@ -575,12 +588,16 @@ router.get('/removealltokens',
       db.accessTokens.removeAll()
         .then(() => db.refreshTokens.removeAll())
         .then(() => db.sessions.removeAll())
-        .then(() => res.set('Cache-Control', 'no-store').render('generic-message', {
-          name: req.user.name,
-          title: 'Clear Auth',
-          message: 'Access tokens and refresh tokens have been removed form the database. ' +
-            'Authorization server session data has been cleared'
-        }))
+        .then(() => {
+          const message = req.user.username + ' removed all token and cleared sessions';
+          logUtils.adminLogActivity(req, message);
+          return res.set('Cache-Control', 'no-store').render('generic-message', {
+            name: req.user.name,
+            title: 'Clear Auth',
+            message: 'Access tokens and refresh tokens have been removed form the database. ' +
+              'Authorization server session data has been cleared'
+          });
+        })
         .catch((err) => next(err));
     } else {
       res.set('Cache-Control', 'no-store').render('confirm-remove', { name: req.user.name });

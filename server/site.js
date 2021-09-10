@@ -9,6 +9,7 @@ const db = require('./db');
 const { requireScopeForWebPanel } = require('./scope');
 const validate = require('./validate');
 const inputValidation = require('./input-validation');
+const logUtils = require('./log-utils');
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -82,7 +83,6 @@ exports.changePasswordHandler = [
   requireScopeForWebPanel(['user.password', 'user.admin']),
   inputValidation.changePassword,
   (req, res, next) => {
-    console.log(req.body);
     validate.usernameMatchesSession(req, req.body.username)
       .then((username) => db.users.findByUsername(username))
       .then((user) => validate.user(user, req.body.oldpassword))
@@ -90,6 +90,7 @@ exports.changePasswordHandler = [
       .then((user) => db.users.updatePassword(user.id, req.body.newpassword1))
       .then((user) => validate.userExists(user))
       .then((user) => {
+        logUtils.userLogActivity(req, user.username + ' changed password');
         const message = 'Your password has been successfully changed. ';
         res.set('Cache-Control', 'no-store').render('change-password-message',
           { name: req.user.name, passwordMessage: message });

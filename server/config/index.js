@@ -8,6 +8,11 @@ const path = require('path');
 
 require('dotenv').config();
 
+// const nodeEnv = process.env.NODE_ENV || 'development';
+
+// in the case of NODE_ENV=production, force logging to console.
+exports.nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
+
 exports.site = {
   vhost: process.env.SITE_VHOST || '*',
   authURL: process.env.SITE_AUTH_URL || 'http://127.0.0.1:3500',

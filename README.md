@@ -55,6 +55,9 @@ PGHOST=sql.example.com  (or)  PGHOSTADDR=127.0.0.1
 PGPORT=5432
 PGDATABASE=collabauth
 PGSSLMODE=disable
+
+# When NODE_ENV=production, force logger to send access and admin log to console.
+NODE_DEBUG_LOG=0
 ```
 
 ### Scopes

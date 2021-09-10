@@ -10,4 +10,5 @@ push*
 notes.md
 *.tar
 .env
-sessions/
+sessions
+logs

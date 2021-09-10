@@ -19,6 +19,7 @@ const db = require('./db');
 const site = require('./site');
 const adminPanel = require('./admin-panel');
 const checkVhost = require('./check-vhost');
+const logConfig = require('./log-config');
 
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -31,13 +32,10 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-//
+// ------------------
 // HTTP access log
-//
-console.log('Access log: (console)');
-const logFormat = ':date[iso] :remote-addr :status :method :http-version :req[host]:url';
-const logOptions = {};
-app.use(logger(logFormat, logOptions));
+// ------------------
+app.use(logger(logConfig.format, logConfig.options));
 
 // ---------------
 // clean headers
