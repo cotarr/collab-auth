@@ -10,18 +10,65 @@ This is one of 3 repositories
 | [collab-frontend](https://github.com/cotarr/collab-frontend)       | Mock Web server, reverse proxy, html content          |
 | [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
 
+# Acknowledgements
+
+The initial starting point for this application was copied
+as a template application from Oauth2OrizeRecpies by Frank Hassanabad
+https://github.com/FrankHassanabad/Oauth2orizeRecipes
 
 ### Security Note
 
-No security review has been performed. No formal testing has been performed.
+No security review has been performed.
 
-### Install node server
+In the development configuration, passwords are stored in plain text in local files.
+
+### Install node server for development environment
 
 ```bash
 git clone git@github.com:cotarr/collab-auth.git
 cd collab-auth
 npm install
 ```
+
+### Setup development configuration
+
+Running the server in development mode will require 3 things.
+
+- A file to define user login and passwords
+- A file to define client IDs and client secrets
+- Certificates to sign and verify JWT tokens.
+
+There is a bash script named `config-dev-script.sh` that
+will automate these 3 things for setup of a development server.
+You should review this script before use.
+
+The script will copy example user template and client template
+to working files to define users and clients in the development environment.
+In the development server, the passwords within these files are in plain text.
+
+This will run openssl to generate certificates.
+The certificates are used by the program to sign and verify access_tokens.
+Running openssl will prompt the input for various inputs.
+Inputs can be skipped by entering a period [.].
+The recommended entry "collab-auth" is entered into 2 required field for
+"Organization Name" and "Common Name."
+
+The enviornment variable NODE_ENV should not exist or it may
+be set to NODE_ENV=development.
+
+No additional configuration is required to start a development server.
+
+```bash
+npm run config-dev-script
+```
+
+### Start with npm
+
+```bash
+npm start
+```
+
+The server can also be started with `node bin/www`
 
 ### Example Environment variables (showing defaults)
 
@@ -79,14 +126,19 @@ NODE_DEBUG_LOG=0
 
 ### User configuration
 
-At this time, users are read from static files with plain text credentials.
-Copy example files to a new name.
+In the development configuration, clients and users are read from static
+files with plain text credentials in JSON format.
+To setup for development, copy example files to a new name.
 Edit files: clients-db.json, users-db.json as needed.
 
 ```
 cp -v example-clients-db.json clients-db.json
 cp -v example-users-db.json users-db.json
 ```
+
+In the production environment, credentials are stored in a PostgreSQL database.
+
+Instructions for production: TBD
 
 ### Certificates (Tokens)
 
@@ -125,17 +177,3 @@ The certificate filenames should be included in your .gitignore file.
 Unless otherwise specified, the TLS certificates will fall back to the same
 files that were generated for JWT token signature. This can be overwritten
 with the environment variables shown above.
-
-### Start with npm
-
-```bash
-npm start
-```
-
-The server can also be started manually with `node index.js` or `./index.js`
-
-# Acknowledgements
-
-The initial starting point for this application was copied
-as a template application from Oauth2OrizeRecpies by Frank Hassanabad
-https://github.com/FrankHassanabad/Oauth2orizeRecipes

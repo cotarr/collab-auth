@@ -7,7 +7,7 @@ Note certificates are also used to sign/verify JWT tokens
 
 * Entry of period [.] will skip an input
 * For testing, the following were used
- * Organization = collab-auth
+ * Organization Name = collab-auth
  * Common Name = collab-auth
 
 

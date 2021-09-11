@@ -5,7 +5,8 @@
   "main": "bin/www",
   "scripts": {
     "lint": "eslint *.js config db test",
-    "start": "node bin/www"
+    "start": "node bin/www",
+    "config-dev-script": "bash ./config-dev-script.sh"
   },
   "repository": {
     "type": "git",
@@ -20,7 +21,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "connect-ensure-login": "^0.1.1",
-    "connect-pg-simple": "^6.2.1",
+    "connect-pg-simple": "^7.0.0",
     "cookie-parser": "^1.4.5",
     "dotenv": "^10.0.0",
     "ejs": "^3.1.6",

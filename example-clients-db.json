@@ -7,13 +7,31 @@
     "trustedClient": false,
     "allowedScope": [
       "auth.none",
+      "auth.info",
+      "auth.client",
       "auth.token",
       "api.read",
-      "api.write",
-      "api.admin"
+      "api.write"
     ],
     "allowedRedirectURI": [
       "http://localhost:3000/login/callback"
-    ]
+    ],
+    "createdAt": "2021-08-22T18:38:29.250Z",
+    "updatedAt": "2021-08-22T18:38:29.250Z"
+  },
+  {
+    "id": "c5d04092-df38-4421-8426-8bd4c8635af4",
+    "name": "collab-backend-api",
+    "clientId": "def456",
+    "clientSecret": "ssh-secret",
+    "trustedClient": false,
+    "allowedScope": [
+      "auth.info"
+    ],
+    "allowedRedirectURI": [
+      "http://localhost:3000/login/callback"
+    ],
+    "createdAt": "2021-08-22T18:38:29.250Z",
+    "updatedAt": "2021-08-22T18:38:29.250Z"
   }
 ]
