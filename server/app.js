@@ -92,6 +92,7 @@ const sessionOptions = {
   secret: config.session.secret,
   cookie: {
     path: '/',
+    // express-session takes cookie.maxAge in milliseconds
     maxAge: config.session.maxAge,
     secure: (config.server.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
@@ -112,6 +113,7 @@ if (config.session.disableMemorystore) {
   sessionStore.PgSessionStore = require('connect-pg-simple')(session);
   sessionOptions.store = new sessionStore.PgSessionStore({
     pool: sessionStore.pgPool,
+    // connect-pg-simple ttl is in seconds
     ttl: config.session.ttl,
     tableName: 'session'
   });
@@ -121,10 +123,10 @@ if (config.session.disableMemorystore) {
   sessionOptions.saveUninitialized = false; // need false for memorystore
   sessionStore.MemoryStore = require('memorystore')(session);
   sessionOptions.store = new sessionStore.MemoryStore({
-    // milliseconds
+    // Memorystore ttl is in milliseconds
     ttl: config.session.maxAge,
     stale: true,
-    checkPeriod: 864000000 // prune every 24 hours
+    checkPeriod: 86400000 // prune every 24 hours
   });
 }
 app.use(session(sessionOptions));
