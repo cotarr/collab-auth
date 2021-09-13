@@ -49,6 +49,7 @@ router.get('/listusers',
         userArray.forEach((user, i) => {
           const filteredUser = {
             id: user.id,
+            number: user.number,
             username: user.username,
             name: user.name
           };
@@ -98,6 +99,7 @@ router.get('/viewuser',
           }
           const filteredUser = {
             id: user.id,
+            number: user.number,
             username: user.username,
             name: user.name,
             loginDisabled: user.loginDisabled,
@@ -150,6 +152,7 @@ router.post('/createuser',
   (req, res, next) => {
     const user = {
       name: req.body.name,
+      number: req.body.number,
       username: req.body.username,
       password: req.body.newpassword1,
       loginDisabled: (req.body.loginDisabled === 'on') || false,
@@ -194,6 +197,7 @@ router.get('/edituser',
 
           const filteredUser = {
             id: user.id,
+            number: user.number,
             username: user.username,
             name: user.name,
             loginDisabled: user.loginDisabled,

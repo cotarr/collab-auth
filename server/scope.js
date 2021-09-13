@@ -221,6 +221,11 @@ exports.requireScopeForWebPanel = (requiredScope) => {
  * @returns {Array} Returns intercepted scope, or default scope
  */
 exports.intersectReqCliUsrScopes = (httpRequestedScope, clientAllowedScope, userRole) => {
+  // ------ when issuing a new token, uncomment this to show scope intersection arrays
+  // console.log('httpRequestedScope\n', httpRequestedScope);
+  // console.log('clientAllowedScope\n', clientAllowedScope);
+  // console.log('userRole\n', userRole);
+
   const defaultScope = ['auth.none'];
   const scopeIntersection = [];
 
@@ -236,6 +241,9 @@ exports.intersectReqCliUsrScopes = (httpRequestedScope, clientAllowedScope, user
         scopeIntersection.push(reqScope);
       }
     });
+    // ------ when issuing a token, uncomment this to show intersected scope
+    // console.log('scopeIntersection\n', scopeIntersection);
+
     return scopeIntersection;
   }
 };

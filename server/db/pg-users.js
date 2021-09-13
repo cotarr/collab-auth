@@ -85,15 +85,17 @@ exports.updateLoginTime = (user) => {
  * @returns {Promise}  resolved promise created use, otherwise user exist throws error
  */
 exports.save = (user) => {
+  console.log(user);
   const uidQuery = {
-    text: 'SELECT * FROM authusers WHERE "username" = $1 AND "deleted" = FALSE',
-    values: [user.username]
+    text: 'SELECT * FROM authusers WHERE ("username" = $1 OR "number" = $2) AND "deleted" = FALSE',
+    values: [user.username, user.number]
   };
   return pgPool.query(uidQuery)
     .then((foundUser) => {
       if (foundUser.rows.length === 0) {
         const saveQuery = {
           text: 'INSERT INTO authusers (' +
+          '"number",' +
           '"username",' +
           '"password",' +
           '"name",' +
@@ -102,8 +104,9 @@ exports.save = (user) => {
           '"lastLogin", ' +
           '"updatedAt", ' +
           '"createdAt") ' +
-          'VALUES ($1, $2, $3, $4, $5, $6, now(), now()) RETURNING *',
+          'VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING *',
           values: [
+            parseInt(user.number),
             user.username,
             user.password,
             user.name,
@@ -114,7 +117,7 @@ exports.save = (user) => {
         };
         return pgPool.query(saveQuery);
       } else {
-        const err = new Error('username already exists');
+        const err = new Error('username or number already exists');
         err.status = 400;
         throw err;
       }

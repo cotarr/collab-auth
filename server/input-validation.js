@@ -224,6 +224,7 @@ exports.deleteByUUID = [
  */
 exports.createUser = [
   checkExtraneousKeys([
+    'number',
     'username',
     'newpassword1',
     'name',
@@ -237,6 +238,7 @@ exports.createUser = [
     .not().exists(),
   // Required Body Keys
   body([
+    'number',
     'username',
     'newpassword1',
     'name',
@@ -245,6 +247,8 @@ exports.createUser = [
   //
   // Validate Required keys
   //
+  body('number', 'Invalid positive integer value')
+    .isInt({ min: 0, max: 1000000000 }),
   body('name', 'Invalid string length')
     .isLength({ min: config.data.userNameMinLength, max: config.data.userNameMaxLength }),
   body('name', 'Invalid characters in string')
@@ -286,6 +290,11 @@ exports.editUser = [
     'loginDisabled',
     'role'], 'body'),
   // Forbidden body keys
+  body([
+    'number',
+    'username'], 'Read only value')
+    .not().exists(),
+  // Required Body Keys
   body([
     'updatedAt',
     'createdAt'], 'Server generated values not allowed')
@@ -477,6 +486,9 @@ exports.editClient = [
     'allowedScope',
     'allowedRedirectURI'], 'body'),
   // Forbidden body keys
+  body([
+    'clientId'], 'Read only value')
+    .not().exists(),
   body([
     'updatedAt',
     'createdAt'], 'Server generated values not allowed')

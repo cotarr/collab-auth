@@ -114,15 +114,19 @@ exports.updateLoginTime = (user) => {
 exports.save = (user) => {
   return new Promise((resolve, reject) => {
     let err = false;
-    // Check for pre-existing users, error
-    const foundUser = users.find((usr) => usr.username === user.username);
+    // Check for pre-existing username or number, error
+    const foundUser = users.find((usr) => {
+      return ((usr.username === user.username) ||
+        (parseInt(usr.number) === parseInt(user.number)));
+    });
     if (!(foundUser == null)) {
-      err = new Error('username already exists');
+      err = new Error('username or number already exists');
       err.status = 400;
     }
     if (!err) {
       // Create new user and save to RAM database
       user.id = uuid.v4();
+      user.number = parseInt(user.number);
       user.lastLogin = null;
       user.createdAt = new Date();
       user.updatedAt = new Date();
