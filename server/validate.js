@@ -159,6 +159,7 @@ validate.token = (token, accessToken) => {
         }
         tokenMetaData.user = {
           id: user.id,
+          number: user.number,
           username: user.username,
           name: user.name
         };
