@@ -562,7 +562,9 @@ exports.dialogAuthorization = [
 ];
 
 exports.dialogAuthDecision = [
-  checkExtraneousKeys(['transaction_id'], 'body'),
+  checkExtraneousKeys([
+    'cancel',
+    'transaction_id'], 'body'),
   body('transaction_id').exists().isLength({ min: 1, max: 64 }),
   handleErrorOauth
 ];
