@@ -42,13 +42,27 @@ exports.login = [
 ];
 
 /**
- * Logout of the system and redirect logout info page
+ * Logout of the system and render logout info page
  */
-exports.logout = (req, res) => {
-  req.logout();
-  // name empty string for header
-  res.set('Cache-Control', 'no-store').render('logout', { name: '' });
-  // res.redirect('/');
+exports.logout = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    if (req.session) {
+      req.session.destroy((err) => {
+        if (err) {
+          return next(err);
+        } else {
+          // name empty string for header
+          return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
+        }
+      });
+    } else {
+      // name empty string for header
+      return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
+    }
+  } else {
+    // name empty string for header
+    return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
+  }
 };
 
 /**
