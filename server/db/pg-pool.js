@@ -1,8 +1,8 @@
 'use strict';
 const pg = require('pg');
 
-const config = require('../config');
-const nodeEnv = process.env.NODE_ENV || 'development';
+// const config = require('../config');
+// const nodeEnv = process.env.NODE_ENV || 'development';
 
 // Create table: node_modules/connect-pg-simple/table.sql
 //
@@ -18,7 +18,10 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 
 module.exports = new pg.Pool({
   max: 20, // set pool max size to 20
-  idleTimeoutMillis: 1000, // close idle clients after 1 second
-  connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
-  maxUses: 7500 // close (and replace) a connection after it has been used 7500 times (see below for discussion)
+  // close idle clients after 1 second
+  idleTimeoutMillis: 1000,
+  // return an error after 1 second if connection could not be established
+  connectionTimeoutMillis: 1000,
+  // close (and replace) a connection after it has been used 7500 times
+  maxUses: 7500
 });

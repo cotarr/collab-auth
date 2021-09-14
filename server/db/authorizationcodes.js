@@ -27,7 +27,7 @@ exports.find = (code) => {
  * Saves a authorization code, client id, redirect uri, user id, expiration date, and scope.
  * @param   {String}  code           - The authorization code (required)
  * @param   {String}  clientID       - The client ID (required)
- * @param   {String}  redirectURI    - The redirect URI of where to send access tokens once exchanged
+ * @param   {String}  redirectURI    - Redirect URI of where to send access tokens once exchanged
  * @param   {String}  userID         - The user ID (required)
  * @param   {Number}  expirationDate - The code expiration milliseconds
  * @param   {String}  scope          - The scope (optional)
@@ -54,8 +54,8 @@ exports.delete = (code) => {
 };
 
 /**
- * Removes expired authorization codes. It does this by looping through them all and then removing the
- * expired ones it finds.
+ * Removes expired authorization codes. It does this by looping through them all
+ * and then removing the expired ones it finds.
  * @returns {Promise} resolved with an associative of codes that were expired
  */
 exports.removeExpired = () => {

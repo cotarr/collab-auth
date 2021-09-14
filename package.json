@@ -4,7 +4,7 @@
   "description": "Collaboration project repo for oauth2 provider",
   "main": "bin/www",
   "scripts": {
-    "lint": "eslint *.js config db test",
+    "lint": "eslint server bin/www",
     "start": "node bin/www",
     "config-dev-script": "bash ./config-dev-script.sh"
   },

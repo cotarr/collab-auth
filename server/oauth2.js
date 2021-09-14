@@ -328,7 +328,8 @@ server.exchange(oauth2orize.exchange.refreshToken(
     db.refreshTokens.find(refreshToken)
       .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
       .then((token) => validate.token(token, refreshToken))
-      .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed validation'))
+      .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+        'refresh_token failed validation'))
       .then((tokenMetaData) => {
         // verify, only client that issues the refresh token may renew it
         // client parameter comes from passport client authorization
@@ -536,9 +537,11 @@ exports.revoke = [
       db.accessTokens.find(accessToken)
         .then((token) => validate.tokenNotNull(token, 'access_token not found'))
         .then((token) => validate.token(token, accessToken))
-        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'access_token failed validation'))
+        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+          'access_token failed validation'))
         .then(() => db.accessTokens.delete(accessToken))
-        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting access_token'))
+        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+          'error deleting access_token'))
         .then(() => {
           if ((req.body) && (req.body.refresh_token) &&
             (typeof req.body.refresh_token === 'string') &&
@@ -548,9 +551,11 @@ exports.revoke = [
             return db.refreshTokens.find(refreshToken)
               .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
               .then((token) => validate.token(token, refreshToken))
-              .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed validation'))
+              .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+                'refresh_token failed validation'))
               .then(() => db.refreshTokens.delete(refreshToken))
-              .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting refresh token'));
+              .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+                'error deleting refresh token'));
           } else {
             // else, case of only access_token, but not refresh token
             return {};
@@ -569,9 +574,11 @@ exports.revoke = [
         db.refreshTokens.find(refreshToken)
           .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
           .then((token) => validate.token(token, refreshToken))
-          .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'refresh_token failed valiation'))
+          .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+            'refresh_token failed valiation'))
           .then(() => db.refreshTokens.delete(refreshToken))
-          .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'error deleting refresh_token'))
+          .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+            'error deleting refresh_token'))
           .catch((err) => next(err));
       } else {
         // Case of no valid tokens found, access_token or refresh_token
@@ -615,7 +622,8 @@ exports.introspect = [
       db.accessTokens.find(accessToken)
         .then((token) => validate.tokenNotNull(token, 'access_token not found'))
         .then((token) => validate.token(token, accessToken))
-        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData, 'access_token validaiton failed'))
+        .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
+          'access_token validaiton failed'))
         .then((tokenMetaData) => {
           const resJson = {
             active: true,
@@ -626,7 +634,8 @@ exports.introspect = [
             exp: tokenMetaData.decoded.exp,
             iat: tokenMetaData.decoded.iat,
             grant_type: tokenMetaData.token.grantType,
-            expires_in: Math.floor((tokenMetaData.token.expirationDate.getTime() - Date.now()) / 1000),
+            expires_in: Math.floor(
+              (tokenMetaData.token.expirationDate.getTime() - Date.now()) / 1000),
             auth_time: Math.floor(tokenMetaData.token.authTime.valueOf() / 1000),
             scope: tokenMetaData.token.scope,
             client: tokenMetaData.client

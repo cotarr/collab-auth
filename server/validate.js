@@ -224,7 +224,8 @@ validate.isRefreshToken = ({ scope }) => {
 validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime }) => {
   const refreshToken = jwtUtils.createToken({ sub: userID, exp: config.refreshToken.expiresIn });
   const expiration = new Date(Date.now() + (config.refreshToken.expiresIn * 1000));
-  return db.refreshTokens.save(refreshToken, expiration, userID, clientID, scope, grantType, authTime)
+  return db.refreshTokens.save(
+    refreshToken, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => refreshToken);
 };
 
