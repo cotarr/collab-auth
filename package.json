@@ -1,7 +1,7 @@
 {
   "name": "collab-auth",
   "version": "0.0.1",
-  "description": "Collaboration project repo for oauth2 provider",
+  "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
     "lint": "npx eslint server bin/www",

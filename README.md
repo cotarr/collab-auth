@@ -1,8 +1,12 @@
 # collab-auth
 
-Description: TBD
+This is 1 of 4 repositories used on a collaboration project for learning oauth2orize and passport.
+The concept involves setup of a home network oauth2 server that could be used to restrict
+access to a personal web server, database API, and home network IOT devices.
+This repository will use the oauth2orize library. Users records and sessions can be
+temporarily stored in memory during development or configured to use PostgreSQL.
+This is a learning project and will require additional work before considering use in a production.
 
-This is one of 4 repositories
 
 |                        Repository                                  |                   Description                         |
 | ------------------------------------------------------------------ | ----------------------------------------------------- |
@@ -35,8 +39,8 @@ npm install
 
 Running the server in development mode will require 3 things.
 
-- A file to define user login and passwords
-- A file to define client IDs and client secrets
+- A file to define user accounts with login username and password
+- A file to define client accounts with client id and client secret
 - Certificates to sign and verify JWT tokens.
 
 There is a bash script named `config-dev-script.sh` that
@@ -45,7 +49,7 @@ You should review this script before use.
 
 The script will copy example user template and client template
 to working files to define users and clients in the development environment.
-In the development server, the passwords within these files are in plain text.
+In the development server, the passwords within these files are stored in plain text.
 
 This will run openssl to generate certificates.
 The certificates are used by the program to sign and verify access_tokens.
@@ -54,7 +58,7 @@ Inputs can be skipped by entering a period [.].
 The recommended entry "collab-auth" is entered into 2 required field for
 "Organization Name" and "Common Name."
 
-The enviornment variable NODE_ENV should not exist or it may
+The environment variable NODE_ENV should not exist or it may
 be set to NODE_ENV=development.
 
 No additional configuration is required to start a development server.
@@ -70,6 +74,23 @@ npm start
 ```
 
 The server can also be started with `node bin/www`
+
+### Administrator Login
+
+A simple administrator web page may be accessed at `http://127.0.0.1:3500/panel/menu`.
+This is a very simple page with limited functions to add or modify user records and client records.
+To gain access to the administrator page, a user account must be assigned the role "user-admin".
+It is recommended an admin user be a dedicated account, and that the user-admin role not be
+added to commonly used accounts. Usernames and real names are currently restricted to
+A-Z a-z 0-9 characters. In development mode, user and client account records are loaded from
+static files when the server starts, and changes to users and client account records are not saved.
+If configured for PostgreSQL, changes will be saved to the database.
+
+### User password changes
+
+Users may change their own passwords using `http://127.0.0.1:3500/changepassword`.
+A user account must be assigned the role "user.password" or "user.admin" to gain access
+to this page and change passwords.
 
 ### Example Environment variables (showing defaults)
 
@@ -88,23 +109,24 @@ SERVER_TLS=false
 SERVER_PORT=3500
 SERVER_PID_FILENAME=
 
+SESSION_DISABLE_MEMORYSTORE=false
+SESSION_EXPIRE_SEC=604800
+SESSION_SECRET="A Secret That Should Be Changed"
+
+# To enable PostgreSQL, set to true
+DATABASE_DISABLE_INMEM_DB=true
+PGUSER=xxxxx
+PGPASSWORD=xxxxx
+PGHOST=sql.example.com  (or)  PGHOSTADDR=127.0.0.1
+PGPORT=5432
+PGDATABASE=collabauth
+PGSSLMODE=disable
+
 OAUTH2_DISABLE_TOKEN_GRANT=false
 OAUTH2_DISABLE_CODE_GRANT=false
 OAUTH2_DISABLE_CLIENT_GRANT=false
 OAUTH2_DISABLE_PASSWORD_GRANT=false
 OAUTH2_DISABLE_REFRESH_TOKEN_GRANT=false
-
-SESSION_DISABLE_MEMORYSTORE=false
-SESSION_EXPIRE_SEC
-SESSION_SECRET
-
-DATABASE_DISABLE_INMEM_DB=true
-PGUSER
-PGPASSWORD
-PGHOST=sql.example.com  (or)  PGHOSTADDR=127.0.0.1
-PGPORT=5432
-PGDATABASE=collabauth
-PGSSLMODE=disable
 
 # When NODE_ENV=production, force logger to send access and admin log to console.
 NODE_DEBUG_LOG=0
@@ -137,9 +159,9 @@ cp -v example-clients-db.json clients-db.json
 cp -v example-users-db.json users-db.json
 ```
 
-In the production environment, credentials are stored in a PostgreSQL database.
+Optional configuration allows use of a PostgreSQL database to store account records.
 
-Instructions for production: TBD
+Instructions to create SQL tables: TBD
 
 ### Certificates (Tokens)
 
