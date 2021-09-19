@@ -29,7 +29,7 @@ exports.server = {
   serverTlsCert: process.env.SERVER_TLS_CERT ||
     path.join(__dirname, './server/certs/certificate.pem'),
   tls: (process.env.SERVER_TLS === 'true') || false,
-  port: process.env.SERVER_PORT || 3500,
+  port: parseInt(process.env.SERVER_PORT || '3500'),
   pidFilename: process.env.SERVER_PID_FILENAME || ''
 };
 

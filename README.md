@@ -73,7 +73,7 @@ The server can also be started with `node bin/www`
 
 ### Example Environment variables (showing defaults)
 
-The `.env` file is supported.
+The `.env` file is supported using dotenv npm package
 
 ```
 SITE_VHOST=*
