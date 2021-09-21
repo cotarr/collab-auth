@@ -1,5 +1,8 @@
 'use strict';
 
+const crypto = require('crypto');
+const CryptoJS = require('crypto-js');
+
 const config = require('./config');
 const db = require('./db');
 const jwtUtils = require('./jwt-utils');
@@ -64,6 +67,23 @@ validate.usernameMatchesSession = (req, username) => {
 };
 
 /**
+ * Timing safe compare, from express-basic-auth
+ * @param   {Stromg} userInput - Express request object
+ * @param   {String} secret username from passport change form
+ * @returns {Boolean} Return true if successful match, else false
+ */
+const safeCompare = function (userInput, secret) {
+  const userInputLength = Buffer.byteLength(userInput);
+  const secretLength = Buffer.byteLength(secret);
+  const userInputBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
+  userInputBuffer.write(userInput);
+  const secretBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
+  secretBuffer.write(secret);
+  return !!(crypto.timingSafeEqual(userInputBuffer, secretBuffer)) &
+    userInputLength === secretLength;
+};
+
+/**
  * Given a client and a client secret this return the client if it exists and its clientSecret
  * matches, otherwise this will throw an error
  * @param   {Object} client       - The client profile
@@ -73,11 +93,37 @@ validate.usernameMatchesSession = (req, username) => {
  */
 validate.client = (client, clientSecret) => {
   validate.clientExists(client);
-  if (client.clientSecret !== clientSecret) {
-    console.log('Client secret does not match');
-    throw new Error('Client secret does not match');
+  if (config.database.disableInMemoryDb) {
+    //
+    // Client secret is AES encrypted.
+    //
+    // This is case of PostsgreSQL database
+    //
+    const plainTextBytes =
+      CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+    const plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+    // Timing safe compare
+    if (safeCompare(clientSecret, plainTextClientSecret)) {
+      // Success, client secret matches
+      return client;
+    } else {
+      console.log('Client secret does not match');
+      throw new Error('Client secret does not match');
+    }
+  } else {
+    //
+    // Client secret is PLAIN TEXT
+    //                  ==========
+    // This is case of in-memory database loaded from static files
+    //
+    if (safeCompare(clientSecret, client.clientSecret)) {
+      // Success, client secret matches
+      return client;
+    } else {
+      console.log('Client secret does not match');
+      throw new Error('Client secret does not match');
+    }
   }
-  return client;
 };
 
 /**

@@ -2,6 +2,7 @@
 
 const express = require('express');
 const router = express.Router();
+const CryptoJS = require('crypto-js');
 
 const uid2 = require('uid2');
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
@@ -361,12 +362,19 @@ router.get('/viewclient',
           err.status = 400;
           return next(err);
         }
-
+        let plainTextClientSecret = client.clientSecret;
+        // Case of PostgreSQL, client secret is AES encrypted
+        if (config.database.disableInMemoryDb) {
+          // Decrypt Client Secret from database
+          const plainTextBytes =
+            CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+          plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+        }
         const filteredClient = {
           id: client.id,
           name: client.name,
           clientId: client.clientId,
-          clientSecret: client.clientSecret,
+          clientSecret: plainTextClientSecret,
           allowedScope: toScopeString(client.allowedScope),
           allowedRedirectURI: toScopeString(client.allowedRedirectURI),
           updatedAt: client.updatedAt.toUTCString(),
@@ -413,10 +421,16 @@ router.post('/createclient',
   requireScopeForWebPanel('user.admin'),
   inputValidation.createClient,
   (req, res, next) => {
+    let savedClientSecret = req.body.clientSecret;
+    if (config.database.disableInMemoryDb) {
+      // Case of PostgreSQL database, use AES encryption on client secret
+      savedClientSecret =
+        CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
+    }
     const client = {
       name: req.body.name,
       clientId: req.body.clientId,
-      clientSecret: req.body.clientSecret,
+      clientSecret: savedClientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: toScopeArray(req.body.allowedScope),
       allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
@@ -457,12 +471,19 @@ router.get('/editclient',
             err.status = 400;
             return next(err);
           }
-
+          let plainTextClientSecret = client.clientSecret;
+          // Case of PostgreSQL, client secret is AES encrypted
+          if (config.database.disableInMemoryDb) {
+            // Decrypt Client Secret from database
+            const plainTextBytes =
+              CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+            plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+          }
           const filteredClient = {
             id: client.id,
             name: client.name,
             clientId: client.clientId,
-            clientSecret: client.clientSecret,
+            clientSecret: plainTextClientSecret,
             allowedScope: toScopeString(client.allowedScope),
             allowedRedirectURI: toScopeString(client.allowedRedirectURI),
             updatedAt: client.updatedAt.toUTCString(),
@@ -496,10 +517,16 @@ router.post('/editclient',
   requireScopeForWebPanel('user.admin'),
   inputValidation.editClient,
   (req, res, next) => {
+    let savedClientSecret = req.body.clientSecret;
+    if (config.database.disableInMemoryDb) {
+      // Case of PostgreSQL database, use AES encryption on client secret
+      savedClientSecret =
+        CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
+    }
     const client = {
       id: req.body.id,
       name: req.body.name,
-      clientSecret: req.body.clientSecret,
+      clientSecret: savedClientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: toScopeArray(req.body.allowedScope),
       allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
