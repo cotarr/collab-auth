@@ -5,8 +5,9 @@
   "main": "bin/www",
   "scripts": {
     "lint": "npx eslint server bin/www",
-    "start": "node bin/www",
-    "config-dev-script": "bash ./config-dev-script.sh"
+    "start": "node ./bin/www",
+    "config-dev-script": "bash ./config-dev-script.sh",
+    "create-postgres-admin-user": "node ./SQL-tools/create-postgres-admin-user.js"
   },
   "repository": {
     "type": "git",
@@ -19,6 +20,7 @@
   },
   "homepage": "https://github.com/cotarr/collab-auth#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "connect-ensure-login": "^0.1.1",
     "connect-pg-simple": "^7.0.0",

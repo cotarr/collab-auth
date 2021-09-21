@@ -85,7 +85,6 @@ exports.updateLoginTime = (user) => {
  * @returns {Promise}  resolved promise created use, otherwise user exist throws error
  */
 exports.save = (user) => {
-  console.log(user);
   const uidQuery = {
     text: 'SELECT * FROM authusers WHERE ("username" = $1 OR "number" = $2) AND "deleted" = FALSE',
     values: [user.username, user.number]
