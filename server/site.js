@@ -157,8 +157,11 @@ exports.changePasswordHandler = [
           { name: req.user.name, passwordMessage: message });
       })
       .catch((e) => {
-        // next(err);
+        // console.log(e.message);
         let message = 'There was an error changing your password';
+        if (e.message === 'Not current user') {
+          message = 'Error: Username was Invalid';
+        }
         if (e.message === 'User password not correct') {
           message = 'Error: Old password was Invalid.';
         }
