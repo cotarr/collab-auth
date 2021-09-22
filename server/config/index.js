@@ -42,6 +42,7 @@ exports.session = {
 
 exports.database = {
   disableInMemoryDb: (process.env.DATABASE_DISABLE_INMEM_DB === 'true') || false,
+  timeToCheckExpiredTokensSeconds: 3600,
   defaultClient: {
     randomSecretLength: 24,
     trustedClient: false,
@@ -55,7 +56,6 @@ exports.database = {
     allowedRedirectURI: ['http://localhost:3000/login/callback']
   },
   defaultUser: {
-    randomPasswordLength: 12,
     role: [
       'api.read',
       'user.password'
@@ -69,56 +69,15 @@ exports.oauth2 = {
   disableCodeGrant: (process.env.OAUTH2_DISABLE_CODE_GRANT === 'true') || false,
   disableClientGrant: (process.env.OAUTH2_DISABLE_CLIENT_GRANT === 'true') || false,
   disablePasswordGrant: (process.env.OAUTH2_DISABLE_PASSWORD_GRANT === 'true') || false,
-  disableRefreshTokenGrant: (process.env.OAUTH2_DISABLE_REFRESH_TOKEN_GRANT === 'true') || false
-
-};
-
-/**
- * Configuration of access tokens.
- *
- * expiresIn               - The time in seconds before the access token expires. Default is 60
- *                           minutes
- */
-exports.token = {
-  expiresIn: 3600
-};
-
-/**
- * Configuration of code token.
- * expiresIn - The time in seconds before the authorization code expires.
- */
-exports.code = {
-  length: 24,
-  expiresIn: 60
-};
-
-/**
- * Decision configuration
- */
-exports.decision = {
-  // Transaction ID length
-  idLength: 16
-};
-
-/**
- * Configuration of refresh token.
- * expiresIn - The time in minutes before the code token expires.  Default is 100 years.  Most if
- *             all refresh tokens are expected to not expire.  However, I give it a very long shelf
- *             life instead.
- */
-exports.refreshToken = {
-  expiresIn: 30 * 24 * 3600
-};
-
-/**
- * Database configuration for access and refresh tokens.
- *
- * timeToCheckExpiredTokens - The time in seconds to check the database for expired access tokens.
- *                            For example, if it's set to 3600, then that's one hour to check for
- *                            expired access tokens.
- */
-exports.db = {
-  timeToCheckExpiredTokens: 3600
+  disableRefreshTokenGrant: (process.env.OAUTH2_DISABLE_REFRESH_TOKEN_GRANT === 'true') || false,
+  authCodeLength: 24,
+  authCodeExpiresInSeconds: 60,
+  tokenExpiresInSeconds: parseInt(process.env.OAUTH2_TOKEN_EXPIRES_IN_SECONDS || '3600'),
+  refreshTokenExpiresInSeconds:
+    parseInt(process.env.OAUTH2_REFRESH_TOKEN_EXPIES_IN_SECONDS || '2592000'),
+  clientTokenExpiresInSeconds:
+    parseInt(process.env.OAUTH2_CLIENT_TOKEN_EXPIES_IN_SECONDS || '86400'),
+  decisionTransactionIdLength: 16
 };
 
 exports.data = {

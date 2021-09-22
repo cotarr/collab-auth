@@ -300,8 +300,9 @@ validate.isRefreshToken = ({ scope }) => {
  * @returns {Promise} The resolved refresh token after saved
  */
 validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime }) => {
-  const refreshToken = jwtUtils.createToken({ sub: userID, exp: config.refreshToken.expiresIn });
-  const expiration = new Date(Date.now() + (config.refreshToken.expiresIn * 1000));
+  const refreshToken =
+    jwtUtils.createToken({ sub: userID, exp: config.oauth2.refreshTokenExpiresInSeconds });
+  const expiration = new Date(Date.now() + (config.oauth2.refreshTokenExpiresInSeconds * 1000));
   return db.refreshTokens.save(
     refreshToken, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => refreshToken);
@@ -317,8 +318,8 @@ validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime 
  * @returns {Promise}  The resolved refresh token after saved
  */
 validate.generateToken = ({ userID, clientID, scope, grantType, authTime }) => {
-  const token = jwtUtils.createToken({ sub: userID, exp: config.token.expiresIn });
-  const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
+  const token = jwtUtils.createToken({ sub: userID, exp: config.oauth2.tokenExpiresInSeconds });
+  const expiration = new Date(Date.now() + (config.oauth2.tokenExpiresInSeconds * 1000));
   return db.accessTokens.save(token, expiration, userID, clientID, scope, grantType, authTime)
     .then(() => token);
 };

@@ -228,6 +228,6 @@ setInterval(() => {
     .catch((err) => console.error('Error trying to remove expired refreshTokens:', err.stack));
   db.authorizationCodes.removeExpired()
     .catch((err) => console.error('Error trying to remove expired authorization codes', err.stack));
-}, config.db.timeToCheckExpiredTokens * 1000);
+}, config.database.timeToCheckExpiredTokensSeconds * 1000);
 
 module.exports = app;

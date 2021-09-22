@@ -65,8 +65,8 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, loca
   }
 
   // Authorization code length (characters)
-  const code = uid2(config.code.length);
-  const expiration = new Date(Date.now() + (config.code.expiresIn * 1000));
+  const code = uid2(config.oauth2.authCodeLength);
+  const expiration = new Date(Date.now() + (config.oauth2.authCodeExpiresInSeconds * 1000));
   db.authorizationCodes.save(code, client.id, redirectURI, user.id, expiration, areq.tokenScope)
     .then(() => done(null, code))
     .catch((err) => done(err));
@@ -104,12 +104,12 @@ server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) =>
   }
 
   const grantType = 'implicit';
-  const token = jwtUtils.createToken({ sub: user.id, exp: config.token.expiresIn });
-  const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
+  const token = jwtUtils.createToken({ sub: user.id, exp: config.oauth2.tokenExpiresInSeconds });
+  const expiration = new Date(Date.now() + (config.oauth2.tokenExpiresInSeconds * 1000));
   const authTime = new Date();
   // Note responseParams returned in redirect URL query parameter
   const responseParams = {
-    expires_in: config.token.expiresIn
+    expires_in: config.oauth2.tokenExpiresInSeconds
     // *** removed next 3 in order to clean up redirect query string
     // grant_type: grantType,
     // scope: client.scope,
@@ -150,7 +150,7 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, auth
   }
 
   const responseParams = {
-    expires_in: config.token.expiresIn,
+    expires_in: config.oauth2.tokenExpiresInSeconds,
     grant_type: 'authorization_code'
   };
 
@@ -210,7 +210,7 @@ server.exchange(oauth2orize.exchange.password(
     }
 
     const responseParams = {
-      expires_in: config.token.expiresIn,
+      expires_in: config.oauth2.tokenExpiresInSeconds,
       scope: scope,
       grant_type: 'password'
     };
@@ -277,12 +277,12 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
 
   // Compile token scope
   const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
-  const token = jwtUtils.createToken({ sub: client.id, exp: config.token.expiresIn });
-  const expiration = new Date(Date.now() + (config.token.expiresIn * 1000));
+  const token = jwtUtils.createToken({ sub: client.id, exp: config.oauth2.tokenExpiresInSeconds });
+  const expiration = new Date(Date.now() + (config.oauth2.tokenExpiresInSeconds * 1000));
   const authTime = new Date();
   const grantType = 'client_credentials';
   const responseParams = {
-    expires_in: config.token.expiresIn,
+    expires_in: config.oauth2.tokenExpiresInSeconds,
     scope: tokenScope,
     grantType: grantType,
     auth_time: Math.floor(authTime.valueOf() / 1000)
@@ -322,7 +322,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
     }
 
     const responseParams = {
-      expires_in: config.token.expiresIn,
+      expires_in: config.oauth2.tokenExpiresInSeconds,
       grant_type: 'refresh_token'
     };
     db.refreshTokens.find(refreshToken)
@@ -382,7 +382,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
 exports.authorization = [
   login.ensureLoggedIn(),
   inputValidation.dialogAuthorization,
-  server.authorization({ idLength: config.decision.idLength },
+  server.authorization({ idLength: config.oauth2.decisionTransactionIdLength },
     (clientID, redirectURI, scope, grantType, done) => {
       db.clients.findByClientId(clientID)
         .then((client) => {
