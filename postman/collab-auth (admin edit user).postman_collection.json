@@ -1,0 +1,1571 @@
+{
+	"info": {
+		"name": "collab-auth (admin edit user)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/logout (session)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/logout",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "clear 127.0.0.1 cookies",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('127.0.0.1', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/status",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/menu (save menu url)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /login\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/menu",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"menu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (user.admin from env)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"",
+							"pm.test(\"Redirect address is /panel/menu\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/panel/menu');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{user_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/menu (200)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Web Administration Panel\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/menu",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"menu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/createuser (user.none)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"New user record successfully saved\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"",
+							"// Random username",
+							"pm.globals.set('testUsername','testUsername' + Math.floor(Math.random() * 1000000).toString());",
+							"",
+							"// Random usernumber",
+							"pm.globals.set('testUserNumber', 9000 +  Math.floor(Math.random() * 1000))",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "Test User",
+							"type": "text"
+						},
+						{
+							"key": "number",
+							"value": "{{testUserNumber}}",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword",
+							"type": "text"
+						},
+						{
+							"key": "loginDisabled",
+							"value": "on",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "role",
+							"value": "user.none",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/createuser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"createuser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/listusers save created uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Extract tokens to global variables\", function () {",
+							"",
+							"    let uuidArray = [];",
+							"",
+							"    let bodyString = pm.response.text();",
+							"",
+							"    let trArray = bodyString.split('<tr>');",
+							"",
+							"    for (let i = 2; i < trArray.length; i++) {",
+							"        // take before </tr>",
+							"        // giving string  <td>xxx</td><td>xxxx</td>",
+							"        let beforeSlashTr = trArray[i].split('</tr>')[0]",
+							"        // split array between <td>",
+							"        let tdArray = beforeSlashTr.split('<td>');",
+							"        // Take third <td></td> and discard after </td>",
+							"        let tdWant = tdArray[3].split('</td>')[0];",
+							"        // This gave UUID, push to array",
+							"        uuidArray.push(tdWant);",
+							"    }",
+							"    // console.log(uuidArray);",
+							"    // console.log(uuidArray[uuidArray.length-1]);",
+							"    pm.globals.set('createdUserUuid', uuidArray[uuidArray.length-1])",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/listusers",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"listusers"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/viewuser (check some data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    const testUsername = pm.globals.get('testUsername')",
+							"    pm.expect(pm.response.text()).to.include(testUsername);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include('Test User');",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include('user.none');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/viewuser?id={{createdUserUuid}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"viewuser"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{createdUserUuid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (user.none)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"// This is expected because no callbackUri or save URL is provided.",
+							"pm.test(\"Redirect address is /redirecterror\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/redirecterror');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mynewpassword",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/menu (403)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/menu",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"menu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (403)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (user.admin from env)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"// This is expected because no callbackUri or save URL is provided.",
+							"pm.test(\"Redirect address is /redirecterror\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/redirecterror');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{user_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/edituser (change pw only)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Modified user record successfully saved\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "{{createdUserUuid}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Test User",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword1",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword1",
+							"type": "text"
+						},
+						{
+							"key": "loginDisabled",
+							"value": "on",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "role",
+							"value": "user.none",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/edituser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"edituser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/edituser (pw not match)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Passwords do not match\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "{{createdUserUuid}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Test User",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword3",
+							"type": "text"
+						},
+						{
+							"key": "loginDisabled",
+							"value": "on",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "role",
+							"value": "user.password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/edituser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"edituser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/edituser (name, scope user.password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Modified user record successfully saved\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "id",
+							"value": "{{createdUserUuid}}",
+							"type": "text"
+						},
+						{
+							"key": "name",
+							"value": "Different Test User",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "",
+							"type": "text"
+						},
+						{
+							"key": "loginDisabled",
+							"value": "on",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "role",
+							"value": "user.password",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/panel/edituser",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"edituser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/viewuser (check some data)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    const testUsername = pm.globals.get('testUsername')",
+							"    pm.expect(pm.response.text()).to.include(testUsername);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include('Different Test User');",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include('user.password');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/viewuser?id={{createdUserUuid}}",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"viewuser"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{createdUserUuid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (user.password)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"// This is expected because no callbackUri or save URL is provided.",
+							"pm.test(\"Redirect address is /redirecterror\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/redirecterror');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mynewpassword1",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/menu (403)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 403\", function () {",
+							"    pm.response.to.have.status(403);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/menu",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"menu"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (200)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Change Password\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (200)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Your password has been successfully changed\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "oldpassword",
+							"value": "mynewpassword1",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (same as old)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"New password must be different\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "oldpassword",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (old invalid)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Old password was Invalid\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "oldpassword",
+							"value": "invalidOldPassword",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (user invalid)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Username was Invalid\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "invalidUsername",
+							"type": "text"
+						},
+						{
+							"key": "oldpassword",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (new not match)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"Passwords do not match\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "oldpassword",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "differentValue",
+							"type": "text"
+						},
+						{
+							"key": "newpassword2",
+							"value": "mynewpassword2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/changepassword (missing param)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "oldpassword",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "newpassword1",
+							"value": "mynewpassword2",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_host}}/changepassword",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"changepassword"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (confirm not changed)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{testUsername}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "mynewpassword",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/login (user.admin from env)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"// This is expected because no callbackUri or save URL is provided.",
+							"pm.test(\"Redirect address is /redirecterror\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/redirecterror');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{user_username}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{user_password}}",
+							"type": "text"
+						}
+					],
+					"options": {
+						"raw": {
+							"language": "xml"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/deleteuser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"User successfully deleted\");",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/deleteuser?id={{createdUserUuid}}&confirm=yes",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"deleteuser"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{createdUserUuid}}"
+						},
+						{
+							"key": "confirm",
+							"value": "yes"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

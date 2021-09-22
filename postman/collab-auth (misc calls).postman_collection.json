@@ -43,12 +43,23 @@
 			"response": []
 		},
 		{
-			"name": "/debug (Write db to log)",
+			"name": "/logout (clear 127.0.0.1 cookies)",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('127.0.0.1', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
 							""
 						],
 						"type": "text/javascript"
@@ -56,18 +67,15 @@
 				}
 			],
 			"request": {
-				"auth": {
-					"type": "noauth"
-				},
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{auth_host}}/debug",
+					"raw": "{{frontend_host}}/status",
 					"host": [
-						"{{auth_host}}"
+						"{{frontend_host}}"
 					],
 					"path": [
-						"debug"
+						"status"
 					]
 				}
 			},
@@ -88,6 +96,26 @@
 					],
 					"path": [
 						"error"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/status",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/status",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"status"
 					]
 				}
 			},
@@ -601,6 +629,47 @@
 					],
 					"path": [
 						"secure"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/.well-known/security.txt",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/.well-known/security.txt",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						".well-known",
+						"security.txt"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/robots.txt",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/robots.txt",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"robots.txt"
 					]
 				}
 			},

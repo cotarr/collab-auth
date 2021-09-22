@@ -60,3 +60,8 @@ This in not a test suite. Do to run it in order.
 ## Collection: "collab-auth (session auth)"
 
 Used to check cookie on auth server web access.
+
+## Collection: "collab-auth (admin edit user)"
+
+Used to exercise and check admin panel for user editing.
+Used to exercise and check user password change form submissions.
