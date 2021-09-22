@@ -114,7 +114,7 @@ SESSION_EXPIRE_SEC=604800
 SESSION_SECRET="A Secret That Should Be Changed"
 
 # To enable PostgreSQL, set to true
-DATABASE_DISABLE_INMEM_DB=true
+DATABASE_DISABLE_IN_MEMORY_DB=true
 PGUSER=xxxxx
 PGPASSWORD=xxxxx
 PGHOST=sql.example.com  (or)  PGHOSTADDR=127.0.0.1

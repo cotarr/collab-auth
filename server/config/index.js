@@ -41,7 +41,8 @@ exports.session = {
 };
 
 exports.database = {
-  disableInMemoryDb: (process.env.DATABASE_DISABLE_INMEM_DB === 'true') || false,
+  disableInMemoryDb: (process.env.DATABASE_DISABLE_IN_MEMORY_DB === 'true') || false,
+  disableWebAdminPanel: (process.env.DATABASE_DISABLE_WEB_ADMIN_PANEL === 'true') || false,
   timeToCheckExpiredTokensSeconds: 3600,
   defaultClient: {
     randomSecretLength: 24,

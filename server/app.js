@@ -161,7 +161,9 @@ app.post('/changepassword', site.changePasswordHandler);
 //
 //   Used to create and edit user and client records
 // --------------------------------------------------
-app.use('/panel', adminPanel);
+if (!config.database.disableWebAdminPanel) {
+  app.use('/panel', adminPanel);
+}
 
 // ---------------------------------
 // Secure link to challenge cookie
