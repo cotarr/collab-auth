@@ -1,5 +1,9 @@
 'use strict';
 
+const bcrypt = require('bcryptjs');
+const config = require('./config');
+const nodeEnv = process.env.NODE_ENV || 'development';
+
 // NPM modules
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
@@ -17,7 +21,14 @@ const logUtils = require('./log-utils');
  * Render the login Form
  */
 exports.loginForm = (req, res, next) => {
-  res.set('Cache-Control', 'no-store').render('login');
+  res.set('Cache-Control', 'no-store').render('login',
+    {
+      opt: {
+        maxUnLen: config.data.userUsernameMaxLength,
+        maxPwLen: config.data.userPasswordMaxLength
+      }
+    }
+  );
 };
 /**
  * redirectError an informational web page to inform the
@@ -66,6 +77,33 @@ exports.logout = (req, res, next) => {
 };
 
 /**
+ * Validate password fields, then if PostgreSQL options, use bcrypt to hash password
+ *
+ * If error, throws error
+ * Otherwise replace password in req.body
+ */
+const validateAndHashPassword = (req, res, user) => {
+  if (req.body.newpassword1 !== req.body.newpassword2) {
+    throw new Error('Passwords do not match');
+  } else if ((req.body.newpassword1.length < config.data.userPasswordMinLength) ||
+    (req.body.newpassword1.length > config.data.userPasswordMaxLength)) {
+    throw new Error('Password invlid length');
+  } else if (req.body.oldpassword === req.body.newpassword1) {
+    throw new Error('New password same');
+  } else {
+    // Use bcrypt to hash password for PostgreSQL configuration
+    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+      // Else, in Memory storage, use Plain Text
+      // Leave password unchanged in req.body
+    } else {
+      req.body.newpassword1 = bcrypt.hashSync(req.body.newpassword1, 10);
+    }
+  }
+  // user is passed through unchanged
+  return user;
+};
+
+/**
  * Change Password Form
  */
 exports.changePassword = [
@@ -78,7 +116,15 @@ exports.changePassword = [
         { name: req.user.name, passwordMessage: message });
     } else {
       res.set('Cache-Control', 'no-store').render('change-password',
-        { name: req.user.name, username: req.user.username });
+        {
+          name: req.user.name,
+          username: req.user.username,
+          opt: {
+            minPwLen: config.data.userPasswordMinLength,
+            maxPwLen: config.data.userPasswordMaxLength
+          }
+        }
+      );
     }
   }
 ];
@@ -101,6 +147,7 @@ exports.changePasswordHandler = [
       .then((username) => db.users.findByUsername(username))
       .then((user) => validate.user(user, req.body.oldpassword))
       .then((user) => db.users.updateLoginTime(user))
+      .then((user) => validateAndHashPassword(req, res, user))
       .then((user) => db.users.updatePassword(user.id, req.body.newpassword1))
       .then((user) => validate.userExists(user))
       .then((user) => {
@@ -109,8 +156,23 @@ exports.changePasswordHandler = [
         res.set('Cache-Control', 'no-store').render('change-password-message',
           { name: req.user.name, passwordMessage: message });
       })
-      .catch((err) => {
-        next(err);
+      .catch((e) => {
+        // next(err);
+        let message = 'There was an error changing your password';
+        if (e.message === 'User password not correct') {
+          message = 'Error: Old password was Invalid.';
+        }
+        if (e.message === 'Passwords do not match') {
+          message = 'Error: Passwords do not match.';
+        }
+        if (e.message === 'Password invlid length') {
+          message = 'Error: Password invlid length.';
+        }
+        if (e.message === 'New password same') {
+          message = 'Error: New password must be different.';
+        }
+        res.set('Cache-Control', 'no-store').render('change-password-message',
+          { name: req.user.name, passwordMessage: message });
       });
   }
 ];

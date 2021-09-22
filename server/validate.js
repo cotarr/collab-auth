@@ -2,13 +2,33 @@
 
 const crypto = require('crypto');
 const CryptoJS = require('crypto-js');
+const bcrypt = require('bcryptjs');
 
 const config = require('./config');
+const nodeEnv = process.env.NODE_ENV || 'development';
+
 const db = require('./db');
 const jwtUtils = require('./jwt-utils');
 
 /** Validate object to attach all functions to  */
 const validate = Object.create(null);
+
+/**
+ * Timing safe compare, from express-basic-auth
+ * @param   {Stromg} userInput - Express request object
+ * @param   {String} secret username from passport change form
+ * @returns {Boolean} Return true if successful match, else false
+ */
+const safeCompare = function (userInput, secret) {
+  const userInputLength = Buffer.byteLength(userInput);
+  const secretLength = Buffer.byteLength(secret);
+  const userInputBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
+  userInputBuffer.write(userInput);
+  const secretBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
+  secretBuffer.write(secret);
+  return !!(crypto.timingSafeEqual(userInputBuffer, secretBuffer)) &
+    userInputLength === secretLength;
+};
 
 /**
  * Given a user and a password this will return the user if it exists and the password matches,
@@ -27,10 +47,39 @@ validate.user = (user, password) => {
     throw new Error('User login disabled');
   } else {
     validate.userExists(user);
-    if (user.password !== password) {
-      throw new Error('User password not correct');
+    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+      //
+      // User Password is PLAIN TEXT
+      // This is case of in-memory database loaded from static files
+      //
+      // Timing safe compare
+      if (safeCompare(user.password, password)) {
+        return user;
+      } else {
+        throw new Error('User password not correct');
+      }
+    } else {
+      //
+      // This is case of PostsgreSQL database
+      //
+      // Unicode characters can be up to 4 bytes, bcrypt has maximum input 72 characters.
+      const uint8PasswordArray = new TextEncoder('utf8').encode(password);
+      if ((uint8PasswordArray.length <= 72) &&
+        (password.length > 0)) {
+        //
+        // Check bcrypt salted hash to see if it matches
+        //
+        if (bcrypt.compareSync(password, user.password)) {
+          return user;
+        } else {
+          throw new Error('User password not correct');
+        }
+      } else {
+        const err = new Error('Bad login malformed request');
+        err.status = 400;
+        throw err;
+      }
     }
-    return user;
   }
 };
 
@@ -67,23 +116,6 @@ validate.usernameMatchesSession = (req, username) => {
 };
 
 /**
- * Timing safe compare, from express-basic-auth
- * @param   {Stromg} userInput - Express request object
- * @param   {String} secret username from passport change form
- * @returns {Boolean} Return true if successful match, else false
- */
-const safeCompare = function (userInput, secret) {
-  const userInputLength = Buffer.byteLength(userInput);
-  const secretLength = Buffer.byteLength(secret);
-  const userInputBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
-  userInputBuffer.write(userInput);
-  const secretBuffer = Buffer.alloc(userInputLength, 0, 'utf8');
-  secretBuffer.write(secret);
-  return !!(crypto.timingSafeEqual(userInputBuffer, secretBuffer)) &
-    userInputLength === secretLength;
-};
-
-/**
  * Given a client and a client secret this return the client if it exists and its clientSecret
  * matches, otherwise this will throw an error
  * @param   {Object} client       - The client profile
@@ -93,17 +125,13 @@ const safeCompare = function (userInput, secret) {
  */
 validate.client = (client, clientSecret) => {
   validate.clientExists(client);
-  if (config.database.disableInMemoryDb) {
+  if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
     //
-    // Client secret is AES encrypted.
+    // Client secret is PLAIN TEXT
+    //                  ==========
+    // This is case of in-memory database loaded from static files
     //
-    // This is case of PostsgreSQL database
-    //
-    const plainTextBytes =
-      CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
-    const plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
-    // Timing safe compare
-    if (safeCompare(clientSecret, plainTextClientSecret)) {
+    if (safeCompare(clientSecret, client.clientSecret)) {
       // Success, client secret matches
       return client;
     } else {
@@ -112,11 +140,15 @@ validate.client = (client, clientSecret) => {
     }
   } else {
     //
-    // Client secret is PLAIN TEXT
-    //                  ==========
-    // This is case of in-memory database loaded from static files
+    // Client secret is AES encrypted.
     //
-    if (safeCompare(clientSecret, client.clientSecret)) {
+    // This is case of PostsgreSQL database
+    //
+    const plainTextBytes =
+    CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+    const plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+    // Timing safe compare
+    if (safeCompare(clientSecret, plainTextClientSecret)) {
       // Success, client secret matches
       return client;
     } else {

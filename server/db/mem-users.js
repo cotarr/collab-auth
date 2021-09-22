@@ -157,13 +157,13 @@ exports.update = (user) => {
     if (!err) {
       // write changes to RAM database
       foundUser.name = user.name;
-      foundUser.password = user.userSecret;
       foundUser.loginDisabled = user.loginDisabled;
       foundUser.role = user.role;
       if ((user.password) && (user.password.length > 0)) {
         foundUser.password = user.password;
       }
       foundUser.updatedAt = new Date();
+      if ((user.password) && (user.password.length > 0)) foundUser.password = user.Password;
 
       // Stringify a deep copy to maintain RAM database as immutable
       const safeUser = _deepCopyUser(foundUser);

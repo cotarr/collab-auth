@@ -133,7 +133,7 @@ exports.data = {
   userUsernameMinLength: 1,
   userUsernameMaxLength: 40,
   userPasswordMinLength: 8,
-  userPasswordMaxLength: 64,
+  userPasswordMaxLength: 32,
   allScopesMaxLength: 1024,
   allowedRedirectURIMaxLength: 1024
 };

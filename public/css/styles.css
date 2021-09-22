@@ -116,12 +116,12 @@ body {
     padding: 4px;
     border: 1px solid #b0b0b0;
     display: inline-block;
-    font-family: monospace;
     box-sizing: border-box;
 }
 
 textarea {
   resize: none;
+  font-size: 88%;
 }
 
 .password-form {

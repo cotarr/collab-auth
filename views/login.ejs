@@ -6,7 +6,6 @@
   <link rel="stylesheet" href="/css/login.css">
 </head>
 <body>
-
   <div>
     <form action="/login" method="post">
       <fieldset>
@@ -15,11 +14,15 @@
         </div>
         <div>
             <label for="name">Username:</label>
-            <input type="text" name="username" autocomplete="username" required/>
+            <input type="text" name="username"
+            minlength="1" maxlength="<%= opt.maxUnLen %>"
+            autocomplete="username" required/>
         </div>
         <div>
             <label for="password">Password:</label>
-            <input type="password" name="password" autocomplete="current-password" required/>
+            <input type="password" name="password"
+            minlength="1" maxlength="<%= opt.maxPwLen %>"
+            autocomplete="current-password" required/>
         </div>
         <div>I consent to use of cookies</div>
         <div>

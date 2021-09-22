@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const CryptoJS = require('crypto-js');
+const bcrypt = require('bcryptjs');
 
 const uid2 = require('uid2');
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
@@ -12,7 +13,7 @@ const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scop
 const logUtils = require('./log-utils');
 
 const config = require('./config/');
-// const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeEnv = process.env.NODE_ENV || 'development';
 
 /**
  * Admin menu endpoint
@@ -135,11 +136,17 @@ router.get('/createuser',
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     const defaultUser = {
-      password: uid2(config.database.defaultUser.randomPasswordLength),
       role: toScopeString(config.database.defaultUser.role)
     };
     return res.set('Cache-Control', 'no-store').render('create-user',
-      { name: req.user.name, defaultUser: defaultUser });
+      {
+        name: req.user.name,
+        defaultUser: defaultUser,
+        opt: {
+          minPwLen: config.data.userPasswordMinLength,
+          maxPwLen: config.data.userPasswordMaxLength
+        }
+      });
   }
 );
 
@@ -151,29 +158,50 @@ router.post('/createuser',
   requireScopeForWebPanel('user.admin'),
   inputValidation.createUser,
   (req, res, next) => {
-    const user = {
-      name: req.body.name,
-      number: req.body.number,
-      username: req.body.username,
-      password: req.body.newpassword1,
-      loginDisabled: (req.body.loginDisabled === 'on') || false,
-      role: toScopeArray(req.body.role)
-    };
-    db.users.save(user)
-      .then((createdUser) => {
-        if (createdUser == null) {
-          throw new Error('Error saving user');
-        } else {
-          const message = req.user.username + ' created new user: ' + createdUser.username;
-          logUtils.adminLogActivity(req, message);
-          return res.set('Cache-Control', 'no-store').render('generic-message', {
-            name: req.user.name,
-            title: 'Ceate New User',
-            message: 'New user record successfully saved.'
-          });
-        }
-      })
-      .catch((err) => next(err));
+    if (req.body.newpassword1 !== req.body.newpassword2) {
+      return res.set('Cache-Control', 'no-store').render('generic-message', {
+        name: req.user.name,
+        title: 'Ceate New User',
+        message: 'Error: Passwords do not match, aborted.'
+      });
+    } else if ((req.body.newpassword1.length < config.data.userPasswordMinLength) ||
+      (req.body.newpassword1.length > config.data.userPasswordMaxLength)) {
+      return res.set('Cache-Control', 'no-store').render('generic-message', {
+        name: req.user.name,
+        title: 'Ceate New User',
+        message: 'Error: Password invlid length, aborted'
+      });
+    } else {
+      // Case of PostgreSQUL, use bcrypt to hash password
+      let password = bcrypt.hashSync(req.body.newpassword1, 10);
+      if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+        // Else, case of in Memory storage, use Plain Text
+        password = req.body.newpassword1;
+      }
+      const user = {
+        name: req.body.name,
+        number: req.body.number,
+        username: req.body.username,
+        password: password,
+        loginDisabled: (req.body.loginDisabled === 'on') || false,
+        role: toScopeArray(req.body.role)
+      };
+      db.users.save(user)
+        .then((createdUser) => {
+          if (createdUser == null) {
+            throw new Error('Error saving user');
+          } else {
+            const message = req.user.username + ' created new user: ' + createdUser.username;
+            logUtils.adminLogActivity(req, message);
+            return res.set('Cache-Control', 'no-store').render('generic-message', {
+              name: req.user.name,
+              title: 'Ceate New User',
+              message: 'New user record successfully saved.'
+            });
+          }
+        })
+        .catch((err) => next(err));
+    }
   }
 );
 
@@ -217,7 +245,16 @@ router.get('/edituser',
             filteredUser.disabled = '';
           }
           return res.set('Cache-Control', 'no-store').render('edit-user',
-            { name: req.user.name, user: filteredUser });
+            {
+              name: req.user.name,
+              user: filteredUser,
+              opt: {
+                // if blank password unchanged
+                minPwLen: 0,
+                maxPwLen: config.data.userPasswordMaxLength
+              }
+            }
+          );
         })
         .catch((err) => {
           return next(err);
@@ -238,13 +275,42 @@ router.post('/edituser',
   requireScopeForWebPanel('user.admin'),
   inputValidation.editUser,
   (req, res, next) => {
+    // Password is optional, if both password input elements are empty,
+    // then, the password will remain unchanged.
+    let password;
+    if (((req.body.newpassword1) && (req.body.newpassword1.length > 0)) ||
+      ((req.body.newpassword2) && (req.body.newpassword2.length > 0))) {
+      // Case of password present, it must be checked
+      if (req.body.newpassword1 !== req.body.newpassword2) {
+        return res.set('Cache-Control', 'no-store').render('generic-message', {
+          name: req.user.name,
+          title: 'Ceate New User',
+          message: 'Error: Passwords do not match, aborted.'
+        });
+      } else if ((req.body.newpassword1.length < config.data.userPasswordMinLength) ||
+        (req.body.newpassword1.length > config.data.userPasswordMaxLength)) {
+        return res.set('Cache-Control', 'no-store').render('generic-message', {
+          name: req.user.name,
+          title: 'Ceate New User',
+          message: 'Error: Password invlid length, aborted'
+        });
+      } else {
+        // Use bcrypt to hash password for PostgreSQL configuration
+        password = bcrypt.hashSync(req.body.newpassword1, 10);
+        if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+          // Else, in Memory storage, use Plain Text
+          password = req.body.newpassword1;
+        }
+      }
+    }
     const user = {
       id: req.body.id,
       name: req.body.name,
-      password: req.body.newpassword1,
+      password: undefined,
       loginDisabled: (req.body.loginDisabled === 'on') || false,
       role: toScopeArray(req.body.role)
     };
+    if (password) user.password = password;
     db.users.update(user)
       .then((editedUser) => {
         if (editedUser == null) {
@@ -262,6 +328,7 @@ router.post('/edituser',
       .catch((err) => next(err));
   }
 );
+
 /**
  * Delete user record endpoint
  *
@@ -421,11 +488,12 @@ router.post('/createclient',
   requireScopeForWebPanel('user.admin'),
   inputValidation.createClient,
   (req, res, next) => {
-    let savedClientSecret = req.body.clientSecret;
-    if (config.database.disableInMemoryDb) {
-      // Case of PostgreSQL database, use AES encryption on client secret
-      savedClientSecret =
-        CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
+    // Case of PostgreSQL database, use AES encryption on client secret
+    let savedClientSecret =
+      CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
+    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+      // Else, case of in-memory database, plain text
+      savedClientSecret = req.body.clientSecret;
     }
     const client = {
       name: req.body.name,
@@ -471,13 +539,13 @@ router.get('/editclient',
             err.status = 400;
             return next(err);
           }
-          let plainTextClientSecret = client.clientSecret;
           // Case of PostgreSQL, client secret is AES encrypted
-          if (config.database.disableInMemoryDb) {
-            // Decrypt Client Secret from database
-            const plainTextBytes =
-              CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
-            plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+          const plainTextBytes =
+            CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+          let plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+          if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+            // Else, ease of in-memory database, Plain text
+            plainTextClientSecret = client.clientSecret;
           }
           const filteredClient = {
             id: client.id,
@@ -517,11 +585,12 @@ router.post('/editclient',
   requireScopeForWebPanel('user.admin'),
   inputValidation.editClient,
   (req, res, next) => {
-    let savedClientSecret = req.body.clientSecret;
+    // Case of PostgreSQL database, use AES encryption on client secret
+    let savedClientSecret =
+      CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
     if (config.database.disableInMemoryDb) {
-      // Case of PostgreSQL database, use AES encryption on client secret
-      savedClientSecret =
-        CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
+      // Else, Case of in-memory database, plain text
+      savedClientSecret = req.body.clientSecret;
     }
     const client = {
       id: req.body.id,
@@ -577,8 +646,10 @@ router.get('/deleteclient',
         .catch((err) => next(err));
     } else if ((req.query) && (Object.keys(req.query).length === 2) &&
       ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
+      console.log('deleting user');
       db.clients.delete(req.query.id)
         .then((deletedClient) => {
+          console.log(deletedClient);
           if (deletedClient == null) {
             throw new Error('Error deleting client');
           } else {
@@ -629,7 +700,9 @@ router.get('/removealltokens',
               'Authorization server session data has been cleared'
           });
         })
-        .catch((err) => next(err));
+        .catch((err) => {
+          return next(err);
+        });
     } else {
       res.set('Cache-Control', 'no-store').render('confirm-remove', { name: req.user.name });
     }

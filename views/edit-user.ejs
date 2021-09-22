@@ -26,11 +26,15 @@
             <tr><td>Username</td><td><%= user.username %></td></tr>
             <tr>
               <td><label for="newpassword1">New password</label></td>
-              <td><input class="input" type="password" name="newpassword1" minlength="8" maxlength="48" autocomplete="new-password" /></td>
+              <td><input class="input" type="password" name="newpassword1"
+                minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>"
+                value="" autocomplete="new-password" /></td>
             </tr>
             <tr>
               <td><label for="newpassword2">New password again</label></td>
-              <td><input class="input" type="password" name="newpassword2" minlength="8" maxlength="48" autocomplete="new-password" /></td>
+              <td><input class="input" type="password" name="newpassword2"
+                minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>"
+                value="" autocomplete="new-password" /></td>
             </tr>
             <tr>
               <td><label for "loginDisabled">Login Disabled</label></td>

@@ -172,7 +172,7 @@ const checkExtraneousKeys = function (allowKeys, location) {
 };
 
 /**
- * Change user password POST request
+ * Login POST request
  *
  * Array of middleware functions for input validation
  */
@@ -193,9 +193,9 @@ exports.loginRequest = [
   body('username', 'Invalid characters in string')
     .isWhitelisted(idAllowedChars),
   body('password', 'Invalid string length')
-    .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
+    .isLength({ min: 1, max: config.data.userPasswordMaxLength }),
   handleErrorHTTP
-]; // Change Password
+]; // Login Request
 
 /**
  * Validate input for ?id=UUID.v4
@@ -227,6 +227,7 @@ exports.createUser = [
     'number',
     'username',
     'newpassword1',
+    'newpassword2',
     'name',
     'loginDisabled',
     'role'], 'body'),
@@ -257,11 +258,11 @@ exports.createUser = [
     .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
   body('username', 'Invalid characters in string')
     .isWhitelisted(idAllowedChars),
-  body('newpassword1',
-    'Password minimum ' + config.data.userPasswordMinLength.toString() + ' characters')
-    .isLength({ min: config.data.userPasswordMinLength }),
+  // Password length validated in javascript, 72 is max bcrypt byte length
   body('newpassword1', 'Invalid string length')
-    .isLength({ max: config.data.userPasswordMaxLength }),
+    .isLength({ min: 1, max: 72 }),
+  body('newpassword2', 'Invalid string length')
+    .isLength({ min: 1, max: 72 }),
   body('loginDisabled').optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
@@ -302,7 +303,6 @@ exports.editUser = [
   // Required Body Keys
   body([
     'id',
-    'newpassword1',
     'name',
     'role'], 'Required values')
     .exists(),
@@ -314,37 +314,11 @@ exports.editUser = [
     .isLength({ min: config.data.userNameMinLength, max: config.data.userNameMaxLength }),
   body('name', 'Invalid characters in string')
     .isWhitelisted(nameAllowedChars),
-  body('newpassword1').optional()
-    .custom(function (value, { req }) {
-      if ((value) && (value.length > 0)) {
-        if (!req.body.newpassword2 || (req.body.newpassword2.length === 0)) {
-          throw new Error('New password requires two entries');
-        }
-        if (value.length !== req.body.newpassword2.length) {
-          throw new Error('Password mismatch');
-        }
-        if (value !== req.body.newpassword2) {
-          throw new Error('Password mismatch');
-        }
-        if (value.length < config.data.userPasswordMinLength) {
-          throw new Error(
-            'Password minimum ' + config.data.userPasswordMinLength.toString() + ' characters');
-        }
-        if (value.length > config.data.userPasswordMaxLength) {
-          throw new Error('Invalid string length');
-        }
-      }
-      return true;
-    }),
-  body('newpassword2').optional()
-    .custom(function (value, { req }) {
-      if ((value) && (value.length > 0)) {
-        if ((!req.body.newpassword1) || (req.body.newpassword1.length === 0)) {
-          throw new Error('New password requires two entries');
-        }
-      }
-      return true;
-    }),
+  // Password length validated in javascript, 72 is max bcrypt byte length
+  body('newpassword1', 'Invalid string length').optional()
+    .isLength({ min: 0, max: 72 }),
+  body('newpassword2', 'Invalid string length').optional()
+    .isLength({ min: 0, max: 72 }),
   body('loginDisabled').optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
@@ -352,7 +326,7 @@ exports.editUser = [
       }
       return true;
     }),
-  body('oole', 'Invalid string length')
+  body('role', 'Invalid string length')
     .isLength({ max: config.data.allScopesMaxLength }),
   body('role', 'Invalid characters in string')
     .isWhitelisted(scopeAllowedChars),
@@ -384,36 +358,13 @@ exports.changePassword = [
     .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
   body('username', 'Invalid characters in string')
     .isWhitelisted(idAllowedChars),
-  body('oldpassword', 'Invalid string length')
-    .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
-  body('newpassword1')
-    .custom(function (value, { req }) {
-      if ((value) && (value.length > 0)) {
-        if (!req.body.newpassword2 || (req.body.newpassword2.length === 0)) {
-          throw new Error('New password requires two entries');
-        }
-        if (value.length !== req.body.newpassword2.length) {
-          throw new Error('Password mismatch');
-        }
-        if (value !== req.body.newpassword2) {
-          throw new Error('Password mismatch');
-        }
-        if (value.length < config.data.userPasswordMinLength) {
-          throw new Error(
-            'Password minimum ' + config.data.userPasswordMinLength.toString() + ' characters');
-        }
-        if (value.length > config.data.userPasswordMaxLength) {
-          throw new Error('Invalid string length');
-        }
-        // Check for repeat passwords disabled
-        if ((req.body.oldpassword) && (value === req.body.oldpassword)) {
-          throw new Error('New password must be different');
-        }
-      }
-      return true;
-    }),
-  body('newpassword2', 'Invalid string length')
-    .isLength({ min: config.data.userNameMinLength, max: config.data.userPasswordMaxLength }),
+  // String length checked in javascript, 72 is maximum bytes for bcrypt
+  body('newpassword1', 'Invalid string length').optional()
+    .isLength({ min: 1, max: 72 }),
+  body('newpassword1', 'Invalid string length').optional()
+    .isLength({ min: 1, max: 72 }),
+  body('newpassword2', 'Invalid string length').optional()
+    .isLength({ min: 1, max: 72 }),
   handleErrorHTTP
 ]; // Change Password
 
