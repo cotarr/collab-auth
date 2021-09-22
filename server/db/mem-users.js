@@ -159,12 +159,8 @@ exports.update = (user) => {
       foundUser.name = user.name;
       foundUser.loginDisabled = user.loginDisabled;
       foundUser.role = user.role;
-      if ((user.password) && (user.password.length > 0)) {
-        foundUser.password = user.password;
-      }
       foundUser.updatedAt = new Date();
-      if ((user.password) && (user.password.length > 0)) foundUser.password = user.Password;
-
+      if ((user.password) && (user.password.length > 0)) foundUser.password = user.password;
       // Stringify a deep copy to maintain RAM database as immutable
       const safeUser = _deepCopyUser(foundUser);
       resolve(safeUser);
