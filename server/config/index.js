@@ -74,9 +74,9 @@ exports.oauth2 = {
   authCodeExpiresInSeconds: 60,
   tokenExpiresInSeconds: parseInt(process.env.OAUTH2_TOKEN_EXPIRES_IN_SECONDS || '3600'),
   refreshTokenExpiresInSeconds:
-    parseInt(process.env.OAUTH2_REFRESH_TOKEN_EXPIES_IN_SECONDS || '2592000'),
+    parseInt(process.env.OAUTH2_REFRESH_TOKEN_EXPIRES_IN_SECONDS || '2592000'),
   clientTokenExpiresInSeconds:
-    parseInt(process.env.OAUTH2_CLIENT_TOKEN_EXPIES_IN_SECONDS || '86400'),
+    parseInt(process.env.OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS || '86400'),
   decisionTransactionIdLength: 16
 };
 

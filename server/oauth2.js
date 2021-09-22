@@ -277,8 +277,9 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
 
   // Compile token scope
   const tokenScope = intersectReqCliScopes(scope, client.allowedScope);
-  const token = jwtUtils.createToken({ sub: client.id, exp: config.oauth2.tokenExpiresInSeconds });
-  const expiration = new Date(Date.now() + (config.oauth2.tokenExpiresInSeconds * 1000));
+  const token =
+    jwtUtils.createToken({ sub: client.id, exp: config.oauth2.clientTokenExpiresInSeconds });
+  const expiration = new Date(Date.now() + (config.oauth2.clientTokenExpiresInSeconds * 1000));
   const authTime = new Date();
   const grantType = 'client_credentials';
   const responseParams = {
