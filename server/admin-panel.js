@@ -430,13 +430,12 @@ router.get('/viewclient',
           err.status = 400;
           return next(err);
         }
-        let plainTextClientSecret = client.clientSecret;
         // Case of PostgreSQL, client secret is AES encrypted
-        if (config.database.disableInMemoryDb) {
-          // Decrypt Client Secret from database
-          const plainTextBytes =
-            CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
-          plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+        const plainTextBytes =
+          CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+        let plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+        if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+          plainTextClientSecret = client.clientSecret;
         }
         const filteredClient = {
           id: client.id,
@@ -589,7 +588,7 @@ router.post('/editclient',
     // Case of PostgreSQL database, use AES encryption on client secret
     let savedClientSecret =
       CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
-    if (config.database.disableInMemoryDb) {
+    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
       // Else, Case of in-memory database, plain text
       savedClientSecret = req.body.clientSecret;
     }

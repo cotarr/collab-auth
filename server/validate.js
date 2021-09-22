@@ -145,7 +145,7 @@ validate.client = (client, clientSecret) => {
     // This is case of PostsgreSQL database
     //
     const plainTextBytes =
-    CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+      CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
     const plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
     // Timing safe compare
     if (safeCompare(clientSecret, plainTextClientSecret)) {
