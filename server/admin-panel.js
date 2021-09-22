@@ -370,7 +370,8 @@ router.get('/deleteuser',
               message: 'User successfully deleted.'
             });
           }
-        });
+        })
+        .catch((err) => next(err));
     } else {
       const err = new Error('Invalid query parameters');
       err.status = 400;
@@ -649,7 +650,6 @@ router.get('/deleteclient',
       console.log('deleting user');
       db.clients.delete(req.query.id)
         .then((deletedClient) => {
-          console.log(deletedClient);
           if (deletedClient == null) {
             throw new Error('Error deleting client');
           } else {
