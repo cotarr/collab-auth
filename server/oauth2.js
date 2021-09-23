@@ -283,7 +283,7 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
   const authTime = new Date();
   const grantType = 'client_credentials';
   const responseParams = {
-    expires_in: config.oauth2.tokenExpiresInSeconds,
+    expires_in: config.oauth2.clientTokenExpiresInSeconds,
     scope: tokenScope,
     grantType: grantType,
     auth_time: Math.floor(authTime.valueOf() / 1000)
