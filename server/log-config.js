@@ -13,14 +13,15 @@
 const fs = require('fs');
 const path = require('path');
 
-const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
+// in the case of NODE_ENV=production, force logging to console.
+const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 let logToFile = (nodeEnv === 'production');
 let errorFilter = (nodeEnv === 'production');
 
 // enable console logging in production by export NODE_DEBUG_LOG=1
-if (config.nodeDebugLog) {
+if (nodeDebugLog) {
   logToFile = false;
   errorFilter = false;
 }
