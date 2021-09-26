@@ -26,6 +26,17 @@ const robotPolicy = require('./robot-policy');
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
+if (nodeEnv === 'production') {
+  if (config.session.secret === 'A Secret That Should Be Changed') {
+    console.error('Error, session secret must be changed for production');
+    process.exit(1);
+  }
+  if (config.oauth2.clientSecretAesKey === 'A Secret That Should Be Changed') {
+    console.error('Error, oauth2 client secret AES key must be changed for production');
+    process.exit(1);
+  }
+}
+
 // Express configuration
 const app = express();
 app.set('view engine', 'ejs');
