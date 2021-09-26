@@ -646,7 +646,7 @@ router.get('/deleteclient',
         .catch((err) => next(err));
     } else if ((req.query) && (Object.keys(req.query).length === 2) &&
       ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
-      console.log('deleting user');
+      // console.log('deleting user');
       db.clients.delete(req.query.id)
         .then((deletedClient) => {
           if (deletedClient == null) {
