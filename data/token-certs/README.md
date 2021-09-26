@@ -1,7 +1,7 @@
 # TODO: Make your own certificates
 
-
-- The .gitignore should include certs/*.pem
+* Token certificates are located in data/token-certs/
+* The .gitignore should include  data/token-certs/*.pem
 
 Note certificates are also used to sign/verify JWT tokens
 

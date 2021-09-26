@@ -34,9 +34,9 @@ else
   echo "users-db.json exists, skipping..."
 fi
 
-if [ ! -f "./server/certs/privatekey.pem" ] && [ ! -f "./server/certs/certificate.pem" ]; then
+if [ ! -f "./data/token-certs/privatekey.pem" ] && [ ! -f "./data/token-certs/certificate.pem" ]; then
   echo "Creating private key"
-  openssl genrsa -out ./server/certs/privatekey.pem 2048
+  openssl genrsa -out ./data/token-certs/privatekey.pem 2048
   echo "Creating certificate"
   echo
   echo "------------------------------------------------"
@@ -47,9 +47,9 @@ if [ ! -f "./server/certs/privatekey.pem" ] && [ ! -f "./server/certs/certificat
   echo "    Other entries may be skipped"
   echo "    Entry of period [.] will skip an input"
   echo "------------------------------------------------"
-  openssl req -new -key ./server/certs/privatekey.pem -out ./server/certs/certrequest.csr
-  openssl x509 -req -in ./server/certs/certrequest.csr -signkey ./server/certs/privatekey.pem -out ./server/certs/certificate.pem
-  rm -v ./server/certs/certrequest.csr
+  openssl req -new -key ./data/token-certs/privatekey.pem -out ./data/token-certs/certrequest.csr
+  openssl x509 -req -in ./data/token-certs/certrequest.csr -signkey ./data/token-certs/privatekey.pem -out ./data/token-certs/certificate.pem
+  rm -v ./data/token-certs/certrequest.csr
 else
   echo "Certificates exist, skipping..."
 fi

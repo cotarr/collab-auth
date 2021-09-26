@@ -103,8 +103,8 @@ SITE_OWN_HOST=127.0.0.1:3500
 SITE_SECURITY_CONTACT=security@example.com
 SITE_SECURITY_EXPIRES="Fri, 1 Apr 2022 08:00:00 -0600"
 
-SERVER_TLS_KEY=../../server/certs/privatekey.pem
-SERVER_TLS_CERT=../../server/certs/certificate.pem
+SERVER_TLS_KEY=
+SERVER_TLS_CERT=
 SERVER_TLS=false
 SERVER_PORT=3500
 SERVER_PID_FILENAME=
@@ -177,9 +177,9 @@ The certificate filenames should be included in your .gitignore file if they are
 in the repository.
 
 ```
-server/certs/certificate.pem
-server/certs/privatekey.pem
-server/certs/README.md
+data/token-certs/certificate.pem
+data/token-certs/privatekey.pem
+data/token-certs/README.md
 ```
 
 The following console commands can be used to generate the certificates.
@@ -200,6 +200,5 @@ The certificate filenames should be included in your .gitignore file.
 
 ### Certificates (TLS)
 
-Unless otherwise specified, the TLS certificates will fall back to the same
-files that were generated for JWT token signature. This can be overwritten
-with the environment variables shown above.
+A filename path can be set for express/node.js web server TLS certificates using
+environment variables (see above).

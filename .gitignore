@@ -1,6 +1,8 @@
 node_modules
 server/certs/*.pem
 server/certs/*.csr
+data/token-certs/*.pem
+data/token-certs/*.csr
 *.bak
 credentials.json
 clients-db.json

@@ -4,7 +4,7 @@
   "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
-    "lint": "npx eslint server bin/www",
+    "lint": "npx eslint server bin/www SQL-tools *.js",
     "start": "node ./bin/www",
     "config-dev-script": "bash ./config-dev-script.sh",
     "create-postgres-admin-user": "node ./SQL-tools/create-postgres-admin-user.js"
