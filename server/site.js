@@ -31,7 +31,7 @@ exports.loginForm = (req, res, next) => {
     }
   };
   if ((req.query) && (req.query.retry) && (req.query.retry === 'yes')) {
-    options.opt.failMessage = true;
+    options.opt.failMessage = 'Login failed. Try again.';
   }
   res.set('Cache-Control', 'no-store').render('login', options);
 };
@@ -163,24 +163,32 @@ exports.changePasswordHandler = [
       })
       .catch((e) => {
         // console.log(e.message);
-        let message = 'There was an error changing your password';
+        const options = {
+          name: req.user.name,
+          username: req.user.username,
+          opt: {
+            minPwLen: config.data.userPasswordMinLength,
+            maxPwLen: config.data.userPasswordMaxLength
+          }
+        };
+        let message = 'Error changing password.';
         if (e.message === 'Not current user') {
-          message = 'Error: Username was Invalid';
+          message = 'Username was Invalid';
         }
         if (e.message === 'User password not correct') {
-          message = 'Error: Old password was Invalid.';
+          message = 'Old password was Invalid.';
         }
         if (e.message === 'Passwords do not match') {
-          message = 'Error: Passwords do not match.';
+          message = 'Passwords do not match.';
         }
         if (e.message === 'Password invlid length') {
-          message = 'Error: Password invlid length.';
+          message = 'Password invlid length.';
         }
         if (e.message === 'New password same') {
-          message = 'Error: New password must be different.';
+          message = 'New password must be different.';
         }
-        res.set('Cache-Control', 'no-store').render('change-password-message',
-          { name: req.user.name, passwordMessage: message });
+        if (message) options.opt.failMessage = message;
+        res.set('Cache-Control', 'no-store').render('change-password', options);
       });
   }
 ];
