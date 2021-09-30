@@ -8,6 +8,7 @@ const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-pas
 const validate = require('./validate');
 const { addScopeToPassportReqObj } = require('./scope');
 const logUtils = require('./log-utils');
+const stats = require('./stats');
 
 // -----------------------------------------------------
 // Part 1 of 2
@@ -26,8 +27,10 @@ passport.use(new LocalStrategy({ passReqToCallback: true }, (req, username, pass
     .then((user) => validate.user(user, password))
     .then((user) => db.users.updateLoginTime(user))
     .then((user) => logUtils.logPassportLocalLogin(req, user))
+    .then((user) => stats.incrementCounterPm(user, 'userLogin'))
     .then((user) => done(null, user))
     .catch((err) => {
+      stats.incrementCounterFn('failedLogin');
       logUtils.logPassportLocalError(req, err);
       return done(null, false);
     });

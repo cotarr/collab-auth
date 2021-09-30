@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Client</title>
+    <link rel="stylesheet" href="/css/styles.css">
+  </head>
+  <body>
+    <%- include('menu-header') %>
+    <div class="scrollable-div">
+      <div>
+        Counters reset at server start: <%= start %>
+      </div>
+      <div class="vh-20"></div>
+
+      <table class="account-table" border="1" cellpadding="5px">
+        <tbody>
+          <tr><td>User Login</td><td><%= counter.userLogin %></td></tr>
+          <tr><td>Failed Login</td><td><%= counter.failedLogin %></td></tr>
+          <tr><td>Client tokens issued</td><td><%= counter.clientToken %></td></tr>
+          <tr><td>User tokens issued</td><td><%= counter.userToken %></td></tr>
+          <tr><td>Refresh tokens issued</td><td><%= counter.refreshToken %></td></tr>
+          <tr><td>Introspect</td><td><%= counter.introspect %></td></tr>
+        </tbody>
+      </table>
+
+    </div>
+    <%- include('menu-footer') %>
+  </body>
+</html>

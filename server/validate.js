@@ -9,6 +9,7 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 
 const db = require('./db');
 const jwtUtils = require('./jwt-utils');
+const stats = require('./stats');
 
 /** Validate object to attach all functions to  */
 const validate = Object.create(null);
@@ -305,6 +306,7 @@ validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime 
   const expiration = new Date(Date.now() + (config.oauth2.refreshTokenExpiresInSeconds * 1000));
   return db.refreshTokens.save(
     refreshToken, expiration, userID, clientID, scope, grantType, authTime)
+    .then(() => stats.incrementCounterPm({}, 'refreshToken'))
     .then(() => refreshToken);
 };
 
@@ -321,6 +323,7 @@ validate.generateToken = ({ userID, clientID, scope, grantType, authTime }) => {
   const token = jwtUtils.createToken({ sub: userID, exp: config.oauth2.tokenExpiresInSeconds });
   const expiration = new Date(Date.now() + (config.oauth2.tokenExpiresInSeconds * 1000));
   return db.accessTokens.save(token, expiration, userID, clientID, scope, grantType, authTime)
+    .then(() => stats.incrementCounterPm({}, 'userToken'))
     .then(() => token);
 };
 

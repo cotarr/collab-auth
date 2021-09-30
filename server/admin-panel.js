@@ -11,6 +11,7 @@ const db = require('./db');
 const inputValidation = require('./input-validation');
 const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scope');
 const logUtils = require('./log-utils');
+const stats = require('./stats');
 
 const config = require('./config/');
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -705,6 +706,27 @@ router.get('/removealltokens',
     } else {
       res.set('Cache-Control', 'no-store').render('confirm-remove', { name: req.user.name });
     }
+  }
+);
+
+/**
+ * Admin menu endpoint
+ *
+ * The admin menu call the remaining functions in this module
+ * to manage the user records and client records in the database.
+ * The pages are simple server side forms.
+ * Password authentication is required with user role = user.admin
+ */
+router.get('/stats',
+  ensureLoggedIn(),
+  requireScopeForWebPanel('user.admin'),
+  (req, res, next) => {
+    const options = {
+      name: req.user.name,
+      start: stats.serverStartIsoString(),
+      count: stats.counterToStringObj()
+    };
+    res.render('stats', options);
   }
 );
 

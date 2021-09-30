@@ -28,6 +28,7 @@ const {
 } = require('./scope');
 const validate = require('./validate');
 const inputValidation = require('./input-validation');
+const stats = require('./stats');
 
 // create OAuth 2.0 server
 const server = oauth2orize.createServer();
@@ -116,6 +117,7 @@ server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) =>
     // auth_time: Math.floor(authTime.valueOf() / 1000)
   };
   db.accessTokens.save(token, expiration, user.id, client.id, areq.tokenScope, grantType, authTime)
+    .then(() => stats.incrementCounterPm({}, 'userToken'))
     .then(() => done(null, token, responseParams))
     .catch((err) => done(err));
 }));
@@ -292,6 +294,7 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
   //
   // Pass in a null for user id since there is no user when using this grant type
   db.accessTokens.save(token, expiration, null, client.id, tokenScope, grantType, authTime)
+    .then(() => stats.incrementCounterPm({}, 'clientToken'))
     .then(() => done(null, token, null, responseParams))
     .catch((err) => done(err));
 }));
@@ -626,6 +629,7 @@ exports.introspect = [
         .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
           'access_token validaiton failed'))
         .then((tokenMetaData) => {
+          stats.incrementCounterFn('introspect');
           const resJson = {
             active: true,
             revocable: true,
