@@ -23,18 +23,22 @@ const logUtils = require('./log-utils');
  * Previous failed login message added by ejs when query
  * parameter retry is yes, example: /login?retry=yes
  */
-exports.loginForm = (req, res, next) => {
-  const options = {
-    opt: {
-      maxUnLen: config.data.userUsernameMaxLength,
-      maxPwLen: config.data.userPasswordMaxLength
+exports.loginForm = [
+  inputValidation.loginGetRequest,
+  (req, res, next) => {
+    const options = {
+      opt: {
+        maxUnLen: config.data.userUsernameMaxLength,
+        maxPwLen: config.data.userPasswordMaxLength
+      }
+    };
+    if ((req.query) && (req.query.retry) && (req.query.retry === 'yes')) {
+      options.opt.failMessage = 'Login failed. Try again.';
     }
-  };
-  if ((req.query) && (req.query.retry) && (req.query.retry === 'yes')) {
-    options.opt.failMessage = 'Login failed. Try again.';
+    res.set('Cache-Control', 'no-store').render('login', options);
   }
-  res.set('Cache-Control', 'no-store').render('login', options);
-};
+];
+
 /**
  * redirectError an informational web page to inform the
  * user a `/login` was initiated without a valid redirectURL.
@@ -51,7 +55,7 @@ exports.redirectError = [
  * POST /login (credentials in body)
  */
 exports.login = [
-  inputValidation.loginRequest,
+  inputValidation.loginPostRequest,
   passport.authenticate('local',
     { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login?retry=yes' }
   )

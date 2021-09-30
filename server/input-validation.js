@@ -172,11 +172,23 @@ const checkExtraneousKeys = function (allowKeys, location) {
 };
 
 /**
+ * Login GET request
+ *
+ * Array of middleware functions for input validation
+ */
+exports.loginGetRequest = [
+  checkExtraneousKeys(['retry'], 'query'),
+  query(['retry']).optional()
+    .isLength({ min: 0, max: 16 }),
+  handleErrorHTTP
+]; // Login GET Request
+
+/**
  * Login POST request
  *
  * Array of middleware functions for input validation
  */
-exports.loginRequest = [
+exports.loginPostRequest = [
   checkExtraneousKeys([
     'username',
     'password'], 'body'),
@@ -195,7 +207,7 @@ exports.loginRequest = [
   body('password', 'Invalid string length')
     .isLength({ min: 1, max: config.data.userPasswordMaxLength }),
   handleErrorHTTP
-]; // Login Request
+]; // Login POST Request
 
 /**
  * Validate input for ?id=UUID.v4
