@@ -12,6 +12,12 @@
         <div class="center">
             <h1>User Login</h1>
         </div>
+        <% if(opt.failMessage){ %>
+          <div class="red-text center">
+            Login failed. Try again.
+          </div>
+          <div class="div-height-20"></div>
+        <% } %>
         <div>
             <label for="name">Username:</label>
             <input type="text" name="username"

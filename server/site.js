@@ -19,16 +19,21 @@ const logUtils = require('./log-utils');
 
 /**
  * Render the login Form
+ *
+ * Previous failed login message added by ejs when query
+ * parameter retry is yes, example: /login?retry=yes
  */
 exports.loginForm = (req, res, next) => {
-  res.set('Cache-Control', 'no-store').render('login',
-    {
-      opt: {
-        maxUnLen: config.data.userUsernameMaxLength,
-        maxPwLen: config.data.userPasswordMaxLength
-      }
+  const options = {
+    opt: {
+      maxUnLen: config.data.userUsernameMaxLength,
+      maxPwLen: config.data.userPasswordMaxLength
     }
-  );
+  };
+  if ((req.query) && (req.query.retry) && (req.query.retry === 'yes')) {
+    options.opt.failMessage = true;
+  }
+  res.set('Cache-Control', 'no-store').render('login', options);
 };
 /**
  * redirectError an informational web page to inform the
@@ -48,7 +53,7 @@ exports.redirectError = [
 exports.login = [
   inputValidation.loginRequest,
   passport.authenticate('local',
-    { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login' }
+    { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login?retry=yes' }
   )
 ];
 
