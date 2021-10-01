@@ -723,12 +723,14 @@ router.get('/stats',
   (req, res, next) => {
     Promise.all([
       db.accessTokens.rowCount(),
-      db.refreshTokens.rowCount()
+      db.refreshTokens.rowCount(),
+      db.sessions.sessionCount(req)
     ])
       .then((dbCountArray) => {
         const rows = {
           accessToken: dbCountArray[0].toString(),
-          refreshToken: dbCountArray[1].toString()
+          refreshToken: dbCountArray[1].toString(),
+          sessionCount: dbCountArray[2].toString()
         };
         const options = {
           name: req.user.name,

@@ -19,3 +19,20 @@ exports.removeAll = () => {
       return queryResponse.rows;
     });
 };
+
+/**
+ * Query to count number of session stored in express session store using connect-pg-simple
+ *
+ * @params {Object} req - Node.js request object (Not used, only in MemoryStore conditional)
+ * @returns {Promise} resolved with integer value
+ */
+exports.sessionCount = (req) => {
+  const query = {
+    text: 'SELECT COUNT(*) FROM session'
+  };
+  // Return Promise
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows[0].count;
+    });
+};
