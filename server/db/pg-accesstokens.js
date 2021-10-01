@@ -107,3 +107,18 @@ exports.removeAll = () => {
       return queryResponse.rows;
     });
 };
+
+/**
+ * Query count for number of rows in table
+ * @returns {Promise} resolved with integer value
+ */
+exports.rowCount = () => {
+  const query = {
+    text: 'SELECT COUNT(*) FROM accesstokens'
+  };
+  // Return Promise
+  return pgPool.query(query)
+    .then((queryResponse) => {
+      return queryResponse.rows[0].count;
+    });
+};

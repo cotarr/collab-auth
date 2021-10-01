@@ -89,3 +89,13 @@ exports.removeAll = () => {
   tokens = Object.create(null);
   return Promise.resolve(deletedTokens);
 };
+
+/**
+ * Query count for number of rows in table
+ * @returns {Promise} resolved with integer value
+ */
+exports.rowCount = () => {
+  const count = Object.keys(tokens).length;
+  // Return Promise
+  return Promise.resolve(count);
+};

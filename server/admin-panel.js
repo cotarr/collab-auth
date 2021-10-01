@@ -721,12 +721,27 @@ router.get('/stats',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
-    const options = {
-      name: req.user.name,
-      start: stats.serverStartIsoString(),
-      count: stats.counterToStringObj()
-    };
-    res.render('stats', options);
+    Promise.all([
+      db.accessTokens.rowCount(),
+      db.refreshTokens.rowCount()
+    ])
+      .then((dbCountArray) => {
+        const rows = {
+          accessToken: dbCountArray[0].toString(),
+          refreshToken: dbCountArray[1].toString()
+        };
+        const options = {
+          name: req.user.name,
+          start: stats.serverStartIsoString(),
+          count: stats.counterToStringObj(),
+          rows: rows
+        };
+        res.render('stats', options);
+      })
+      .catch((err) => {
+        console.log(err);
+        next(err);
+      });
   }
 );
 
