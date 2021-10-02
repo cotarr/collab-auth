@@ -5,8 +5,6 @@ const http = require('http');
 const path = require('path');
 
 // express/passport packages
-const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const express = require('express');
 const session = require('express-session');
 const oauth2 = require('./oauth2');
@@ -40,10 +38,9 @@ if (nodeEnv === 'production') {
 // Express configuration
 const app = express();
 app.set('view engine', 'ejs');
-app.use(cookieParser());
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 // ------------------
 // HTTP access log
