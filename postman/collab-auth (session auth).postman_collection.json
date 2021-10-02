@@ -802,6 +802,45 @@
 			"response": []
 		},
 		{
+			"name": "/panel/stats (fail)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 302\", function () {",
+							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Content-Type header is application/json\", () => {",
+							"  pm.expect(pm.response.headers.get('Location')).to.eql('/login');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/panel/stats",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"panel",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/changepassword (expect fail)",
 			"event": [
 				{
