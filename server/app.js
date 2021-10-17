@@ -97,6 +97,8 @@ const sessionOptions = {
   name: 'authorization.sid',
   proxy: false,
   rolling: true,
+  resave: false,
+  saveUninitialized: false,
   secret: config.session.secret,
   cookie: {
     path: '/',
@@ -104,33 +106,28 @@ const sessionOptions = {
     maxAge: config.session.maxAge,
     secure: (config.server.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
-    // sameSite: 'Lax'
     sameSite: 'Strict'
   }
 };
 
-const sessionStore = {};
 if (config.session.disableMemorystore) {
   // SQL queries
   // List:       SELECT sid, expire FROM session;
   // Clear all:  DELETE FROM session;
   console.log('Using PostgresSQL connect-pg-simple for session storage');
-  sessionOptions.resave = false;
-  sessionOptions.saveUninitialized = false;
-  sessionStore.pgPool = require('./db/pg-pool');
-  sessionStore.PgSessionStore = require('connect-pg-simple')(session);
-  sessionOptions.store = new sessionStore.PgSessionStore({
-    pool: sessionStore.pgPool,
+
+  const pgPool = require('./db/pg-pool');
+  const PgSessionStore = require('connect-pg-simple')(session);
+  sessionOptions.store = new PgSessionStore({
+    pool: pgPool,
     // connect-pg-simple ttl is in seconds
     ttl: config.session.ttl,
     tableName: 'session'
   });
 } else {
   console.log('Using memorystore for session storage');
-  sessionOptions.resave = false; // need false for memorystore
-  sessionOptions.saveUninitialized = false; // need false for memorystore
-  sessionStore.MemoryStore = require('memorystore')(session);
-  sessionOptions.store = new sessionStore.MemoryStore({
+  const MemoryStore = require('memorystore')(session);
+  sessionOptions.store = new MemoryStore({
     // Memorystore ttl is in milliseconds
     ttl: config.session.maxAge,
     stale: true,

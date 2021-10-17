@@ -65,24 +65,8 @@ exports.login = [
  * Logout of the system and render logout info page
  */
 exports.logout = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    if (req.session) {
-      req.session.destroy((err) => {
-        if (err) {
-          return next(err);
-        } else {
-          // name empty string for header
-          return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
-        }
-      });
-    } else {
-      // name empty string for header
-      return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
-    }
-  } else {
-    // name empty string for header
-    return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
-  }
+  req.logout();
+  return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
 };
 
 /**
