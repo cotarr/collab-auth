@@ -85,7 +85,7 @@ const validateAndHashPassword = (req, res, user) => {
     throw new Error('New password same');
   } else {
     // Use bcrypt to hash password for PostgreSQL configuration
-    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+    if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
       // Else, in Memory storage, use Plain Text
       // Leave password unchanged in req.body
     } else {

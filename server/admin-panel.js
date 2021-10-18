@@ -30,7 +30,7 @@ router.get('/menu',
   (req, res, next) => {
     // Warning message if running Memory Store RAM database
     let visibility = '';
-    if (config.database.disableInMemoryDb) visibility = 'hidden';
+    if (config.database.enablePgUserDatabase) visibility = 'hidden';
     res.set('Cache-Control', 'no-store').render('menu-admin',
       { name: req.user.name, visibility: visibility });
   }
@@ -175,7 +175,7 @@ router.post('/createuser',
     } else {
       // Case of PostgreSQUL, use bcrypt to hash password
       let password = bcrypt.hashSync(req.body.newpassword1, 10);
-      if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+      if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
         // Else, case of in Memory storage, use Plain Text
         password = req.body.newpassword1;
       }
@@ -298,7 +298,7 @@ router.post('/edituser',
       } else {
         // Use bcrypt to hash password for PostgreSQL configuration
         password = bcrypt.hashSync(req.body.newpassword1, 10);
-        if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+        if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
           // Else, in Memory storage, use Plain Text
           password = req.body.newpassword1;
         }
@@ -435,7 +435,7 @@ router.get('/viewclient',
         const plainTextBytes =
           CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
         let plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
-        if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+        if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
           plainTextClientSecret = client.clientSecret;
         }
         const filteredClient = {
@@ -492,7 +492,7 @@ router.post('/createclient',
     // Case of PostgreSQL database, use AES encryption on client secret
     let savedClientSecret =
       CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
-    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+    if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
       // Else, case of in-memory database, plain text
       savedClientSecret = req.body.clientSecret;
     }
@@ -544,7 +544,7 @@ router.get('/editclient',
           const plainTextBytes =
             CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
           let plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
-          if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+          if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
             // Else, ease of in-memory database, Plain text
             plainTextClientSecret = client.clientSecret;
           }
@@ -589,7 +589,7 @@ router.post('/editclient',
     // Case of PostgreSQL database, use AES encryption on client secret
     let savedClientSecret =
       CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
-    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+    if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
       // Else, Case of in-memory database, plain text
       savedClientSecret = req.body.clientSecret;
     }

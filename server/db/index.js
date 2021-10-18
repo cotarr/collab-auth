@@ -12,13 +12,13 @@ let sessions;
 let clients;
 let users;
 
-if (config.session.disableMemorystore) {
+if (config.session.enablePgSessionStore) {
   sessions = require('./pg-sessions');
 } else {
   sessions = require('./mem-sessions');
 }
 
-if (config.database.disableInMemoryDb) {
+if (config.database.enablePgUserDatabase) {
   console.log('Using PostgresSQL for OAuth2 storage.');
   accessTokens = require('./pg-accesstokens');
   refreshTokens = require('./pg-refreshtokens');

@@ -48,7 +48,7 @@ validate.user = (user, password) => {
     throw new Error('User login disabled');
   } else {
     validate.userExists(user);
-    if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+    if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
       //
       // User Password is PLAIN TEXT
       // This is case of in-memory database loaded from static files
@@ -126,7 +126,7 @@ validate.usernameMatchesSession = (req, username) => {
  */
 validate.client = (client, clientSecret) => {
   validate.clientExists(client);
-  if ((nodeEnv === 'development') && (!config.database.disableInMemoryDb)) {
+  if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
     //
     // Client secret is PLAIN TEXT
     //                  ==========

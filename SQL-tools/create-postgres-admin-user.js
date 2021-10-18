@@ -23,7 +23,7 @@ const bcrypt = require('bcryptjs');
 const config = require('../server/config');
 const db = require('../server/db');
 
-if (!config.database.disableInMemoryDb) {
+if (!config.database.enablePgUserDatabase) {
   console.log('Error: PostgreSQL database disabled, you are using in-memory database');
   process.exit(1);
 }
