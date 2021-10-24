@@ -6,6 +6,7 @@
 
 const path = require('path');
 
+// Import UNIX environment variables from .env file and add to process.env
 require('dotenv').config();
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
@@ -31,8 +32,8 @@ exports.server = {
 };
 
 exports.session = {
-  maxAge: (process.env.SESSION_EXPIRE_SEC * 1000) || (7 * 24 * 3600000),
-  ttl: process.env.SESSION_EXPIRE_SEC || (7 * 24 * 3600),
+  maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '604800') * 1000,
+  ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '608400'),
   secret: process.env.SESSION_SECRET || 'A Secret That Should Be Changed',
   enablePgSessionStore: (process.env.SESSION_ENABLE_POSTGRES === 'true') || false
 };
