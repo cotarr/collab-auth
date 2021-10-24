@@ -736,7 +736,8 @@ router.get('/stats',
           name: req.user.name,
           start: stats.serverStartIsoString(),
           count: stats.counterToStringObj(),
-          rows: rows
+          rows: rows,
+          appVersion: config.server.appVersion
         };
         res.render('stats', options);
       })

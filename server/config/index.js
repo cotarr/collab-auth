@@ -5,9 +5,12 @@
 //
 
 const path = require('path');
+const fs = require('fs');
 
 // Import UNIX environment variables from .env file and add to process.env
 require('dotenv').config();
+
+const appVersion = JSON.parse(fs.readFileSync('package.json')).version;
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -22,6 +25,7 @@ exports.site = {
 };
 
 exports.server = {
+  appVersion: appVersion,
   serverTlsKey: process.env.SERVER_TLS_KEY ||
     path.join(__dirname, '../../data/token-certs/privatekey.pem'),
   serverTlsCert: process.env.SERVER_TLS_CERT ||
