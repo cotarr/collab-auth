@@ -72,6 +72,8 @@ The recommended entry "collab-auth" is entered into 2 required field for
 | A challenge password []:                                    |             |
 | An optional company name []:                                |             |
 
+The configuration script can be run with the following npm command:
+
 ```bash
 npm run config-dev-script
 ```
@@ -86,12 +88,19 @@ The server can also be started with `node bin/www`
 
 ### Administrator Login
 
+```
+username: bob
+password: ssh-secret
+```
+
 A simple administrator web page may be accessed at `http://127.0.0.1:3500/panel/menu`.
 This is a very simple page with limited functions to add or modify user records and client records.
 To gain access to the administrator page, a user account must be assigned the role "user-admin".
 It is recommended an admin user be a dedicated account, and that the user-admin role not be
 added to commonly used accounts. Usernames and real names are currently restricted to
-A-Z a-z 0-9 characters. In development mode, user and client account records are loaded from
+A-Z a-z 0-9 characters.
+
+In development mode, user and client account records are loaded from
 static files when the server starts, and changes to users and client account records are not saved.
 If configured for PostgreSQL, changes will be saved to the database.
 
