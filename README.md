@@ -7,7 +7,6 @@ This repository will use the oauth2orize library. Users records and sessions can
 temporarily stored in memory during development or configured to use PostgreSQL.
 This is a learning project and will require additional work before considering use in a production.
 
-
 |                        Repository                                  |                   Description                         |
 | ------------------------------------------------------------------ | ----------------------------------------------------- |
 | collab-auth                                                        | Oauth2 Authorization Provider, redirect login, tokens |
@@ -37,6 +36,9 @@ npm install
 
 ### Setup development configuration
 
+The environment variable NODE_ENV should not exist or it may
+be set to NODE_ENV=development.
+
 Running the server in development mode will require 3 things.
 
 - A file to define user accounts with login username and password
@@ -58,10 +60,17 @@ Inputs can be skipped by entering a period [.].
 The recommended entry "collab-auth" is entered into 2 required field for
 "Organization Name" and "Common Name."
 
-The environment variable NODE_ENV should not exist or it may
-be set to NODE_ENV=development.
-
-No additional configuration is required to start a development server.
+|                      openssl prompt                         |   response  |     
+| ----------------------------------------------------------- | ----------- |
+| Country Name (2 letter code) [AU]:                          | .           |
+| State or Province Name (full name) [Some-State]:.           | .           |
+| Locality Name (eg, city) []:                                | .           |
+| Organization Name (eg, company) [Internet Widgits Pty Ltd]: | collab-auth |
+| Organizational Unit Name (eg, section) []:                  | .           |
+| Common Name (e.g. server FQDN or YOUR name) []:             | collab-auth |
+| Email Address []:                                           | .           |
+| A challenge password []:                                    |             |
+| An optional company name []:                                |             |
 
 ```bash
 npm run config-dev-script

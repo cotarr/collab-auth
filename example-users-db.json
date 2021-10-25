@@ -2,7 +2,7 @@
   {
     "id": "05d3649f-2bdc-4e0e-aaf7-848dd1516ca0",
     "username": "bob",
-    "password": "secret",
+    "password": "bobssecret",
     "name": "Bob Smith",
     "loginDisabled": false,
     "role": [
