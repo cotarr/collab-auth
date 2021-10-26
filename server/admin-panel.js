@@ -230,7 +230,6 @@ router.get('/edituser',
             number: user.number,
             username: user.username,
             name: user.name,
-            loginDisabled: user.loginDisabled,
             role: toScopeString(user.role),
             updatedAt: user.updatedAt.toUTCString(),
             createdAt: user.createdAt.toUTCString()
@@ -240,7 +239,7 @@ router.get('/edituser',
           } else {
             filteredUser.lastLogin = '';
           }
-          if (user.disabled) {
+          if (user.loginDisabled) {
             filteredUser.disabled = 'checked';
           } else {
             filteredUser.disabled = '';
