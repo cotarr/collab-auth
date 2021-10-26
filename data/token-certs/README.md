@@ -3,13 +3,24 @@
 * Token certificates are located in data/token-certs/
 * The .gitignore should include  data/token-certs/*.pem
 
-Note certificates are also used to sign/verify JWT tokens
+Note: For development and testing purposes, these certificates can also be used
+as a self signed TLS certificates for HTTP requests. 
+The file path to this location is the default server TLS certificate filename.
 
+* Openssl is used to generate the certificates
 * Entry of period [.] will skip an input
-* For testing, the following were used
- * Organization Name = collab-auth
- * Common Name = collab-auth
 
+|                      openssl prompt                         |   response  |     
+| ----------------------------------------------------------- | ----------- |
+| Country Name (2 letter code) [AU]:                          | .           |
+| State or Province Name (full name) [Some-State]:.           | .           |
+| Locality Name (eg, city) []:                                | .           |
+| Organization Name (eg, company) [Internet Widgits Pty Ltd]: | collab-auth |
+| Organizational Unit Name (eg, section) []:                  | .           |
+| Common Name (e.g. server FQDN or YOUR name) []:             | collab-auth |
+| Email Address []:                                           | .           |
+| A challenge password []:                                    |             |
+| An optional company name []:                                |             |
 
 ```bash
 openssl genrsa -out privatekey.pem 2048
