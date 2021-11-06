@@ -125,24 +125,44 @@ exports.save = (client) => {
  * @returns {Promise}  resolved promise with the modifiedclient, otherwise throws error
  */
 exports.update = (client) => {
-  const updateQuery = {
-    text: 'UPDATE authclients SET ' +
-      '"name" = $2, ' +
-      '"clientSecret" = $3, ' +
-      '"trustedClient" = $4, ' +
-      '"allowedScope" = $5, ' +
-      '"allowedRedirectURI" = $6, ' +
-      '"updatedAt" = now() ' +
-      'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
-    values: [
-      client.id,
-      client.name,
-      client.clientSecret,
-      client.trustedClient,
-      client.allowedScope,
-      client.allowedRedirectURI
-    ]
-  };
+  let updateQuery;
+  if ((client.clientSecret) && (client.clientSecret.length > 0)) {
+    updateQuery = {
+      text: 'UPDATE authclients SET ' +
+        '"name" = $2, ' +
+        '"clientSecret" = $3, ' +
+        '"trustedClient" = $4, ' +
+        '"allowedScope" = $5, ' +
+        '"allowedRedirectURI" = $6, ' +
+        '"updatedAt" = now() ' +
+        'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
+      values: [
+        client.id,
+        client.name,
+        client.clientSecret,
+        client.trustedClient,
+        client.allowedScope,
+        client.allowedRedirectURI
+      ]
+    };
+  } else {
+    updateQuery = {
+      text: 'UPDATE authclients SET ' +
+        '"name" = $2, ' +
+        '"trustedClient" = $3, ' +
+        '"allowedScope" = $4, ' +
+        '"allowedRedirectURI" = $5, ' +
+        '"updatedAt" = now() ' +
+        'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
+      values: [
+        client.id,
+        client.name,
+        client.trustedClient,
+        client.allowedScope,
+        client.allowedRedirectURI
+      ]
+    };
+  }
   return pgPool.query(updateQuery)
     .then((queryResponse) => {
       if (queryResponse.rows[0] == null) {

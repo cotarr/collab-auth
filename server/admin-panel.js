@@ -162,14 +162,14 @@ router.post('/createuser',
     if (req.body.newpassword1 !== req.body.newpassword2) {
       return res.set('Cache-Control', 'no-store').render('generic-message', {
         name: req.user.name,
-        title: 'Ceate New User',
+        title: 'Create New User',
         message: 'Error: Passwords do not match, aborted.'
       });
     } else if ((req.body.newpassword1.length < config.data.userPasswordMinLength) ||
       (req.body.newpassword1.length > config.data.userPasswordMaxLength)) {
       return res.set('Cache-Control', 'no-store').render('generic-message', {
         name: req.user.name,
-        title: 'Ceate New User',
+        title: 'Create New User',
         message: 'Error: Password invlid length, aborted'
       });
     } else {
@@ -196,7 +196,7 @@ router.post('/createuser',
             logUtils.adminLogActivity(req, message);
             return res.set('Cache-Control', 'no-store').render('generic-message', {
               name: req.user.name,
-              title: 'Ceate New User',
+              title: 'Create New User',
               message: 'New user record successfully saved.'
             });
           }
@@ -284,14 +284,14 @@ router.post('/edituser',
       if (req.body.newpassword1 !== req.body.newpassword2) {
         return res.set('Cache-Control', 'no-store').render('generic-message', {
           name: req.user.name,
-          title: 'Ceate New User',
+          title: 'Create New User',
           message: 'Error: Passwords do not match, aborted.'
         });
       } else if ((req.body.newpassword1.length < config.data.userPasswordMinLength) ||
         (req.body.newpassword1.length > config.data.userPasswordMaxLength)) {
         return res.set('Cache-Control', 'no-store').render('generic-message', {
           name: req.user.name,
-          title: 'Ceate New User',
+          title: 'Create New User',
           message: 'Error: Password invlid length, aborted'
         });
       } else {
@@ -441,12 +441,17 @@ router.get('/viewclient',
           id: client.id,
           name: client.name,
           clientId: client.clientId,
-          clientSecret: plainTextClientSecret,
+          clientSecret: null,
           allowedScope: toScopeString(client.allowedScope),
           allowedRedirectURI: toScopeString(client.allowedRedirectURI),
           updatedAt: client.updatedAt.toUTCString(),
           createdAt: client.createdAt.toUTCString()
         };
+        if (config.oauth2.editorShowClientSecret) {
+          filteredClient.clientSecret = plainTextClientSecret;
+        } else {
+          filteredClient.clientSecret = null;
+        }
 
         if (client.trustedClient) {
           filteredClient.trustedClient = 'Yes';
@@ -495,6 +500,14 @@ router.post('/createclient',
       // Else, case of in-memory database, plain text
       savedClientSecret = req.body.clientSecret;
     }
+    if ((req.body.clientSecret.length < config.data.clientSecretMinLength) ||
+      (req.body.clientSecret.length > config.data.clientSecretMaxLength)) {
+      return res.set('Cache-Control', 'no-store').render('generic-message', {
+        name: req.user.name,
+        title: 'Create New Client',
+        message: 'Error: Client secret invlid length, aborted'
+      });
+    }
     const client = {
       name: req.body.name,
       clientId: req.body.clientId,
@@ -512,7 +525,7 @@ router.post('/createclient',
           logUtils.adminLogActivity(req, message);
           return res.set('Cache-Control', 'no-store').render('generic-message', {
             name: req.user.name,
-            title: 'Ceate New Client',
+            title: 'Create New Client',
             message: 'New client record successfully saved.'
           });
         }
@@ -551,13 +564,17 @@ router.get('/editclient',
             id: client.id,
             name: client.name,
             clientId: client.clientId,
-            clientSecret: plainTextClientSecret,
+            clientSecret: null,
             allowedScope: toScopeString(client.allowedScope),
             allowedRedirectURI: toScopeString(client.allowedRedirectURI),
             updatedAt: client.updatedAt.toUTCString(),
             createdAt: client.createdAt.toUTCString()
           };
-
+          if (config.oauth2.editorShowClientSecret) {
+            filteredClient.clientSecret = plainTextClientSecret;
+          } else {
+            filteredClient.clientSecret = null;
+          }
           if (client.trustedClient) {
             filteredClient.trustedClient = 'checked';
           } else {
@@ -585,21 +602,34 @@ router.post('/editclient',
   requireScopeForWebPanel('user.admin'),
   inputValidation.editClient,
   (req, res, next) => {
-    // Case of PostgreSQL database, use AES encryption on client secret
-    let savedClientSecret =
-      CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
-    if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
-      // Else, Case of in-memory database, plain text
-      savedClientSecret = req.body.clientSecret;
-    }
     const client = {
       id: req.body.id,
       name: req.body.name,
-      clientSecret: savedClientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: toScopeArray(req.body.allowedScope),
       allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
     };
+    // If client secret is zero length or missing, the previous client secret will not be updated
+    if ((req.body.clientSecret) &&
+      (!(req.body.clientSecret == null)) && (req.body.clientSecret.length > 0)) {
+      // length check
+      if ((req.body.clientSecret.length < config.data.clientSecretMinLength) ||
+        (req.body.clientSecret.length > config.data.clientSecretMaxLength)) {
+        return res.set('Cache-Control', 'no-store').render('generic-message', {
+          name: req.user.name,
+          title: 'Create New Client',
+          message: 'Error: Client secret invlid length, aborted'
+        });
+      }
+      // Case of PostgreSQL database, use AES encryption on client secret
+      client.clientSecret =
+        CryptoJS.AES.encrypt(req.body.clientSecret, config.oauth2.clientSecretAesKey).toString();
+      // for development environment env, override with plain text password
+      if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
+        // Else, Case of in-memory database, plain text
+        client.clientSecret = req.body.clientSecret;
+      }
+    }
     db.clients.update(client)
       .then((editedClient) => {
         if (editedClient == null) {

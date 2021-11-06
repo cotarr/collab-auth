@@ -73,6 +73,7 @@ exports.oauth2 = {
   disableClientGrant: (process.env.OAUTH2_DISABLE_CLIENT_GRANT === 'true') || false,
   disablePasswordGrant: (process.env.OAUTH2_DISABLE_PASSWORD_GRANT === 'true') || false,
   disableRefreshTokenGrant: (process.env.OAUTH2_DISABLE_REFRESH_TOKEN_GRANT === 'true') || false,
+  editorShowClientSecret: (process.env.OAUTH2_EDITOR_SHOW_CLIENT_SECRET === 'true') || false,
   authCodeLength: 24,
   authCodeExpiresInSeconds: 60,
   tokenExpiresInSeconds: parseInt(process.env.OAUTH2_TOKEN_EXPIRES_IN_SECONDS || '3600'),

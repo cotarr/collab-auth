@@ -417,11 +417,9 @@ exports.createClient = [
     .isLength({ min: config.data.clientIdMinLength, max: config.data.clientIdMaxLength }),
   body('clientId', 'Invalid characters in string')
     .isWhitelisted(idAllowedChars),
-  body('clientSecret',
-    'Client Secret minimum ' + config.data.clientSecretMinLength.toString() + ' characters')
-    .isLength({ min: config.data.clientSecretMinLength, max: config.data.clientIdMaxLength }),
+  // length also checked in admin-panel.js, this is general input validation
   body('clientSecret', 'Invalid string length')
-    .isLength({ max: config.data.clientIdMaxLength }),
+    .isLength({ min: 0, max: 1024 }),
   body('trustedClient').optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
@@ -472,11 +470,9 @@ exports.editClient = [
     .isLength({ min: config.data.clientNameMinLength, max: config.data.clientNameMaxLength }),
   body('name', 'Invalid characters in string')
     .isWhitelisted(nameAllowedChars),
-  body('clientSecret',
-    'Client Secret minimum ' + config.data.clientSecretMinLength.toString() + ' characters')
-    .isLength({ min: config.data.clientSecretMinLength, max: config.data.clientIdMaxLength }),
+  // length also checked in admin-panel.js, this is general input validation
   body('clientSecret', 'Invalid string length')
-    .isLength({ max: config.data.clientIdMaxLength }),
+    .isLength({ min: 0, max: 1024 }),
   body('trustedClient').optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {

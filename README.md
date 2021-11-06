@@ -9,7 +9,7 @@ This is a learning project and will require additional work before considering u
 
 |                        Repository                                  |                   Description                         |
 | ------------------------------------------------------------------ | ----------------------------------------------------- |
-| collab-auth                                                        | Oauth2 Authorization Provider, redirect login, tokens |
+| [collab-auth](https://github.com/cotarr/collab-auth)               | Oauth2 Authorization Provider, redirect login, tokens |
 | [collab-frontend](https://github.com/cotarr/collab-frontend)       | Mock Web server, reverse proxy, HTML content          |
 | [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
 | [collab-iot-device](https://github.com/cotarr/collab-iot-device)   | Mock IOT Device with data acquisition saved to DB     |
@@ -141,6 +141,7 @@ OAUTH2_DISABLE_CODE_GRANT=false
 OAUTH2_DISABLE_CLIENT_GRANT=false
 OAUTH2_DISABLE_PASSWORD_GRANT=false
 OAUTH2_DISABLE_REFRESH_TOKEN_GRANT=false
+OAUTH2_EDITOR_SHOW_CLIENT_SECRET=false
 OAUTH2_TOKEN_EXPIRES_IN_SECONDS=3600
 OAUTH2_REFRESH_TOKEN_EXPIRES_IN_SECONDS=2592000
 OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=86400

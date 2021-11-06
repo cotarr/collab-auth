@@ -148,7 +148,9 @@ exports.update = (client) => {
     if (!err) {
       // write changes to RAM database
       foundClient.name = client.name;
-      foundClient.clientSecret = client.clientSecret;
+      if ((client.clientSecret) && (client.clientSecret.length > 0)) {
+        foundClient.clientSecret = client.clientSecret;
+      }
       foundClient.allowedScope = client.allowedScope;
       foundClient.allowedRedirectURI = client.allowedRedirectURI;
       foundClient.updatedAt = new Date();
