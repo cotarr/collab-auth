@@ -185,9 +185,11 @@ cp -v example-users-db.json users-db.json
 ### Database Configuration using PostgreSQL
 
 When operating in the development environment as described above,
-all data is stored in RAM variables. All data is lost when the program is stopped.
+the database is emulated using data storage in RAM variables.
+This is not suitable for deployment because all data will be
+lost when the program is stopped.
 
-For deployment to production, configuration options enable use of a SQL database
+For deployment to production, configuration options enable use of a PostgreSQL database
 for storage of access tokens, refresh tokens, user accounts and client accounts.
 When the database option is enabled, user passwords are hashed using bcrypt.
 Client secrets are encrypted using crypto-js/aes for storage in the database.
@@ -201,6 +203,7 @@ It is assumed you are familiar with installation of PostgreSQL,
 creation of a new database, user account and password.
 The database is running locally and the connection
 will use localhost 127.0.0.1 without TLS encryption.
+The firewall must protect the PostgreSQL port from external internet connections.
 The npm package "pg" is used as a PostgreSQL client.
 The pg client will use the following environment variables
 to connect to the database at startup.
@@ -328,7 +331,7 @@ When deployed for use on the internet, valid domain certificates
 should be used for encryption of https requests to the server and
 verification of the hostname.
 The express/node.js web server will read TLS certificates at startup
-using configuration settins. The following can be set using
+using configuration settings. The following can be set using
 Unix environment variables or including in a .env file.
 Edit the filenames as needed.
 

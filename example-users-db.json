@@ -1,6 +1,7 @@
 [
   {
     "id": "05d3649f-2bdc-4e0e-aaf7-848dd1516ca0",
+    "number": 1,
     "username": "bob",
     "password": "bobssecret",
     "name": "Bob Smith",
@@ -16,6 +17,7 @@
   },
   {
     "id": "560df31c-15c6-43d5-882b-f8891cbfb200",
+    "number": 2,
     "username": "joe",
     "password": "password",
     "name": "Joe Davis",
