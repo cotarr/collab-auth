@@ -1,7 +1,29 @@
 # Instruction to use postman
 
-- Import this collection from repository
-- Import development environment variables (edit as necessary)
+## Authentication server description
+
+This application is an OAuth 2.0 authentication server.
+A simple administration editor is included to confgure client accounts and user accounts.
+
+## Global Settings
+
+- Automatically follow redirects = OFF
+
+## Import postman collections
+
+Import enviornment applies to all collections in this repository
+
+- Import "postman/collab-auth.postman_environment.json" (enviornment for collab-auth)
+
+All indivudual collections may be imported as a set.
+
+- Import "postman/collab-auth (admin edit user).postman_collection.json"
+- Import "postman/collab-auth (client grant).postman_collection.json"
+- Import "postman/collab-auth (code grant).postman_collection.json"
+- Import "postman/collab-auth (implicit grant).postman_collection.json"
+- Import "postman/collab-auth (misc calls).postman_collection.json"
+- Import "postman/collab-auth (password grant).postman_collection.json"
+- Import "postman/collab-auth (session auth).postman_collection.json"
 
 ## Local variables
 
@@ -55,7 +77,7 @@ This is similar to code grant, but returns token directly instead of authorizato
 ## Collection: "collab-auth (misc calls)"
 
 This collection is various single route debug tests.
-This in not a test suite. Do to run it in order.
+This in not a test suite. Do to run it as a colleciton runner.
 
 ## Collection: "collab-auth (session auth)"
 

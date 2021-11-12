@@ -14,7 +14,11 @@ This is a learning project and will require additional work before considering u
 | [collab-backend-api](https://github.com/cotarr/collab-backend-api) | Mock REST API using tokens to authorize requests      |
 | [collab-iot-device](https://github.com/cotarr/collab-iot-device)   | Mock IOT Device with data acquisition saved to DB     |
 
-# Acknowledgements
+### Documentation:
+
+https://cotarr.github.io/collab-auth
+
+# Acknowledgments
 
 The initial starting point for this application was copied
 as a template application from Oauth2OrizeRecpies by Frank Hassanabad
@@ -154,12 +158,10 @@ NODE_DEBUG_LOG=0
 
 | Scope         | Permission                               | Component         |
 | ------------- | :--------------------------------------- | :---------        |
-| auth.none     | No access                                | OAuth2 API        |
 | auth.info     | Client permission to check token status  | OAuth2 API        |
 | auth.client   | Client permission to issue client tokens | OAuth2 API        |
 | auth.token    | Client permission to Issue user tokens   | OAuth2 API        |
 | auth.admin    | ( Reserved for future)                   | OAuth2 API        |
-| user.none     | No access                                | Web control panel |
 | user.password | Change own password                      | Web control panel |
 | user.admin    | Edit any user or client record           | Web control panel |
 | api.read      | API read requests (client && user)       | Mock REST API     |

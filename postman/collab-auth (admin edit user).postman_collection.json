@@ -1,6 +1,7 @@
 {
 	"info": {
 		"name": "collab-auth (admin edit user)",
+		"description": "See collab-auth/postman/README.md\n\nThe collab-auth (admin edit user) collection includes test related to use of the admin panel.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
