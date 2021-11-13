@@ -11,7 +11,7 @@ const authLogFilename = path.join(__dirname, '../logs/auth.log');
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 
-const config = require('./config');
+// const config = require('./config');
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
 let logToFile = (nodeEnv === 'production');
