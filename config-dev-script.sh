@@ -35,21 +35,10 @@ else
 fi
 
 if [ ! -f "./data/token-certs/privatekey.pem" ] && [ ! -f "./data/token-certs/certificate.pem" ]; then
-  echo "Creating private key"
-  openssl genrsa -out ./data/token-certs/privatekey.pem 2048
-  echo "Creating certificate"
-  echo
-  echo "------------------------------------------------"
-  echo "              R E A D   M E"
-  echo "    For testing, the following were used"
-  echo "        Organization Name = collab-auth"
-  echo "        Common Name = collab-auth"
-  echo "    Other entries may be skipped"
-  echo "    Entry of period [.] will skip an input"
-  echo "------------------------------------------------"
-  openssl req -new -key ./data/token-certs/privatekey.pem -out ./data/token-certs/certrequest.csr
-  openssl x509 -req -in ./data/token-certs/certrequest.csr -signkey ./data/token-certs/privatekey.pem -out ./data/token-certs/certificate.pem
-  rm -v ./data/token-certs/certrequest.csr
+  echo "Creating RSA public/private keys for access token signatures"
+  openssl req -newkey rsa:2048 -nodes \ 
+    -keyout ./data/token-certs/privatekey.pem \
+    -x509 -out ./data/token-certs/certificate.pem -subj "/CN=collab-auth"
 else
   echo "Certificates exist, skipping..."
 fi

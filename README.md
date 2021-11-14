@@ -1,8 +1,7 @@
 # collab-auth
 
 This is 1 of 4 repositories used on a collaboration project for learning 
-[oauth2orize](https://www.npmjs.com/package/oauth2orize) and 
-[passport](https://www.npmjs.com/package/passport).
+[oauth2orize](https://www.npmjs.com/package/oauth2orize).
 The concept involves setup of a home network oauth2 server that could be used to restrict
 access to a personal web server, database API, and home network IOT devices.
 This repository will use the oauth2orize library. Users records and sessions can be
@@ -54,7 +53,7 @@ Running the server in development mode will require 3 things.
 
 - A file to define user accounts with login username and password
 - A file to define client accounts with client id and client secret
-- Certificates to sign and verify JWT tokens.
+- Certificates containing RSA keys to sign and verify JWT tokens.
 
 There is a bash script named `config-dev-script.sh` that
 will automate these 3 things for setup of a development server.
@@ -64,24 +63,9 @@ The script will copy example user accounts template and client accounts template
 to working files to define users and clients in the development environment.
 In the development server, the passwords within these files are stored in plain text.
 
-This will run openssl to generate certificates.
-The certificates are used by the program to sign and verify access_tokens.
-Running openssl will prompt the input for various inputs.
-Inputs can be skipped by entering a period [.].
-The recommended entry "collab-auth" is entered into 2 required field for
-"Organization Name" and "Common Name."
-
-|                      openssl prompt                         |   response  |     
-| ----------------------------------------------------------- | ----------- |
-| Country Name (2 letter code) [AU]:                          | .           |
-| State or Province Name (full name) [Some-State]:.           | .           |
-| Locality Name (eg, city) []:                                | .           |
-| Organization Name (eg, company) [Internet Widgits Pty Ltd]: | collab-auth |
-| Organizational Unit Name (eg, section) []:                  | .           |
-| Common Name (e.g. server FQDN or YOUR name) []:             | collab-auth |
-| Email Address []:                                           | .           |
-| A challenge password []:                                    |             |
-| An optional company name []:                                |             |
+The script will run openssl to generate a pair of files containing the RSA keys.
+The RSA private key is used add a digital signature to a new token using the "RS256" algoithm.
+The RSA public key is used to verify the signature whe then token is decoded.
 
 The configuration script can be run with the following npm command:
 
