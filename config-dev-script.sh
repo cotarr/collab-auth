@@ -36,7 +36,7 @@ fi
 
 if [ ! -f "./data/token-certs/privatekey.pem" ] && [ ! -f "./data/token-certs/certificate.pem" ]; then
   echo "Creating RSA public/private keys for access token signatures"
-  openssl req -newkey rsa:2048 -nodes \ 
+  openssl req -newkey rsa:2048 -nodes \
     -keyout ./data/token-certs/privatekey.pem \
     -x509 -out ./data/token-certs/certificate.pem -subj "/CN=collab-auth"
 else
