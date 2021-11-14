@@ -1,6 +1,8 @@
 # collab-auth
 
-This is 1 of 4 repositories used on a collaboration project for learning oauth2orize and passport.
+This is 1 of 4 repositories used on a collaboration project for learning 
+[oauth2orize](https://www.npmjs.com/package/oauth2orize) and 
+[passport](https://www.npmjs.com/package/passport).
 The concept involves setup of a home network oauth2 server that could be used to restrict
 access to a personal web server, database API, and home network IOT devices.
 This repository will use the oauth2orize library. Users records and sessions can be
