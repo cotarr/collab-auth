@@ -33,6 +33,10 @@ if (nodeEnv === 'production') {
     console.error('Error, oauth2 client secret AES key must be changed for production');
     process.exit(1);
   }
+  if (!(config.server.tls)) {
+    console.error('Error, TLS is required for production');
+    process.exit(1);
+  }
 }
 
 // Express configuration
