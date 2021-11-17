@@ -10,7 +10,8 @@ if (!global.counter) {
     clientToken: 0,
     userToken: 0,
     refreshToken: 0,
-    introspect: 0
+    introspect: 0,
+    httpRequest: 0
   };
 }
 global.startDate = new Date();

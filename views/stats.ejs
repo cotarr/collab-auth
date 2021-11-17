@@ -40,6 +40,18 @@
         </tbody>
       </table>
 
+        <h2>Web Server Traffic</h2>
+      <div>
+        Reset at start: <%= start %>
+      </div>
+      <div class="vh-20"></div>
+
+      <table class="account-table" border="1" cellpadding="5px">
+        <tbody>
+          <tr><td>Total requests</td><td><%= counter.httpRequest %></td></tr>
+        </tbody>
+      </table>
+
       <div class="vh-20"></div>
       <div>
         Collab-auth Version: <%= appVersion %>

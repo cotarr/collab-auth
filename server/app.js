@@ -76,6 +76,15 @@ app.use(helmet.contentSecurityPolicy({
 }));
 
 //
+// Simple counter, visible in the admin editor at /panel/menu
+// Useful to see normal usage and set firewall limit rules
+//
+app.use((req, res, next) => {
+  global.counter.httpRequest++;
+  next();
+});
+
+//
 //   /status    Is the server alive?
 //
 app.get('/status', (req, res) => res.json({ status: 'ok' }));
