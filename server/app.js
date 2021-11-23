@@ -102,6 +102,10 @@ if (nodeEnv === 'production') {
   app.use(checkVhost.rejectNotVhost);
 }
 
+// Edge case: IOS iPhone brwoser request to favicon.ico makes request without cookie.
+// This unprotected route prevents an authorization redirect on favicon.ico requests.
+app.get('/favicon.ico', (req, res) => { res.end(); });
+
 // -----------------------------------------------------------------
 // express-session
 // -----------------------------------------------------------------
