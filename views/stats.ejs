@@ -53,6 +53,23 @@
       </table>
 
       <div class="vh-20"></div>
+
+      <h2>
+        Configuration
+      </h2>
+
+      <table class="account-table" border="1" cellpadding="5px">
+        <tbody>
+          <tr><td>vhost</td><td><%= site.vhost %></td></tr>
+          <tr><td>authURL</td><td><%= site.authURL %></td></tr>
+          <tr><td>tokenExpiresInSeconds</td><td><%= oauth2.tokenExpiresInSeconds %></td></tr>
+          <tr><td>refreshTokenExpiresInSeconds</td><td><%= oauth2.refreshTokenExpiresInSeconds %></td></tr>
+          <tr><td>clientTokenExpiresInSeconds</td><td><%= oauth2.clientTokenExpiresInSeconds %></td></tr>
+          <tr><td>authCodeExpiresInSeconds</td><td><%= oauth2.authCodeExpiresInSeconds %></td></tr>
+        </tbody>
+      </table>
+
+      <div class="vh-20"></div>
       <div>
         Collab-auth Version: <%= appVersion %>
       </div>
