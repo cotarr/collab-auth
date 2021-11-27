@@ -36,8 +36,11 @@ exports.server = {
 };
 
 exports.session = {
-  maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '604800') * 1000,
-  ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '608400'),
+  rollingCookie: (process.env.SESSION_SET_ROLLING_COOKIE === 'true') || false,
+  notSessionCookie: (process.env.SESSION_NOT_SESSION_COOKIE === 'true') || false,
+  maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '3600') * 1000,
+  ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '3600'),
+  pruneInterval: parseInt(process.env.SESSION_PRUNE_INTERVAL_SEC || '3600'),
   secret: process.env.SESSION_SECRET || 'A Secret That Should Be Changed',
   enablePgSessionStore: (process.env.SESSION_ENABLE_POSTGRES === 'true') || false
 };

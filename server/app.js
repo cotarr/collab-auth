@@ -113,19 +113,23 @@ app.get('/favicon.ico', (req, res) => { res.end(); });
 const sessionOptions = {
   name: 'authorization.sid',
   proxy: false,
-  rolling: true,
+  rolling: config.session.rollingCookie,
   resave: false,
   saveUninitialized: false,
   secret: config.session.secret,
   cookie: {
     path: '/',
-    // express-session takes cookie.maxAge in milliseconds
-    maxAge: config.session.maxAge,
+    maxAge: null,
     secure: (config.server.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
     sameSite: 'Lax'
   }
 };
+// Session cookie clears when browser is closed.
+if (config.session.notSessionCookie) {
+  // express-session takes cookie.maxAge in milliseconds
+  sessionOptions.cookie.maxAge = config.session.maxAge;
+}
 
 if (config.session.enablePgSessionStore) {
   // SQL queries
@@ -139,7 +143,9 @@ if (config.session.enablePgSessionStore) {
     pool: pgPool,
     // connect-pg-simple ttl is in seconds
     ttl: config.session.ttl,
-    tableName: 'session'
+    tableName: 'session',
+    // Connect-pg-simple takes prune time in seconds
+    pruneSessionInterval: config.session.pruneInterval
   });
 } else {
   console.log('Using memorystore for session storage');
@@ -148,7 +154,8 @@ if (config.session.enablePgSessionStore) {
     // Memorystore ttl is in milliseconds
     ttl: config.session.maxAge,
     stale: true,
-    checkPeriod: 86400000 // prune every 24 hours
+    // Memorystore takes prune time in milliseconds
+    checkPeriod: config.session.pruneInterval * 1000
   });
 }
 app.use(session(sessionOptions));

@@ -394,11 +394,6 @@
 					"mode": "urlencoded",
 					"urlencoded": [
 						{
-							"key": "redirect_uri",
-							"value": "{{redirect}}",
-							"type": "text"
-						},
-						{
 							"key": "client_id",
 							"value": "{{client_id}}",
 							"type": "text"
