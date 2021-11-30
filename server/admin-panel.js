@@ -774,6 +774,7 @@ router.get('/stats',
           oauth2: {
             vhost: config.site.vhost,
             authURL: config.site.authURL,
+            sessionTtl: config.session.ttl,
             tokenExpiresInSeconds: config.oauth2.tokenExpiresInSeconds,
             refreshTokenExpiresInSeconds: config.oauth2.refreshTokenExpiresInSeconds,
             clientTokenExpiresInSeconds: config.oauth2.clientTokenExpiresInSeconds,
