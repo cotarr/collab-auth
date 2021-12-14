@@ -8,16 +8,21 @@
   <body>
     <%- include('menu-header') %>
     <div class="scrollable-div">
-
-      <h2>Confirm Delete User</h2>
-      <div class="content-area">
-        This will delete user record id=<%= deleteId %> from the database.
-      </div>
-      <div class="vh-20"></div>
-      <div>
-        <a href="/panel/deleteuser?id=<%= deleteId %>&confirm=yes"><button class="button">Delete</button></a>
-        <a href="/panel/menu"><button class="button">Cancel</button></a>
-      </div>
+      <form action="/panel/deleteuser" method="post">
+        <fieldset>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <input type="hidden" name="id" value="<%= deleteId %>"/>
+          <h2>Confirm Delete User</h2>
+          <div class="content-area">
+            This will delete user record id=<%= deleteId %> from the database.
+          </div>
+          <div class="vh-20"></div>
+          <div>
+            <button class="button" type="submit" value="Submit">Submit</button>
+            <a href="/panel/menu"><button class="button lm-20" type="button">Cancel</button></a>
+          </div>
+        </fieldset>
+      </form>
     </div>
     <%- include('menu-footer') %>
   </body>

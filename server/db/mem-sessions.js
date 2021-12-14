@@ -1,14 +1,12 @@
 'use strict';
 
 /**
- * Inert function
- * This is to avoid generation of error when using
- * MemoryStore database in the development environment.
- * Sessions are stored in app.js using MemoryStore and
- * deletion of all sessions is not possible as it is with
- * a standard database.
+ * This module is to clear all MemoryStore sessions from database
+ * Sessions are stored in app.js using memorystore.
+ * This is fully independant of session management in app.js
  */
-exports.removeAll = () => {
+exports.removeAll = (req) => {
+  req.sessionStore.clear();
   return Promise.resolve({});
 };
 

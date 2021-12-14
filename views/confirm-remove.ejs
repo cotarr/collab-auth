@@ -8,22 +8,26 @@
   <body>
     <%- include('menu-header') %>
     <div class="scrollable-div">
-
-      <h2>Remove Tokens</h2>
-      <div class="content-area">
-        This function will remove all access-tokens and refresh-tokens from the database.
-        All remote web servers and resource servers will need to obtain new tokens
-        to continue access.
-        Authorization server stored sessions are also cleared, requiring users
-        to login to the authoriztion server with a username and password.
-        Note: Sessions and cookies of remote web servers are not impacted,
-        however, stored tokens on these remote web servers will have been revoked.
-      </div>
-      <div class="vh-20"></div>
-      <div>
-        <a href="/panel/removealltokens?confirm=yes"><button class="button">Remove</button></a>
-        <a href="/panel/menu"><button class="button">Cancel</button></a>
-      </div>
+      <form action="/panel/removealltokens" method="post">
+        <fieldset>      
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+          <h2>Remove Tokens</h2>
+          <div class="content-area">
+            This function will remove all access-tokens and refresh-tokens from the database.
+            All remote web servers and resource servers will need to obtain new tokens
+            to continue access.
+            Authorization server stored sessions are also cleared, requiring users
+            to login to the authoriztion server with a username and password.
+            Note: Sessions and cookies of remote web servers are not impacted,
+            however, stored tokens on these remote web servers will have been revoked.
+          </div>
+          <div class="vh-20"></div>
+          <div>
+            <button class="button" type="submit" value="Submit">Submit</button>
+            <a href="/panel/menu"><button class="button lm-20" type="button">Cancel</button></a>
+          </div>
+        </fieldset>
+      </form>
     </div>
     <%- include('menu-footer') %>
   </body>

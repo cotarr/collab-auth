@@ -13,6 +13,9 @@ const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scop
 const logUtils = require('./log-utils');
 const stats = require('./stats');
 
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: false });
+
 const config = require('./config/');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -135,12 +138,14 @@ router.get('/viewuser',
 router.get('/createuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  csrfProtection,
   (req, res, next) => {
     const defaultUser = {
       role: toScopeString(config.database.defaultUser.role)
     };
     return res.set('Cache-Control', 'no-store').render('create-user',
       {
+        csrfToken: req.csrfToken(),
         name: req.user.name,
         defaultUser: defaultUser,
         opt: {
@@ -158,6 +163,7 @@ router.post('/createuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.createUser,
+  csrfProtection,
   (req, res, next) => {
     if (req.body.newpassword1 !== req.body.newpassword2) {
       return res.set('Cache-Control', 'no-store').render('generic-message', {
@@ -215,6 +221,7 @@ router.get('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
+  csrfProtection,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.users.find(req.query.id)
@@ -246,6 +253,7 @@ router.get('/edituser',
           }
           return res.set('Cache-Control', 'no-store').render('edit-user',
             {
+              csrfToken: req.csrfToken(),
               name: req.user.name,
               user: filteredUser,
               opt: {
@@ -274,6 +282,7 @@ router.post('/edituser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.editUser,
+  csrfProtection,
   (req, res, next) => {
     // Password is optional, if both password input elements are empty,
     // then, the password will remain unchanged.
@@ -330,18 +339,15 @@ router.post('/edituser',
 );
 
 /**
- * Delete user record endpoint
+ * User confirmation to delete user record.
  *
  * The ID is passed in as a GET request URL query parameter
- *
- * First call (query: id) lookup id, then render confirmation screen
- * Second call (query: id, confirmation='yes'), delete the record
- * Otherwise throw HTTP error
  */
 router.get('/deleteuser',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
-  inputValidation.deleteByUUID,
+  inputValidation.viewByUUID,
+  csrfProtection,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.users.find(req.query.id)
@@ -352,12 +358,35 @@ router.get('/deleteuser',
             return next(err);
           }
           return res.set('Cache-Control', 'no-store').render('confirm-delete-user',
-            { name: req.user.name, deleteId: req.query.id });
+            {
+              csrfToken: req.csrfToken(),
+              name: req.user.name,
+              deleteId: req.query.id
+            });
         })
         .catch((err) => next(err));
-    } else if ((req.query) && (Object.keys(req.query).length === 2) &&
-      ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
-      db.users.delete(req.query.id)
+    } else {
+      const err = new Error('Invalid query parameters');
+      err.status = 400;
+      next(err);
+    }
+  }
+);
+
+/**
+ * This is POST request to delete user record from database
+ *
+ * The ID is passed in as a POST request URL body parameter
+ */
+router.post('/deleteuser',
+  ensureLoggedIn(),
+  requireScopeForWebPanel('user.admin'),
+  inputValidation.deleteByUUID,
+  csrfProtection,
+  (req, res, next) => {
+    if ((req.body) && (Object.keys(req.body).length === 2) &&
+      ('id' in req.body) && ('_csrf' in req.body)) {
+      db.users.delete(req.body.id)
         .then((deletedUser) => {
           if (deletedUser == null) {
             throw new Error('Error deleting user');
@@ -373,7 +402,7 @@ router.get('/deleteuser',
         })
         .catch((err) => next(err));
     } else {
-      const err = new Error('Invalid query parameters');
+      const err = new Error('Invalid POST parameters');
       err.status = 400;
       next(err);
     }
@@ -473,6 +502,7 @@ router.get('/viewclient',
 router.get('/createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  csrfProtection,
   (req, res, next) => {
     const clientDefault = {
       clientSecret: uid2(config.database.defaultClient.randomSecretLength),
@@ -481,7 +511,11 @@ router.get('/createclient',
       allowedRedirectURI: toScopeString(config.database.defaultClient.allowedRedirectURI)
     };
     return res.set('Cache-Control', 'no-store').render('create-client',
-      { name: req.user.name, clientDefault: clientDefault });
+      {
+        csrfToken: req.csrfToken(),
+        name: req.user.name,
+        clientDefault: clientDefault
+      });
   }
 );
 
@@ -492,6 +526,7 @@ router.post('/createclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.createClient,
+  csrfProtection,
   (req, res, next) => {
     // Case of PostgreSQL database, use AES encryption on client secret
     let savedClientSecret =
@@ -543,6 +578,7 @@ router.get('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
+  csrfProtection,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.clients.find(req.query.id)
@@ -581,7 +617,11 @@ router.get('/editclient',
             filteredClient.trustedClient = '';
           }
           return res.set('Cache-Control', 'no-store').render('edit-client',
-            { name: req.user.name, aclient: filteredClient });
+            {
+              csrfToken: req.csrfToken(),
+              name: req.user.name,
+              aclient: filteredClient
+            });
         })
         .catch((err) => {
           return next(err);
@@ -601,6 +641,7 @@ router.post('/editclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.editClient,
+  csrfProtection,
   (req, res, next) => {
     const client = {
       id: req.body.id,
@@ -649,18 +690,15 @@ router.post('/editclient',
 );
 
 /**
- * Delete client record endpoint
+ * User confirming page for delete client
  *
  * The ID is passed in as a GET request URL query parameter
- *
- * First call (query: id), lookup id, then render confirmation screen
- * Second call (query: id, confirmation='yes'), delete the record
- * Otherwise throw HTTP error
  */
 router.get('/deleteclient',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
-  inputValidation.deleteByUUID,
+  inputValidation.viewByUUID,
+  csrfProtection,
   (req, res, next) => {
     if ((req.query) && (Object.keys(req.query).length === 1) && ('id' in req.query)) {
       db.clients.find(req.query.id)
@@ -671,13 +709,36 @@ router.get('/deleteclient',
             return next(err);
           }
           return res.set('Cache-Control', 'no-store').render('confirm-delete-client',
-            { name: req.client.name, deleteId: req.query.id });
+            {
+              csrfToken: req.csrfToken(),
+              name: req.client.name,
+              deleteId: req.query.id
+            });
         })
         .catch((err) => next(err));
-    } else if ((req.query) && (Object.keys(req.query).length === 2) &&
-      ('id' in req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
+    } else {
+      const err = new Error('Invalid POST parameters');
+      err.status = 400;
+      next(err);
+    }
+  }
+);
+/**
+ * This is POST request to delete client from database.
+ *
+ * The ID is passed in as a POST request URL body parameter
+ *
+ */
+router.post('/deleteclient',
+  ensureLoggedIn(),
+  requireScopeForWebPanel('user.admin'),
+  inputValidation.deleteByUUID,
+  csrfProtection,
+  (req, res, next) => {
+    if ((req.body) && (Object.keys(req.body).length === 2) &&
+      ('id' in req.body) && ('_csrf' in req.body)) {
       // console.log('deleting user');
-      db.clients.delete(req.query.id)
+      db.clients.delete(req.body.id)
         .then((deletedClient) => {
           if (deletedClient == null) {
             throw new Error('Error deleting client');
@@ -701,24 +762,40 @@ router.get('/deleteclient',
 );
 
 /**
+ * Display user confirmation to remove all tokens and
+ * invalidate all authorization server sessions
+ */
+router.get('/removealltokens',
+  ensureLoggedIn(),
+  requireScopeForWebPanel('user.admin'),
+  csrfProtection,
+  (req, res, next) => {
+    res.set('Cache-Control', 'no-store').render('confirm-remove',
+      {
+        csrfToken: req.csrfToken(),
+        name: req.user.name
+      }
+    );
+  }
+);
+
+/**
  * Remove all tokens and invalidate all authorization server sessions
  * This will have no impact on any downstream web server session status.
  * However, any tokens the downstream web servers store on the users behalf
  * will be invalidated (revoked).
  *
  * This is a series of deleteAll database calls
- *
- * Note: when using MemoryStore, it is not possible to clear sessions
- * so only token will cleared unless uing PostgreSQL
  */
-router.get('/removealltokens',
+router.post('/removealltokens',
   ensureLoggedIn(),
   requireScopeForWebPanel('user.admin'),
+  csrfProtection,
   (req, res, next) => {
-    if ((req.query) && (req.query.confirm) && (req.query.confirm === 'yes')) {
+    if ((req.body) && ('_csrf' in req.body)) {
       db.accessTokens.removeAll()
         .then(() => db.refreshTokens.removeAll())
-        .then(() => db.sessions.removeAll())
+        .then(() => db.sessions.removeAll(req))
         .then(() => {
           const message = req.user.username + ' removed all token and cleared sessions';
           logUtils.adminLogActivity(req, message);
@@ -733,7 +810,9 @@ router.get('/removealltokens',
           return next(err);
         });
     } else {
-      res.set('Cache-Control', 'no-store').render('confirm-remove', { name: req.user.name });
+      const err = new Error('Invalid POST parameters');
+      err.status = 400;
+      next(err);
     }
   }
 );

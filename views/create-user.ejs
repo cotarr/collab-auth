@@ -12,6 +12,8 @@
       <h2>Create New User</h2>
       <form action="/panel/createuser" method="post" autocomplete="OFF">
         <fieldset>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
           <table class="account-table" border="1" cellpadding="5px">
             <tr>
               <td><label for "name">Name</label></td>

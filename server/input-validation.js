@@ -223,9 +223,9 @@ exports.viewByUUID = [
  * Validate input for ?id=UUID.v4
  */
 exports.deleteByUUID = [
-  checkExtraneousKeys(['id', 'confirm'], 'query'),
-  query('id', 'Required values').exists(),
-  query('id', 'Invalid UUID.v4').isUUID(4),
+  checkExtraneousKeys(['_csrf', 'id'], 'body'),
+  body('id', 'Required values').exists(),
+  body('id', 'Invalid UUID.v4').isUUID(4),
   handleErrorHTTP
 ]; // deleteByUUID
 
@@ -236,6 +236,7 @@ exports.deleteByUUID = [
  */
 exports.createUser = [
   checkExtraneousKeys([
+    '_csrf',
     'number',
     'username',
     'newpassword1',
@@ -251,6 +252,7 @@ exports.createUser = [
     .not().exists(),
   // Required Body Keys
   body([
+    '_csrf',
     'number',
     'username',
     'newpassword1',
@@ -296,6 +298,7 @@ exports.createUser = [
  */
 exports.editUser = [
   checkExtraneousKeys([
+    '_csrf',
     'id',
     'newpassword1',
     'newpassword2',
@@ -307,13 +310,14 @@ exports.editUser = [
     'number',
     'username'], 'Read only value')
     .not().exists(),
-  // Required Body Keys
+  // Forbidden Body Keys
   body([
     'updatedAt',
     'createdAt'], 'Server generated values not allowed')
     .not().exists(),
   // Required Body Keys
   body([
+    '_csrf',
     'id',
     'name',
     'role'], 'Required values')
@@ -387,6 +391,7 @@ exports.changePassword = [
  */
 exports.createClient = [
   checkExtraneousKeys([
+    '_csrf',
     'name',
     'clientId',
     'clientSecret',
@@ -400,6 +405,7 @@ exports.createClient = [
     .not().exists(),
   // Required Body Keys
   body([
+    '_csrf',
     'name',
     'clientId',
     'clientSecret',
@@ -440,6 +446,7 @@ exports.createClient = [
 
 exports.editClient = [
   checkExtraneousKeys([
+    '_csrf',
     'id',
     'name',
     'clientSecret',
@@ -456,6 +463,7 @@ exports.editClient = [
     .not().exists(),
   // Required Body Keys
   body([
+    '_csrf',
     'id',
     'name',
     'clientSecret',

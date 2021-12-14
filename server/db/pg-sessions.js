@@ -8,8 +8,9 @@ const pgPool = require('./pg-pool');
  * This module is to clear all PostgreSQL sessions from database
  * Sessions are stored in app.js using connect-pg-simple
  * This is fully independant of session management in app.js
+ * (req not used in postgres. It is for compatibility with mem-sessions.js)
  */
-exports.removeAll = () => {
+exports.removeAll = (req) => {
   const query = {
     text: 'DELETE FROM session'
   };

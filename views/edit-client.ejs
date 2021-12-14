@@ -12,6 +12,7 @@
       <h2>Edit Client</h2>
       <form action="/panel/editclient" method="post" autocomplete="OFF">
         <fieldset>
+          <input type="hidden" name="_csrf" value="<%= csrfToken %>">
 
           <!-- Hidden input for record id -->
           <input class="input" name="id" type="hidden" value="<%= aclient.id %>" />
