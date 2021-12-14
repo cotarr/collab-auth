@@ -93,7 +93,55 @@
 			"response": []
 		},
 		{
-			"name": "/panel/menu (save menu url)",
+			"name": "0c Clear Global Variables",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 404\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"pm.test(\"Unset global variables\", function () {",
+							"    pm.globals.unset('transaction_id');",
+							"    pm.globals.unset('auth_code');",
+							"    pm.globals.unset('access_token');",
+							"    pm.globals.unset('refresh_token');",
+							"    pm.globals.unset('csrf_token');",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer {{access_token}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/not-found",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"not-found"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/panel/menu (remember URL)",
 			"event": [
 				{
 					"listen": "test",
@@ -195,7 +243,7 @@
 			"response": []
 		},
 		{
-			"name": "/panel/menu (200)",
+			"name": "/panel/menu (Get csrfToken)",
 			"event": [
 				{
 					"listen": "test",
@@ -205,8 +253,18 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"Web Administration Panel\");",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
 							"});",
 							""
 						],
@@ -221,13 +279,13 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{auth_host}}/panel/menu",
+					"raw": "{{auth_host}}/panel/createuser",
 					"host": [
 						"{{auth_host}}"
 					],
 					"path": [
 						"panel",
-						"menu"
+						"createuser"
 					]
 				}
 			},
@@ -310,6 +368,11 @@
 						{
 							"key": "role",
 							"value": "user.none",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					]
@@ -682,6 +745,11 @@
 							"key": "role",
 							"value": "user.none",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					]
 				},
@@ -756,6 +824,11 @@
 							"key": "role",
 							"value": "user.password",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					]
 				},
@@ -829,6 +902,11 @@
 						{
 							"key": "role",
 							"value": "user.password",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					]
@@ -1543,26 +1621,25 @@
 				"auth": {
 					"type": "noauth"
 				},
-				"method": "GET",
+				"method": "POST",
 				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"_csrf\": \"{{csrf_token}}\",\n    \"id\": \"{{createdUserUuid}}\"\n}\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
 				"url": {
-					"raw": "{{auth_host}}/panel/deleteuser?id={{createdUserUuid}}&confirm=yes",
+					"raw": "{{auth_host}}/panel/deleteuser",
 					"host": [
 						"{{auth_host}}"
 					],
 					"path": [
 						"panel",
 						"deleteuser"
-					],
-					"query": [
-						{
-							"key": "id",
-							"value": "{{createdUserUuid}}"
-						},
-						{
-							"key": "confirm",
-							"value": "yes"
-						}
 					]
 				}
 			},
