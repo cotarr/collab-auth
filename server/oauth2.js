@@ -441,6 +441,7 @@ exports.authorization = [
           })(req, res, next);
         } else {
           res.set('Cache-Control', 'no-store').render('dialog', {
+            csrfToken: req.csrfToken(),
             // Insert transaction code to form for processing by /dialog/authorization/decision
             transactionID: req.oauth2.transactionID,
             user: req.user,

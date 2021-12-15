@@ -11,6 +11,8 @@ const oauth2 = require('./oauth2');
 const passport = require('passport');
 const logger = require('morgan');
 const helmet = require('helmet');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: false });
 
 // Application custom modules
 const db = require('./db');
@@ -173,17 +175,17 @@ require('./auth');
 //   next();
 // });
 
-app.get('/login', site.loginForm);
-app.post('/login', site.login);
+app.get('/login', csrfProtection, site.loginForm);
+app.post('/login', csrfProtection, site.login);
 app.get('/redirecterror', site.redirectError);
 app.get('/logout', site.logout);
-app.get('/changepassword', site.changePassword);
-app.get('/dialog/authorize', oauth2.authorization);
-app.post('/dialog/authorize/decision', oauth2.decision);
+app.get('/changepassword', csrfProtection, site.changePassword);
+app.get('/dialog/authorize', csrfProtection, oauth2.authorization);
+app.post('/dialog/authorize/decision', csrfProtection, oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/introspect', oauth2.introspect);
 app.post('/oauth/token/revoke', oauth2.revoke);
-app.post('/changepassword', site.changePasswordHandler);
+app.post('/changepassword', csrfProtection, site.changePasswordHandler);
 
 // --------------------------------------------------
 //   Admin Web site

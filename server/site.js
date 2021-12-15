@@ -27,6 +27,7 @@ exports.loginForm = [
   inputValidation.loginGetRequest,
   (req, res, next) => {
     const options = {
+      csrfToken: req.csrfToken(),
       opt: {
         maxUnLen: config.data.userUsernameMaxLength,
         maxPwLen: config.data.userPasswordMaxLength
@@ -110,6 +111,7 @@ exports.changePassword = [
     } else {
       res.set('Cache-Control', 'no-store').render('change-password',
         {
+          csrfToken: req.csrfToken(),
           name: req.user.name,
           username: req.user.username,
           opt: {

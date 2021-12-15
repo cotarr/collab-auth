@@ -9,6 +9,7 @@
   <div>
     <form action="/login" method="post">
       <fieldset>
+        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <div class="center">
             <h1>User Login</h1>
         </div>

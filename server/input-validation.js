@@ -190,10 +190,12 @@ exports.loginGetRequest = [
  */
 exports.loginPostRequest = [
   checkExtraneousKeys([
+    '_csrf',
     'username',
     'password'], 'body'),
   // Required Body Keys
   body([
+    '_csrf',
     'username',
     'password'], 'Required values')
     .exists(),
@@ -356,12 +358,14 @@ exports.editUser = [
  */
 exports.changePassword = [
   checkExtraneousKeys([
+    '_csrf',
     'username',
     'oldpassword',
     'newpassword1',
     'newpassword2'], 'body'),
   // Required Body Keys
   body([
+    '_csrf',
     'username',
     'oldpassword',
     'newpassword1',
@@ -530,6 +534,7 @@ exports.dialogAuthorization = [
 
 exports.dialogAuthDecision = [
   checkExtraneousKeys([
+    '_csrf',
     'cancel',
     'transaction_id'], 'body'),
   body('transaction_id').exists().isLength({ min: 1, max: 64 }),
