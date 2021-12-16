@@ -108,6 +108,7 @@
 							"    pm.globals.unset('auth_code');",
 							"    pm.globals.unset('access_token');",
 							"    pm.globals.unset('refresh_token');",
+							"    pm.globals.unset('csrf_token');",
 							"});",
 							""
 						],
@@ -177,6 +178,21 @@
 							"    }",
 							"});",
 							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    if (csrfToken.length > 0) {",
+							"        pm.globals.set('csrf_token', csrfToken);",
+							"    }",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -221,7 +237,7 @@
 			"response": []
 		},
 		{
-			"name": "2 /login (form)",
+			"name": "2 /login (form, csrfToken)",
 			"event": [
 				{
 					"listen": "test",
@@ -229,7 +245,22 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
-							"});"
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
 						],
 						"type": "text/javascript"
 					}
@@ -303,6 +334,11 @@
 							"key": "password",
 							"value": "{{user_password}}",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					],
 					"options": {
@@ -349,7 +385,7 @@
 							"});",
 							"",
 							"// Case of trusted client",
-							"pm.test(\"Extrace authorization code from redirect URI\", function () {",
+							"pm.test(\"Extract authorization code from redirect URI\", function () {",
 							"    let authCode = null;",
 							"    let locationHeader = pm.response.headers.get('Location');",
 							"    if (locationHeader) {",
@@ -359,6 +395,22 @@
 							"      pm.globals.set('auth_code', authCode)",
 							"    } else {",
 							"        pm.globals.set('auth_code', '');",
+							"    }",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    if (csrfToken.length > 0) {",
+							"        pm.globals.set('csrf_token', csrfToken);",
 							"    }",
 							"});",
 							""
@@ -449,6 +501,11 @@
 						{
 							"key": "transaction_id",
 							"value": "{{transaction_id}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],

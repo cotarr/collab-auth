@@ -93,7 +93,7 @@
 			"response": []
 		},
 		{
-			"name": "0c Clear Global Variables",
+			"name": "Clear Global Variables",
 			"event": [
 				{
 					"listen": "test",
@@ -109,6 +109,11 @@
 							"    pm.globals.unset('access_token');",
 							"    pm.globals.unset('refresh_token');",
 							"    pm.globals.unset('csrf_token');",
+							"    pm.globals.unset('testUsername');   ",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('testUserNumber');",
+							"    pm.globals.unset('createdUserUuid');",
+							"",
 							"});",
 							""
 						],
@@ -182,6 +187,65 @@
 			"response": []
 		},
 		{
+			"name": "/login (form, get csrfToken)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/login (user.admin from env)",
 			"event": [
 				{
@@ -221,6 +285,11 @@
 						{
 							"key": "password",
 							"value": "{{user_password}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],
@@ -498,6 +567,65 @@
 			"response": []
 		},
 		{
+			"name": "/login (form, get csrfToken)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/login (user.none)",
 			"event": [
 				{
@@ -536,6 +664,11 @@
 						{
 							"key": "password",
 							"value": "mynewpassword",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],
@@ -627,6 +760,65 @@
 			"response": []
 		},
 		{
+			"name": "/login (form, get csrfToken)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/login (user.admin from env)",
 			"event": [
 				{
@@ -666,6 +858,11 @@
 						{
 							"key": "password",
 							"value": "{{user_password}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],
@@ -978,6 +1175,65 @@
 			"response": []
 		},
 		{
+			"name": "/login (form, get csrfToken)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"accept": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{auth_host}}/login",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/login (user.password)",
 			"event": [
 				{
@@ -1017,6 +1273,11 @@
 						{
 							"key": "password",
 							"value": "mynewpassword1",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],
@@ -1074,7 +1335,7 @@
 			"response": []
 		},
 		{
-			"name": "/changepassword (200)",
+			"name": "/changepassword (200, csrfToken))",
 			"event": [
 				{
 					"listen": "test",
@@ -1087,7 +1348,20 @@
 							"pm.test(\"Body matches string\", function () {",
 							"    pm.expect(pm.response.text()).to.include(\"Change Password\");",
 							"});",
-							""
+							"",
+							"pm.test(\"Extract CSRF token to global variables\", function () {",
+							"    let body = pm.response.text();",
+							"    let bodyArray = body.split('\\n');",
+							"    let csrfToken = '';",
+							"    for (let i = 0; i < bodyArray.length; i++) {",
+							"        let splitByQuote = bodyArray[i].split('\"');",
+							"        if ((splitByQuote.length === 7) && (splitByQuote[3] === '_csrf')) {",
+							"            csrfToken = splitByQuote[5];",
+							"        }",
+							"    } // next i",
+							"    // console.log('csrf_token: ', csrfToken);",
+							"    pm.globals.set('csrf_token', csrfToken);",
+							"});"
 						],
 						"type": "text/javascript"
 					}
@@ -1166,6 +1440,11 @@
 							"key": "newpassword2",
 							"value": "mynewpassword2",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					]
 				},
@@ -1227,6 +1506,11 @@
 						{
 							"key": "newpassword2",
 							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					]
@@ -1290,6 +1574,11 @@
 							"key": "newpassword2",
 							"value": "mynewpassword2",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					]
 				},
@@ -1351,6 +1640,11 @@
 						{
 							"key": "newpassword2",
 							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					]
@@ -1414,6 +1708,11 @@
 							"key": "newpassword2",
 							"value": "mynewpassword2",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					]
 				},
@@ -1468,6 +1767,11 @@
 							"key": "newpassword1",
 							"value": "mynewpassword2",
 							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
+							"type": "text"
 						}
 					]
 				},
@@ -1492,6 +1796,12 @@
 						"exec": [
 							"pm.test(\"Status code is 302\", function () {",
 							"    pm.response.to.have.status(302);",
+							"});",
+							"",
+							"pm.test(\"Redirect address is /redirecterror\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    location = location.split('?')[0];",
+							"    pm.expect(location).to.equal('/redirecterror');",
 							"});"
 						],
 						"type": "text/javascript"
@@ -1514,7 +1824,12 @@
 						},
 						{
 							"key": "password",
-							"value": "mynewpassword",
+							"value": "mynewpassword2",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],
@@ -1576,6 +1891,11 @@
 						{
 							"key": "password",
 							"value": "{{user_password}}",
+							"type": "text"
+						},
+						{
+							"key": "_csrf",
+							"value": "{{csrf_token}}",
 							"type": "text"
 						}
 					],
