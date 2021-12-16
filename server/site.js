@@ -7,6 +7,8 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 // NPM modules
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: false });
 
 // Custom modules
 const db = require('./db');
@@ -25,6 +27,7 @@ const logUtils = require('./log-utils');
  */
 exports.loginForm = [
   inputValidation.loginGetRequest,
+  csrfProtection,
   (req, res, next) => {
     const options = {
       csrfToken: req.csrfToken(),
@@ -57,6 +60,7 @@ exports.redirectError = [
  */
 exports.login = [
   inputValidation.loginPostRequest,
+  csrfProtection,
   passport.authenticate('local',
     { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login?retry=yes' }
   )
@@ -103,6 +107,7 @@ const validateAndHashPassword = (req, res, user) => {
 exports.changePassword = [
   ensureLoggedIn(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
+  csrfProtection,
   (req, res, next) => {
     if ((req.query) && (req.query.cancel) && (req.query.cancel === 'yes')) {
       const message = 'Your password change request has been cancelled.';
@@ -136,6 +141,7 @@ exports.changePassword = [
 exports.changePasswordHandler = [
   ensureLoggedIn(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
+  csrfProtection,
   inputValidation.changePassword,
   (req, res, next) => {
     validate.usernameMatchesSession(req, req.body.username)
@@ -153,14 +159,6 @@ exports.changePasswordHandler = [
       })
       .catch((e) => {
         // console.log(e.message);
-        const options = {
-          name: req.user.name,
-          username: req.user.username,
-          opt: {
-            minPwLen: config.data.userPasswordMinLength,
-            maxPwLen: config.data.userPasswordMaxLength
-          }
-        };
         let message = 'Error changing password.';
         if (e.message === 'Not current user') {
           message = 'Username was Invalid';
@@ -177,8 +175,10 @@ exports.changePasswordHandler = [
         if (e.message === 'New password same') {
           message = 'New password must be different.';
         }
-        if (message) options.opt.failMessage = message;
-        res.set('Cache-Control', 'no-store').render('change-password', options);
+        const options = {
+          passwordMessage: message
+        };
+        res.set('Cache-Control', 'no-store').render('change-password-error', options);
       });
   }
 ];

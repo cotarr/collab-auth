@@ -14,6 +14,8 @@ const login = require('connect-ensure-login');
 const passport = require('passport');
 const oauth2orize = require('oauth2orize');
 const uid2 = require('uid2');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: false });
 
 // Custom modules
 const config = require('./config');
@@ -386,6 +388,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
 exports.authorization = [
   login.ensureLoggedIn(),
   inputValidation.dialogAuthorization,
+  csrfProtection,
   server.authorization({ idLength: config.oauth2.decisionTransactionIdLength },
     (clientID, redirectURI, scope, grantType, done) => {
       db.clients.findByClientId(clientID)
@@ -481,6 +484,7 @@ exports.authorization = [
 exports.decision = [
   login.ensureLoggedIn(),
   inputValidation.dialogAuthDecision,
+  csrfProtection,
   server.decision(),
   server.authorizationErrorHandler(),
   server.errorHandler()
