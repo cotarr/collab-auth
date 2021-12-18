@@ -51,28 +51,56 @@ app.use(express.json());
 // ------------------
 app.use(logger(logConfig.format, logConfig.options));
 
-// ---------------
-// clean headers
-// ---------------
+// ------------------------------
+// Content Security Policy (CSP)
+// ------------------------------
+// -- Helmet CSP defaults v4.6.0 --
+// default-src 'self';
+// base-uri 'self';
+// block-all-mixed-content;
+// font-src 'self' https: data:;
+// frame-ancestors 'self';
+// img-src 'self' data:;
+// object-src 'none';
+// script-src 'self';
+// script-src-attr 'none';
+// style-src 'self' https: 'unsafe-inline';
+// upgrade-insecure-requests
+// ------------------------------
+const contentSecurityPolicy = {
+  // No fallback to helmet default CSP
+  useDefaults: false,
+  // Custom CSP
+  directives: {
+    defaultSrc: ["'none'"],
+    baseUri: ["'self'"],
+    connectSrc: ["'self'"],
+    imgSrc: ["'self'"],
+    styleSrc: ["'self'"],
+    frameAncestors: ["'none'"]
+  },
+  // Option to disable CSP while showing errors in console log.
+  reportOnly: false
+};
+
+// ----------------------------------------
+// HTTP Security Headers
+// ----------------------------------------
+// -- Helmet Default headers v4.6.0 --
+// X-DNS-Prefetch-Control off
+// Expect-CT max-age=0
+// X-Frame-Options SAMEORIGIN
+// Strict-Transport-Security max-age=15552000; includeSubDomains
+// X-Download-Options noopen
+// X-Content-Type-Options nosniff
+// X-Permitted-Cross-Domain-Policies none
+// Referrer-Policy no-referrer
+// X-XSS-Protection 0
+// ----------------------------------------
 app.use(helmet({
-  hidePoweredBy: false
-}));
-app.use(helmet.referrerPolicy({ policy: 'no-referrer' }));
-// ----------------------------------------
-// CSP Content Security Policy
-// ----------------------------------------
-app.use(helmet.contentSecurityPolicy({
-  useDefaults: true,
-  directives:
-    {
-      defaultSrc: ["'none'"],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      imgSrc: ["'self'"],
-      mediaSrc: ["'none'"],
-      scriptSrc: ["'none'"],
-      styleSrc: ["'self'"]
-    }
+  frameguard: { action: 'deny' },
+  referrerPolicy: { policy: 'no-referrer' },
+  contentSecurityPolicy: contentSecurityPolicy
 }));
 
 //
@@ -104,7 +132,9 @@ if (nodeEnv === 'production') {
 
 // Edge case: IOS iPhone brwoser request to favicon.ico makes request without cookie.
 // This unprotected route prevents an authorization redirect on favicon.ico requests.
-app.get('/favicon.ico', (req, res) => { res.end(); });
+app.get('/favicon.ico', function (req, res, next) {
+  res.status(204).send(null);
+});
 
 // -----------------------------------------------------------------
 // express-session
