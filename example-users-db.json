@@ -8,7 +8,7 @@
     "loginDisabled": false,
     "role": [
       "auth.token",
-      "api.read",
+      "api.write",
       "user.admin"
     ],
     "lastLogin": null,
