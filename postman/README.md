@@ -42,6 +42,11 @@ Note: auth_host must be different domain from frontend and backend
 - client_base64  (YWJjMTIzOnNzaC1zZWNyZXQ=)
 - scopes         (api.read)
 
+## Rate Limiter Issues
+
+Repeated testing may encounter status 429 (Too Many Requests). 
+The rate limiters may be reset by restarting the server.
+
 ## collection: "colab-auth (code grant)"
 
 The use of this depends on the client properties.

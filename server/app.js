@@ -43,7 +43,9 @@ if (nodeEnv === 'production') {
 const app = express();
 app.set('view engine', 'ejs');
 
-app.use(express.urlencoded({ extended: true }));
+// For login forms and admin editor forms
+app.use(express.urlencoded({ extended: false }));
+// For token APIs
 app.use(express.json());
 
 // ------------------
@@ -208,12 +210,12 @@ app.post('/login', site.login);
 app.get('/redirecterror', site.redirectError);
 app.get('/logout', site.logout);
 app.get('/changepassword', site.changePassword);
+app.post('/changepassword', site.changePasswordHandler);
 app.get('/dialog/authorize', oauth2.authorization);
 app.post('/dialog/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);
 app.post('/oauth/introspect', oauth2.introspect);
 app.post('/oauth/token/revoke', oauth2.revoke);
-app.post('/changepassword', site.changePasswordHandler);
 
 // --------------------------------------------------
 //   Admin Web site

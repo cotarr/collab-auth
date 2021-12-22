@@ -7,6 +7,7 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 // NPM modules
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
+const rateLimit = require('express-rate-limit');
 const csrf = require('csurf');
 const csrfProtection = csrf({ cookie: false });
 
@@ -55,10 +56,19 @@ exports.redirectError = [
 ];
 
 /**
+ * Password submission rate limiter
+ */
+const passwordRateLimit = rateLimit({
+  windowMs: config.data.passwordRateLimitTimeMs,
+  max: config.data.passwordRateLimitCount
+});
+
+/**
  * Authenticate normal login page using strategy of authenticate
  * POST /login (credentials in body)
  */
 exports.login = [
+  passwordRateLimit,
   inputValidation.loginPostRequest,
   csrfProtection,
   passport.authenticate('local',

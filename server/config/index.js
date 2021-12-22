@@ -94,6 +94,9 @@ exports.data = {
   clientIdMaxLength: 40,
   clientSecretMinLength: 8,
   clientSecretMaxLength: 64,
+  // rate limit for login password submission
+  passwordRateLimitCount: 10,
+  passwordRateLimitTimeMs: 3600000,
   userNameMinLength: 1,
   userNameMaxLength: 64,
   userUsernameMinLength: 1,
