@@ -56,16 +56,20 @@ exports.redirectError = [
 ];
 
 /**
- * Password submission rate limiter
+ * Password submission rate limiter using express-rate-limit
+ * Limit per IP address for POST request to /login
+ * Successful request add to count.
  */
 const passwordRateLimit = rateLimit({
-  windowMs: config.data.passwordRateLimitTimeMs,
-  max: config.data.passwordRateLimitCount
+  windowMs: config.limits.passwordRateLimitTimeMs,
+  max: config.limits.passwordRateLimitCount
 });
 
 /**
  * Authenticate normal login page using strategy of authenticate
  * POST /login (credentials in body)
+ * Upon success return to saved URL, else show redirect error message.
+ * Includes rate limiter, input validation, csrf token.
  */
 exports.login = [
   passwordRateLimit,

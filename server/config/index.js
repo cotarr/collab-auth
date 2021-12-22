@@ -69,6 +69,12 @@ exports.database = {
   }
 };
 
+exports.limits = {
+  // Rate limit per IP address for POST requests to /login (25 per hour per IP address)
+  passwordRateLimitCount: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_COUNT || '25'),
+  passwordRateLimitTimeMs: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_MS || '3600000')
+};
+
 exports.oauth2 = {
   clientSecretAesKey: process.env.OAUTH_CLIENT_SECRET_AES_KEY || 'A Secret That Should Be Changed',
   disableTokenGrant: (process.env.OAUTH2_DISABLE_TOKEN_GRANT === 'true') || false,
@@ -94,9 +100,6 @@ exports.data = {
   clientIdMaxLength: 40,
   clientSecretMinLength: 8,
   clientSecretMaxLength: 64,
-  // rate limit for login password submission
-  passwordRateLimitCount: 10,
-  passwordRateLimitTimeMs: 3600000,
   userNameMinLength: 1,
   userNameMaxLength: 64,
   userUsernameMinLength: 1,
