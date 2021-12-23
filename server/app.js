@@ -273,6 +273,13 @@ app.use(function (err, req, res, next) {
   let message = http.STATUS_CODES[status] || 'Unknown Error Occurred';
   if ((err.message) && (message !== err.message)) message += ', ' + err.message;
   message = 'Status: ' + status.toString() + ', ' + message;
+
+  // Custom error response for csurf middleware
+  if (err.code === 'EBADCSRFTOKEN') {
+    console.log('Invalid csrf token');
+    return res.status(403).send('Forbidden, invalid csrf token');
+  }
+
   if (nodeEnv === 'production') {
     console.log(message);
     return res.set('Content-Type', 'text/plain').status(status).send(message);

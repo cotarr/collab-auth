@@ -70,8 +70,8 @@ exports.database = {
 };
 
 exports.limits = {
-  // Rate limit per IP address for POST requests to /login (25 per hour per IP address)
-  passwordRateLimitCount: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_COUNT || '25'),
+  // Rate limit per IP address for POST requests to /login (10 per hour per IP address)
+  passwordRateLimitCount: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_COUNT || '10'),
   passwordRateLimitTimeMs: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_MS || '3600000')
 };
 
