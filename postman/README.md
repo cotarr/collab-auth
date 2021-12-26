@@ -5,7 +5,7 @@
 This application is an OAuth 2.0 authentication server.
 A simple administration editor is included to confgure client accounts and user accounts.
 
-## Global Settings
+## Postman Global Settings
 
 - Automatically follow redirects = OFF
 

@@ -60,7 +60,6 @@ exports.redirectError = [
  * Limit per IP address for POST request to /login
  * Successful request add to count.
  */
-console.log(config.limits);
 const passwordRateLimit = rateLimit({
   windowMs: config.limits.passwordRateLimitTimeMs,
   max: config.limits.passwordRateLimitCount,

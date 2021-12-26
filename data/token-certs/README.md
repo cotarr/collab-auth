@@ -1,8 +1,8 @@
-# Instructions to make token signing RSA keys
+# Instructions to make token signing RSA keys for Oauth 2.0 tokens
 
 Openssl is used as a command line tool to generate a pair of files containing the RSA keys.
-The RSA private key is used add a digital signature to a new token using the "RS256" algoithm.
-The RSA public key is used to verify the signature whe then token is decoded.
+The RSA private key is used add a digital signature to a new access token using the "RS256" algoithm.
+The RSA public key is used to verify the signature whe then access token is decoded.
 Although the "certifiacte.pem" file is a standard self signed SSL/TLS web certificate,
 only the RSA Public-Key within the certificate appears to be relevant.
 The certificate attributes for "Validity Not After:..." and "Subject: CN..."
@@ -15,6 +15,9 @@ In the case of this program, each JWT token will have it's own unique expiration
 within the digitally signed token payload, so ignoring the alternate 
 certificate date this does not appear to an issue.         
 
+The file location of the access token RSA certificates is hard coded
+to be this folder. The directory location and filenames are not configurable.
+
 The following commands can be used to generate the RSA keys.
 
 ```bash
@@ -25,3 +28,7 @@ cd ../..
 
 * Token certificates are located in data/token-certs/
 * The .gitignore should include  data/token-certs/*.pem
+
+Note: the program uses two independent sets of certificates, 
+one set for web server TLS encryption, 
+the other set for Oauth 2.0 access token signatures.

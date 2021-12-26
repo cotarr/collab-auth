@@ -3,6 +3,8 @@ server/certs/*.pem
 server/certs/*.csr
 data/token-certs/*.pem
 data/token-certs/*.csr
+data/tls-certs/*.pem
+data/tls-certs/*.csr
 *.bak
 credentials.json
 clients-db.json

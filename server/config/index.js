@@ -20,16 +20,16 @@ exports.site = {
   ownHost: process.env.SITE_OWN_HOST || '127.0.0.1:3500',
   // Example: "mailto:security@example.com",
   securityContact: process.env.SITE_SECURITY_CONTACT || '',
-  // Example: "Fri, 1 Apr 2022 08:00:00 -0600"
+  // Example: "2022-12-26T11:40:35+00:00"
   securityExpires: process.env.SITE_SECURITY_EXPIRES || ''
 };
 
 exports.server = {
   appVersion: appVersion,
   serverTlsKey: process.env.SERVER_TLS_KEY ||
-    path.join(__dirname, '../../data/token-certs/privatekey.pem'),
+    path.join(__dirname, '../../data/tls-certs/privatekey.pem'),
   serverTlsCert: process.env.SERVER_TLS_CERT ||
-    path.join(__dirname, '../../data/token-certs/certificate.pem'),
+    path.join(__dirname, '../../data/tls-certs/certificate.pem'),
   tls: (process.env.SERVER_TLS === 'true') || false,
   port: parseInt(process.env.SERVER_PORT || '3500'),
   pidFilename: process.env.SERVER_PID_FILENAME || ''
