@@ -76,7 +76,7 @@ exports.limits = {
 };
 
 exports.oauth2 = {
-  clientSecretAesKey: process.env.OAUTH_CLIENT_SECRET_AES_KEY || 'A Secret That Should Be Changed',
+  clientSecretAesKey: process.env.OAUTH2_CLIENT_SECRET_AES_KEY || 'A Secret That Should Be Changed',
   disableTokenGrant: (process.env.OAUTH2_DISABLE_TOKEN_GRANT === 'true') || false,
   disableCodeGrant: (process.env.OAUTH2_DISABLE_CODE_GRANT === 'true') || false,
   disableClientGrant: (process.env.OAUTH2_DISABLE_CLIENT_GRANT === 'true') || false,
