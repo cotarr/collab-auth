@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Home</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="head-fixed">
+      Documentation for
+      <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+    </div>
+    <div class="menu-div-fixed">
+      <div class="menu-div">
+        <ul>
+          <li><a class="active" href="index.html">Home</a></li>
+          <li><a href="installation.html">Install Demo</a></li>
+          <li><a href="deployment.html">Deployment</a></li>
+          <li><a href="admin.html">Admin Editor</a></li>
+          <li><a href="scope.html">Scope and Role</a></li>
+          <li><a href="env.html">Env Vars</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div>
+    </div> <!-- /menu-div-fixed -->
+
+    <div class="scrollable-div">
+
+      <div class="text-div">
+        <div class="desc-title">
+          Home
+        </div>
+        <div class="center">
+          <div class="vh-20"></div>
+          <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1130" height="612">
+        </div>
+        <div class="vh-20"></div>
+        <p>
+          This was a collaboration project for learning oauth2orize and passport.
+          The concept involves setup of a home network Oauth 2.0 server that could be used to restrict
+          access to a personal web server, database API, and home network IOT devices.
+          This repository will use the oauth2orize library. Users records and sessions can be
+          temporarily stored in memory during development or configured to use PostgreSQL.
+          This is a learning project and will require additional work before considering use in a production.
+        </p>
+        <p>
+          This project is still under development and may change frequently. No formal release has been issued.
+        </p>
+        <div class="vh-20"></div>
+
+        <div class="div-flex">
+          <div class="div-flex-inline"></div>
+          <div class="div-flex-inline">
+            <table border="1" cellpadding="3px">
+              <tr>
+                <th>Repository</th>
+                <th>Description</th>
+              </tr>
+              <tr>
+                <td><a href="https://github.com/cotarr/collab-auth">collab-auth</a></td>
+                <td>  Oauth 2.0 Authorization Provider, redirect login, tokens</td>
+              </tr>
+              <tr>
+                <td><a href="https://github.com/cotarr/collab-frontend">collab-frontend</a></td>
+                <td>Mock Web server, reverse proxy, HTML content</td>
+              </tr>
+              <tr>
+                <td><a href="https://github.com/cotarr/collab-backend-api">collab-backend-api</a></td>
+                <td>Mock REST API using tokens to authorize requests</td>
+              </tr>
+              <tr>
+                <td><a href="https://github.com/cotarr/collab-iot-device">collab-iot-device</a></td>
+                <td>Mock IOT Device with data acquisition saved to DB</td>
+              </tr>
+            </table>
+          </div>
+          <div class="div-flex-inline"></div>
+        </div>
+
+        <div class="section-title">Security Note</div>
+          <ul>
+            <li>No security review has been performed.</li>
+            <li>In the development configuration, passwords are stored in plain text in local files.</li>
+          </ul>
+        <p>
+
+        <div class="section-title">Acknowledgements</div>
+        <p>
+          The initial starting point for this application was copied
+          as a template application from Oauth2OrizeRecpies by Frank Hassanabad
+          <a href="https://github.com/FrankHassanabad/Oauth2orizeRecipes">https://github.com/FrankHassanabad/Oauth2orizeRecipes</a>.
+        </p>
+
+        <div class="section-title">Motivation</div>
+        <p>
+          The primary motivation for this project was to discover how oauth 2.0 works by attempting to
+          implement Oauth 2.0 on a personal web server and use it restrict access to IOT devices on a home network.
+        </p>
+        <p>
+          First, there is already an excessive quantity of resources on the internet that explain Oauth 2.0,
+          so that will not be reproduced here.
+          For me, this was a learning project, not a teaching project. None, the less, I have been asked to share
+          my example because it because it may be interesting or useful.
+        <p>
+        </p>
+          When I started looking at Oauth 2.0 tutorials,
+          I soon discovered a frequently used phrase "implementation dependent".
+          For example, what standard data should go in an access token? Well, tokens are implementation dependent.
+          How about granular permissions such as "scope"? It is the same, scopes and permissions are implementation dependent.
+          It appeared that Oauth 2.0 was much more of an abstract concept than I had assumed.
+          The only way truly understand it would be to implement it and solve each of these details, one by one, as choices came up.
+        </p>
+        <p>
+          I am a huge fan of raspberry pi projects. At times, I have had up to 15 pi
+          active on a home network. From a hobby perspective, setting up a web API on a raspberry pi
+          is a very simple way to read sensor data from the network. This allows data from home IOT devices
+          to be easily displayed from within a personal web page. The data can be
+          saved in a database, and used to make various charts on the web page.
+          For mobile phone access, the web server and database live in a cloud based server.
+          This project seemed to be a great solution to manage access control for various personal web pages,
+          databases, and home network IOT devices.
+        </p>
+
+        <div class="section-title">Approach and Libraries</div>
+        <p>
+          My personal web pages were put together using an
+          <a href="https://expressjs.com/">Express.js</a>
+          web server running under <a href="https://nodejs.org/">Node.js</a> on a Debian Linux server.
+          I was most comfortable with a solution that could run in that environment.
+        </p>
+        <p>
+          <a href="https://www.npmjs.com/package/oauth2orize">Oauth2orize</a> -
+          Primarily based on download popularity, I decided to use oauth2orize.
+          OAuth2orize is an authorization server toolkit for Node.js that can be used
+          to implement the OAuth 2.0 protocol. Oauth2orize is truly an amazing library.
+          I really enjoyed discovering it's capabilities and exploring it's various functions.
+          Internally, it has a lot of critical security functionality that probably should be left
+          to programmers more experienced than myself. It was a good fit for my use case.
+        </p>
+        <p>
+          <a href="https://github.com/FrankHassanabad/Oauth2orizeRecipes">Oauth2orizeRecipes</a> -
+          It's best to start with an example. I found Oauth2orizeRecipes and used it as a template to start the project.
+          It contained an example Express web server that integrated into oauth2orize with
+          examples of all four oauth 2.0 grant types. Unlike other Oauth 2.0 examples, Oauth2orizeRecipes
+          installed and ran, out of the box. The code was well commented and easy to understand.
+        </p>
+        <p>
+          <a href="https://www.npmjs.com/package/passport">Passport</a> -
+          Passport is an authentication middleware for express/node.js.
+          Expanding on the examples in Oauth2orizeRecipes, passport is an elegant way
+          to insert authentication into an express server request/response flow as
+          an express middleware. Passport has individual "strategy" modules that
+          fully support Oauth 2.0.
+        </p>
+        <p>
+          <a href="https://www.postman.com/downloads/">Postman</a> -
+          Actually, most of the coding on this project was done using Postman rather than a web browser.
+          Once I had Oauth2orizeRecipes up and running, I started using postman from the first day.
+          Most of early time was spent adding console.log() statements to both
+          Oauth2orizeRecipes and oauth2orize as I stepped through the transactions of each Oauth 2.0
+          grant type. I have included exported postman collections with the repository.
+        </p>
+        <p>
+          Authorization Server - Once I could reproduce all four grant types using postman, I created a
+          github repository (<a href="https://github.com/cotarr/collab-auth">collab-auth</a>)
+          to serve as the new authorization server for the project.
+          The "/authorization-server/" folder from Oauth2orizeRecipes was used as a starting template.
+          From there, the collab-auth repository evolved into an implementation that would fit the needs
+          of a personal web server.
+        </p>
+        <ul>
+          <li>Support oauth 2.0 grant types: client, authorization code, implicit, password</li>
+          <li>Support use of refresh tokens</li>
+          <li>Simple  web based administrator panel create and edit user accounts.</li>
+          <li>Incorporate scope permissions.</li>
+          <li>Optional use of PostgreSQL to store user and client accounts.</li>
+          <li>Optional use of PostgreSQL to persist user sessions.</li>
+          <li>Incorporate csrf tokens using <a href="https://www.npmjs.com/package/csurf">csurf</a> to reduce risk of cross-site issues</li>
+          <li>Input validation using express-validator</li>
+          <li>Development postman  collecitons included.</li>
+        </ul>
+        <p>
+          The following 3 repositories were created solely to demonstrate the authorization server.
+        </p>
+        <p>
+          Mock Web Server - A second github repository
+          (<a href="https://github.com/cotarr/collab-frontend">collab-frontend</a>) was created to
+          hold a mock web server. Npm packages for passport, passport-oauth2
+          were configured to use oauth 2.0 authorization code grant.
+          The purpose of the mock web server was to setup passport
+          so the user's web browser would be redirected to authorization server for password entry,
+          then redirected back to the mock web server URL with an authorizaton code.
+          The web server then exchanged the code for an access_token which it stores on the user's behalf.
+        </p>
+        <p>
+          Mock Backend API - A third github repository
+          (<a href="https://github.com/cotarr/collab-backend-api">collab-backend-api</a>) was created.
+          Code was setup to emulate a REST API with one data table where the data is stored
+          using in-memory variables. The purpose of the mock REST API server is to accept
+          HTTP requests containing an Oauth 2.0 bearer token. The token is validated by
+          sending it to the authorization server before fulfilling the database query.
+        </p>
+        <p>
+          Mock IOT Device - Lastly, a forth repository
+          (<a href="https://github.com/cotarr/collab-iot-device">collab-iot-device</a>)
+          was created to emulate a raspberry pi IOT device on a home network.
+          The purpose of the mock IOT device is to obtain an access_token using client
+          credentials grant type and use the token to submit mock data to database in the mock backend API.
+        </p>
+        <p>
+          When all 4 repositories are working, an attempt to visit the demo web page will redirect the user
+          to the authorization server to obtain an access_token. The token is then used to
+          view a data table in the mock API which contains mock data submitted by the emulated
+          IOT device.
+        </p>
+
+        <div class="vh-20"></div>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- scrollable-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/collab-auth">
+        https://github.com/cotarr/collab-auth</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

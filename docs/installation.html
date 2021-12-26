@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Install Demo</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="head-fixed">
+      Documentation for
+      <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+    </div>
+    <div class="menu-div-fixed">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a  class="active" href="installation.html">Install Demo</a></li>
+          <li><a href="deployment.html">Deployment</a></li>
+          <li><a href="admin.html">Admin Editor</a></li>
+          <li><a href="scope.html">Scope and Role</a></li>
+          <li><a href="env.html">Env Vars</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div>
+    </div> <!-- /menu-div-->
+
+    <div class="scrollable-div">
+
+      <div class="text-div">
+        <div class="desc-title">
+          Install Demo
+        </div>
+        <p>
+          This project supports a simple pre-configured development mode.
+          The demo install assumes a secure development environment that is
+          isolated from the internet such as a virtual machine or other
+          development workstation that is protected behind a NAT router.
+          Users, passwords and other credentials are preset to default values
+          in the documentation. No database is required.
+          The development servers do not require TLS certificates.
+          <b>The servers in this development demo should not be exposed directly to the internet.</b>
+        </p>
+        <p>
+          Alternately, <a href="deployment.html">deployment</a> instructions
+          shown on the following page will address configuration changes
+          to make the project more suitable for exposure to the internet.
+          These include TLS certificates, PostgreSQL database, hashed passwords,
+          persistent session storage, and options to disable unused features.
+        </p>
+
+
+        <div class="desc-title">Part 1 of 4 - Authorization Server</div>
+
+        <p>
+          The collab-auth repository is an Oauth 2.0 authorization server. It is the main component
+          of this project. The other three repositories exist only to demonstrate use of the
+          authorization server.
+        </p>
+        <div class="section-title">Prerequisites</div>
+        <ul>
+          <li>Linux development environment. Debian 10 was used for development</li>
+          <li>Node.js is installed. Node 14 was used for development.</li>
+          <li>It is assumed user is familiar with node, npm, and installing packages.</li>
+        </ul>
+
+        <div class="section-title">Clone Repository</div>
+        <p>
+          Open a command line terminal.
+          Use the following commands to clone the collab-auth repository and install
+          package dependencies.
+        </p>
+<pre class="pre-div">
+git clone git@github.com:cotarr/collab-auth.git
+cd collab-auth
+npm install
+</pre>
+
+        <div class="section-title">Configuration Script</div>
+        <p>
+          The environment variable NODE_ENV should not exist or it may
+          be set to NODE_ENV=development.
+        </p>
+        <p>
+          Running the server in development mode will require 3 things.
+        </p>
+        <ul>
+          <li>A file to define user accounts with login username and password</li>
+          <li>A file to define client accounts with client id and client secret</li>
+          <li>Certificates containing RSA keys to sign and verify JWT tokens</li>
+        </ul>
+        <p>
+          There is a bash script named &quot;config-dev-script.sh&quot; in the base folder of
+          the repository that will automate these 3 things for setup of a development server.
+          You should review this script before use.
+        </p><p>
+          The script will copy example user template and client template files 
+          to working files to define users and clients in the development environment.
+          In the development server, the passwords within these files are stored in plain text.
+        </p>
+        <p>
+          The script will run openssl to generate a pair of files containing the RSA keys.
+          The RSA private key is used add a digital signature to a new token using the "RS256" algoithm.
+          The RSA public key is used to verify the signature whe then token is decoded.
+        </p>
+
+        <p>
+          The configuration script can be run with the following npm command.
+          This will execute files specified in package.json.
+        </p>
+
+<pre class="pre-div">
+npm run config-dev-script
+</pre>
+        <div class="section-title">Start Authorization Server</div>
+        <p>
+          The authorization server may now be started in development mode
+          from the command line using the following command.
+          This will execute files specified in package.json.
+        </p>
+<pre class="pre-div">
+npm start
+</pre>
+        <p>
+          This will start a express/node.js server running in the foreground.
+          It may be stopped at any time by pressing Ctrl-c.
+          Check the output for errors. Response should appear as follows:
+        </p>
+<pre class="pre-div-out">
+> collab-auth@0.0.1 start
+> node ./bin/www
+
+Server timestamp: 2021-10-26T14:14:45.296Z
+Using memory variables for OAuth 2.0 storage.
+Auth activity Log: (Console)
+HTTP Access Log: (console)
+Using memorystore for session storage
+Serving static files from /home/some-user/some-folder/collab-auth/public
+NODE_ENV development starting http (non-encrypted)
+listening: :::3500 IPv6
+</pre>
+        <p>
+          To confirm the web browser is running, open your web browser and visit
+          <a href="http://127.0.0.1:3500/status">http://127.0.0.1:3500/status</a>.
+          The server should respond with the following &quot;ok&quot; message
+        </p>
+<pre class="pre-div-out">
+{"status":"ok"}
+</pre>
+        <p>
+          In development mode, the server access log is sent to the console.
+          The status request should be visible in the terminal window.
+        </p>
+<pre class="pre-div-out">
+2021-10-27T13:51:24.752Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/status
+</pre>
+
+        <div class="section-title">TLS Troubleshooting Note</div>
+        <p>
+          This demonstration is configured to use http connections
+          to localhost/127.0.0.1 without https TLS encryption.
+          This is appropriate when testing the authorization server
+          in an isolated environment such as a virtual machine.
+        </p>
+        <p>
+          As time marches forward, some web browsers may not allow
+          password forms without TLS encryption. If the following
+          steps fail, check the address bar to see if http is
+          being automatically upgrade to http(s) TLS request by the browser.
+          In my development VM in October 2021, the Linux version of the
+          Chrome web browser still worked without issue issuing
+          non-encrypted http requests to localhost or 127.0.0.1.
+        </p>
+        <p>
+          If your web browser requires a temporary self signed TLS 
+          certificate for testing, you may generate one. 
+          See: data/tls-certs/README.md
+        </p>
+
+        <div class="section-title">Account Administration</div>
+        <p>
+          Next, we will look at the user file. We are currently running
+          in development mode, and therefore no database has been configured.
+          In this mode, each time the server is restarted, the users
+          are loaded from a file &quot;user-db.json&quot; located in the
+          base folder of the repository. Returning to the terminal,
+          display the file using the cat command. You will see a user named
+          Bob Smith has been defined.
+        </p>
+<pre class="pre-div">
+cat users-db.json
+</pre>
+<pre class="pre-div-out">
+{
+  "id": "05d3649f-2bdc-4e0e-aaf7-848dd1516ca0",
+  "username": "bob",
+  "password": "bobssecret",
+  "name": "Bob Smith",
+  "loginDisabled": false,
+  "role": [
+    "auth.token",
+    "api.write",
+    "user.admin"
+  ],
+  "lastLogin": null,
+  "createdAt": "2021-08-22T18:38:29.250Z",
+  "updatedAt": "2021-08-22T18:38:29.250Z"
+}
+</pre>
+        <p>
+          The data is encoded in standard JSON format.
+          You can see that a user Bob Smith has been created
+          with username &quot;bob&quot; and password &quot;bobssecret&quot;.
+          In the array of roles, user bob also has been assigned the role
+          of &quot;user.admin&quot;. This role will permit bob to access
+          the administration panel. Return to the web browser and enter the URL
+          <a href="http://127.0.0.1:3500/panel/menu">http://127.0.0.1:3500/panel/menu</a>.
+          While attempting to request that page, the server will determine
+          you are not currently logged in and redirect your browser to the
+          login form.
+        </p>
+        <div><img src="images/login-form.png" alt="Login Form" width="351" height="346"></div>
+        <p>
+          Enter the username &quot;bob&quot; and password &quot;bobssecret&quot;.
+          Assuming the password is accepted, you should be redirected back to the
+          admin panel at
+          <a href="http://127.0.0.1:3500/panel/menu">http://127.0.0.1:3500/panel/menu</a>.
+        </p>
+        <p>
+          The page background color has been set to light blue to indicate the current
+          page displayed in the browser is located on the authorization server
+          as opposed to other servers in the demo.
+        </p>
+        <div><img src="images/admin-menu.png" alt="Admin Editor" width="559" height="628" ></div>
+        <p>
+          Congratulations, the authorization server is up and running.
+          Feel free to look around. The editor is functional, but
+          since the server is running in development mode, all data is
+          stored in RAM memory variables and all data will be discarded
+          when the server is stopped.
+        </p>
+
+        <!-- zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz -->
+
+        <div class="desc-title">Part 2 of 4 - Web Server</div>
+
+        <p>
+          The collab-frontend repository is a mock web server using the npm passport package and passport-oauth2
+          passport strategy to implement Oauth 2.0 to restrict access to the web page.
+          The web server emulates a personal web page that would require user authentication to view the page
+          and gain access to data in home network IOT devices.
+          Unauthorized users are redirected to the Oauth 2.0 server for user login.
+          After login, the web server stores the user's Oauth 2.0 access_token used to obtain access to a mock SQL database.
+          The web server includes a reverse proxy to redirect requests to the mock REST API.
+        </p>
+
+        <p>
+          The diagram below shows the frontend web server at the center.
+          The overall purpose of the collab-frontend repository demonstrate the relationship
+          between the user's cookie stored in the web browser on the left, the user's
+          Oauth 2.0 access_token, stored in the frontend
+          web server in the middle, and use of the token to access resources on the
+          backend API server shown on the right.
+        </p>
+
+        <div><img src="images/cookie-to-token.png" alt="cookie to token" width="902" height="214" ></div>
+
+        <div class="section-title">Clone Repository</div>
+        <p>
+          Each of the different components of this demonstration will run in separate
+          terminal windows that are open concurrently.
+          Leave the previous authorization server terminal open.
+          Open a second command line terminal for the web server.
+          Use the following commands to clone the collab-frontend repository and install
+          package dependencies.
+        </p>
+<pre class="pre-div">
+git clone git@github.com:cotarr/collab-frontend.git
+cd collab-frontend
+npm install
+</pre>
+        <div class="section-title">Start Web Server</div>
+        <p>
+          The environment variable NODE_ENV should not exist or it may
+          be set to NODE_ENV=development.
+        </p>
+        <p>
+          The application should run as-is. No configuration is necessary in development mode.
+          The web server may now be started in development mode from the command line using
+          the following command.
+          This will execute files specified in package.json.
+        </p>
+<pre class="pre-div">
+npm start
+</pre>
+        <p>
+          This will start a express/node.js server running in the foreground.
+          It may be stopped at any time by pressing Ctrl-c.
+          Check the output for errors. Response should appear as follows:
+        </p>
+<pre class="pre-div-out">
+> collab-frontend@0.0.1 start
+> node bin/www
+
+Server timestamp: 2021-10-27T13:35:32.928Z
+HTTP Access Log: (console)
+Using memorystore for session storage
+Serving files from: /home/some-user/some-folder/collab-frontend/secure
+NODE_ENV development starting http (non-encrypted)
+listening: :::3000 IPv6
+</pre>
+        <p>
+          For the demonstration to work properly with cookies, the authorization
+          server requires a different hostname than the web server.
+          Previously, we used &quot;127.0.0.1&quot; for the authorization server.
+          Alternately, for the web server &quot;localhost&quot; will be used.
+          To confirm the web server is running, open your web browser and visit
+          <a href="http://localhost:3000/status">http://localhost:3000/status</a>.
+          The server should respond with the following &quot;ok&quot; message
+        </p>
+<pre class="pre-div-out">
+{"status":"ok"}
+</pre>
+<p>
+  In development mode, the server access log is sent to the console.
+  The status request should be visible in the terminal window.
+</p>
+<pre class="pre-div-out">
+2021-10-27T13:48:10.774Z ::ffff:127.0.0.1 200 GET 1.1 localhost:3000/status
+</pre>
+
+        <div class="section-title">Login Workflow</div>
+        <p>
+          The next step is to use both servers at the same time to
+          execute the oauth workflow. This will use the authorization server
+          for password entry, and use the web server to display content.
+        </p>
+        <p>
+          Before trying this we need to clear previous session and cookie data.
+          Since the development configuration uses RAM memory to store session on both the
+          web server and authorization server, the easiest way is to stop and restart
+          both node applications. Go to each terminal window, press Ctrl-C to stop both
+          servers, and restart both servers with &quot;npm start&quot;.
+        </p>
+        <p>
+          Next, attempt to open the main web page by loading
+          <a href="http://localhost:3000/">http://localhost:3000/</a>.
+        </p>
+        <p>
+          When the browser sends the GET request to the web server for the main home page,
+          the web server searches the session store for a matching cookie.
+          No cookie is found. The connection is assumed to be unauthorized.
+          The web server will send a redirect (302) to the
+          browser to redirect to a URL for a landing page at
+          &quot;/unauthorized&quot; path on the web server.
+        </p>
+        <div><img src="images/landing.png" alt="Unauthorized landing page" width="506" height="94"></div>
+        <p>
+          This landing page is an unprotected page that users will see before
+          authenticating their identity with a user password.
+          Optional content may be added to the unprotected landing page to
+          identify the web site and display publicly available content about the web site.
+          The access log in the terminal will show 302 redirect followed by
+          the browser download of the landing page.
+        </p>
+
+<pre class="pre-div-out">
+  2021-11-27T11:22:38.685Z ::1 302 GET 1.1 localhost:3000/
+  2021-11-27T11:22:38.688Z ::1 200 GET 1.1 localhost:3000/unauthorized
+  2021-11-27T11:22:38.723Z ::1 200 GET 1.1 localhost:3000/unauthorized.css
+  2021-11-27T11:22:38.732Z ::1 200 GET 1.1 localhost:3000/favicon.ico
+</pre>
+        <p>
+          Next, select the [Login] button on the landing page.
+          An &lt;a&gt; tag servicing the button will request the
+          &quot;/login&quot; route on the web server which
+          can be seen in the web server access log.
+        </p>
+
+<pre class="pre-div-out">
+  2021-11-27T11:23:29.472Z ::1 302 GET 1.1 localhost:3000/login
+</pre>
+        <p>
+          During the next instructions, the user interaction will switch
+          from the web server to the authorization server.
+        </p>
+        <p>
+          When the web server receives the &quot;/login&quot; request, it will
+          send a second redirect (302) to the browser. The URL will consist of the hostname
+          of the authorization server, the /dialog/authoirze path followed by a query string
+          with parameters for response_type, redirect_uri, scope, and client_id
+        </p>
+        <p>
+          The Authorization server will save the entire request URL in the authorization server
+          session store. It will check if the user has a valid cookie.
+          Since we have previously cleared all session data by restarting the servers,
+          no match will be found in the session store.
+          The authorization server will respond to the /dialog/authorize request by
+          returning an HTML response containing a login form.
+        </p>
+        <div><img src="images/login-form.png" alt="Login Form" width="351" height="346"></div>
+        <p>
+          Switch from the web server terminal to the authorization server terminal.
+          The authorization server access log will show the Oauth 2.0 authorization workflow
+          beginning with the 302 redirect from the web web server, followed by download
+          of the login form.
+        </p>
+<pre class="pre-div-out">
+2021-10-27T19:04:31.021Z ::ffff:127.0.0.1 302 GET 1.1 127.0.0.1:3500/dialog/authorize?response_type=code
+    &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&scope=api.read%20api.write&client_id=abc123
+2021-10-27T19:04:31.040Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/login
+2021-10-27T19:04:31.063Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/css/login.css
+</pre>
+        <p>
+          The user will submit his password and an username using a POST request to the /login
+          path contained in the form.
+        </p>
+<pre class="pre-div-out">
+2021-10-27T19:04:34.886Z ::ffff:127.0.0.1 302 POST 1.1 127.0.0.1:3500/login
+</pre>
+
+        <p>
+          The authorization server compares the username and password to values
+          located in the user database. If the password is correct, the authorization
+          server saves the user's cookie id in the user's session store on the authorization server.
+          This user will now be considered authorized for access to the authorization server HTTP requests.
+        </p>
+        <p>
+          The authorization server will retrieve previously saved URL from the /dialog/authorize request.
+          The authorization server will respond to the password form POST /login request
+          with a redirect (302) to the saved URL, including the query parameters.
+          In other words, the same redirect is recieved a second time.
+          The second redirect can be seen in the log file as follows:
+<pre class="pre-div-out">
+2021-10-27T19:04:34.897Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/dialog/authorize?response_type=code
+   &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&scope=api.read%20api.write&client_id=abc123
+</pre>
+        <p>
+          This time, when the second request to /dialog/authorize is received, the user's web browser
+          now has a valid cookie.
+        </p>
+        <p>
+          At this point in the workflow, the intended scope value
+          of the requested token is determined. Scope is an implementation dependent concept.
+          A string or list of strings is added to the token to add additional granularity
+          to permissions associated with the access_token. In this implementation, the token's
+          scope value is the intersection of the list of allowedScope values in the
+          web server's client account, the list of role values in the user's account,
+          and the list of scope values in the query string of the /dialog/authorize request.
+          In this demonstration, &quot;api.write&quot; is present in all three, and api.write
+          will be queued for future use in generating the token.
+        </p>
+        <p>
+          There are two possible responses to the /dialog/authorize path
+          depending on the client account configuration. If the client account has trustedClient=true,
+          then the authorization server will respond to the /dialog/authorize request with a
+          redirect (302) to the /login/callback path with an authorization code.
+          This is not the case in this demo because trustedClient is set to false.
+        </p>
+        <p>
+          In the case of this demo, with the client account set to trustedClient=false,
+          the authorization server responds to the second /dialog/authorize request by returning a
+          HTML response to the browser with a second form requesting the user to accept or deny the
+          resource request.
+        </p>
+        <div><img src="images/decision.png" alt="Resource Decision Form" width="352" height="476"></div>
+        <p>
+          At this point, the user selects [Accept]. The form submits a POST request
+          to the /dialog/authorize/decision path included in the form.
+          Assuming the user has selected Accept, the authorization server will parse
+          the callback URI specified in the query parameters that were stored from a previous request.
+          It will search for the callback URI in the client account configuration
+          to see if it is listed in the allowedRedirectURI which is an array listing
+          one or more allowed URIs.
+        </p>
+          Assuming the callback URI is valid, the authorization server will reply to the
+          /dialog/authorize/decision request with a redirect (302) to the web server hostname,
+          the /login/callback path, and with a temporary random authorization code appended
+          to the URL as a query parameter.
+          The authorization server access log should show the redirect as follows:
+<pre class="pre-div-out">
+2021-10-27T19:28:32.487Z ::ffff:127.0.0.1 302 POST 1.1 127.0.0.1:3500/dialog/authorize/decision
+</pre>
+        <p>
+          The web server, which has been idle during this time, accepts the redirect to
+          the /login/callback URI. The temporary authorization code is present as
+          the query parameter &quot;code&quot;.
+          The web server access log should show the redirect including the code.
+        </p>
+<pre class="pre-div-out">
+2021-10-27T19:28:32.506Z ::ffff:127.0.0.1 302 GET 1.1 localhost:3000/login/callback?code=8JUuYggcFkGcDh1BsulCkiLL
+</pre>
+        <p>
+          The web server extracts the temporary code from the query parameters of the redirect URI.
+        </p>
+<pre class="pre-div">
+{
+  "code": "8JUuYggcFkGcDh1BsulCkiLL"
+}
+</pre>
+        <p>
+          The web server directly submits a POST request to the authorization server /oauth/token
+          path. The request includes the code, client_id, client_secret, redirect_uri,
+          and grant_type. This request is a direct connection between the web server and authorization
+          server. The user's web browser is not involved in this transaction.
+        </p>
+        <p>
+          The authorization server then validates the authorization code and client credentials.
+          It checks to see if the client account allowedScope includes &quot;auth.token&quot;.
+          A scope of auth.token indicates the client account used by the web server is allowed to issue tokens.
+          Other clients may not have this privilege. For example: a backend API server may be limited to
+          checking tokens and would use a scope value of auth.info which may not issue new tokens.
+        </p>
+
+        <p>
+          Assuming all the validations have passed, the authorization server
+          creates a new access_token using the RSA private key specified in the configuration.
+          For those who are curious, the token is a JWT token. It is a string that consists
+          of 3 parts separated by a period &quot;.&quot; where is the first part is a
+          token header that identifies the type of token, the second part is the token
+          payload, and the third part is the digital signature which can be used
+          to verify the token using the RSA public key (certificate).
+        </p>
+        <p>
+          Exmaple access_token:
+        </p>
+<pre class="pre-div">
+eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwYjQ4ODVhOS1iZTI0LTQwNGYtOTV
+jZS03ZTAxZjg1YmM4MGQiLCJzdWIiOiJhN2IwNmE2ZC03NTM4LTQ1YzgtYmI1Zi1iMTA3YTgyNTh
+jN2QiLCJpYXQiOjE2MzY4ODQ5ODcsImV4cCI6MTYzNjg4NTA0N30.H7CGN8nR0uEreeuMz-Jdp38
+1z_Nq4WphrJ38h5nnPhljuPGNe9MT14DtU1AP_CiaY7hivcXJrBRL1WQ-XpTl7g6LPaiAn1cn49Z
+KjUP_LAizE5-oMAA2vLokS3udXgeEFvHQhBMa_iffv30VldgnbdlTYrC1qO0NAWVYvve1dlyW7mb
+KWjGMpKsrrt3h0xzwLJ_alvdfqZkiLcTqF0RiCaPI3LT-AVk0LULynhslkEdcFG8k2koIAKnkPZa
+ycWcvuBaRoAYGwqAx1o77FXt7b4nwH7gKEvZoxa3jSi-_dtaVD4hyJ6dVc7JASyuz7TdQDGOahLw
+QkseSgdL9TrTsLg
+</pre>
+        <p>
+          Although the contents are digitally signed, the contents are not
+          encrypted, but rather encoded as base64 encoded JSON which can be
+          base64 decoded.
+          The payload contains a unique token id as &quot;jti&quot;,
+          the id of the credentials used to create the token as &quot;sub&quot;,
+          and the token expiration as a unix time in seconds.
+        </p>
+        <p>
+          Decoded token payload:
+        </p>
+<pre class="pre-div">
+{
+  jti: '0b4885a9-be24-404f-95ce-7e01f85bc80d',
+  sub: 'a7b06a6d-7538-45c8-bb5f-b107a8258c7d',
+  iat: 1636884987,
+  exp: 1636885047
+}
+</pre>
+
+        <p>
+          The end user will not have access to the token itself. It
+          will be stored on the user's behalf by the web server.
+          The authorization server responds to the /oauth/token request by
+          sending a response containing and access_token and refresh_token
+          directly to the web server in the body of the response.
+          The response status is set to 200 to indicate success.
+          This should show in the authorization server access log as follows:
+        </p>
+<pre class="pre-div-out">
+2021-10-27T19:28:32.502Z ::ffff:127.0.0.1 200 POST 1.1 127.0.0.1:3500/oauth/token
+</pre>
+        <p>
+          When the web browser receives the new access_token from the authorization server,
+          it stores the token in the user's session store on the web server. The session is
+          marked as authorized. The user is considered authorized to retrieve local files
+          from the web server. The token is available for future use as long as the users
+          cookie and session are valid. For security reasons, the user never takes
+          possession of the access_token and does not have access to retrieve the token directly.
+        </p>
+
+        <p>
+          While the new token is being retrieved by the web server, the users request to /login/callback
+          is suspended asynchronously, waiting the result of the token request.
+          When the oauth handshake is complete and a valid token received, the
+          /login/callback request returns a redirect (302) to the main
+          home page at the / path. The browser will proceed to load the web page.
+          The 302 redirect shown in the log here is duplicated for clarity, also shown above.
+        </p>
+<pre class="pre-div-out">
+2021-10-27T19:28:32.506Z ::ffff:127.0.0.1 302 GET 1.1 localhost:3000/login/callback?code=8JUuYggcFkGcDh1BsulCkiLL
+
+          ( access_token request --> wait --> redirect )
+
+2021-10-27T19:28:32.512Z ::ffff:127.0.0.1 200 GET 1.1 localhost:3000/
+2021-10-27T19:28:32.537Z ::ffff:127.0.0.1 200 GET 1.1 localhost:3000/css/styles.css
+2021-10-27T19:28:32.539Z ::ffff:127.0.0.1 200 GET 1.1 localhost:3000/js/main.js
+</pre>
+
+        <div class="section-title">Checking the Access Token</div>
+        <p>
+          In this example, loading or re-loading the web page will check the
+          status of the access_token.
+        </p>
+          To clarify, there are two levels of access. The user's cookie stored
+          in the browser permits the browser to access the web server. The user's
+          access_token stored in the web server is then appended to secondary requests
+          to retrieve other protected resources.
+        <p>
+          Up until this point, most of the functionality used to login and obtain
+          an access_token occurred on the server side. This section includes additional
+          JavaScript code that executes in the browser.
+        </p>
+        <p>
+          Assuming user's cookie will authorize access to the web server,
+          the main web page HTML, CSS and JavaScript files are requested by the browser,
+          and the web page loads.
+          When the page finishes loading, a browser window.onload event fires to
+          trigger a function that performs a browser fetch to the web server /userinfo endpoint.
+          When the web server receives the /userinfo request, the server retrieves the access_token that
+          was stored on the user's behalf in session store. With the users's access_token and the
+          web server's client client credentials, the web server performs a POST request
+          to the authorization server /oauth/introspect path to check the access_token.
+          After several validation checks, including token signature verification and
+          database token lookup, the authorization server responds to the POST request
+          by returning token meta-data to the web server.
+          In turn the web server extracts the user information from the meta-data and
+          responds to the original /userinfo request.
+        </p>
+        <p>
+          JavaScript in the web browser then extracts the user's real name
+          from the /userinfo request. The string value of the real name is
+          inserted into an HTML element in the web page header bar, on the
+          right side by the logout button. The presence of the real name
+          in the header bar confirms the user's access_token is valid.
+        </p>
+        <div><img src="images/header-user.png" alt="User name in header bar" width="538" height="100"></div>
+        <p>
+          The /userinfo request in the web server access log.
+        </p>
+<pre class="pre-div-out">
+2021-10-29T16:18:26.858Z ::ffff:127.0.0.1 200 GET 1.1 localhost:3000/userinfo
+</pre>
+        <p>
+          The /userinfo request generating an /oauth/introspect request in Authorization server access log.
+        </p>
+<pre class="pre-div-out">
+2021-10-29T16:18:26.854Z ::ffff:127.0.0.1 200 POST 1.1 127.0.0.1:3500/oauth/introspect
+</pre>
+
+        <div class="section-title">Page Refresh</div>
+        <p>
+          Re-loading the page will attempt to resolve any missing authorization.
+        </p>
+
+        <ul>
+          <li>Invalid web server cookie: web server redirect to /unauthorized</li>
+          <li>Invalid access_token: browser opens /unauthorized</li>
+        </ul>
+
+        <div class="section-title">Web Page Functions</div>
+
+        <p>
+          The background color of the web server home page has been set to yellow
+          to distinguish web server pages (yellow) from authorization server pages (blue).
+        </p>
+        <p>
+          The first function on the demo page is labeled &quot;Try the API&quot; for
+          the web server /api/v1/data/iot-data/ route.
+          If you press the [Fetch Data] button, the reverse proxy in the web server
+          will generate a 502 Bad Gateway error. The request fails because the mock SQL
+          database has not been installed. This button be revisited in the next section
+          after installation of the mock database.
+        </p>
+        <div><img src="images/web-fetch-1.png" alt="Example API Request" width="489" height="129"></div>
+        <p>
+          The next section is labeled &quot;Introspect Endpoint&quot; for the web
+          server /proxy/oauth/introspect route.
+          For demonstration purposes, this is a test API on the web server that will display the
+          token validation results for the currently stored user access_token. This functionality is not
+          normally available to the user. It is used by resource servers, such as the database API,
+          to confirm validity of a user's token before honoring the HTTP request.
+          It was added to this demonstration to show the contents of the token meta-data.
+          Press the [Fetch Data] button to initiate the request and display the results on the page.
+        </p>
+        <p>
+          Note that the token's scope is set to &quot;api.write&quot; due to the user role &quot;api.write&quot;
+          in the user account record. This user is allowed to read and write to the table
+          in the mock database.
+        </p>
+        <p>
+          To consider the token to be valid, the application should check for both status 200 in the
+          http request and the property `active === true` in the body of the response.
+        </p>
+        <div><img src="images/web-fetch-2.png" alt="Example token meta-data" width="482" height="490"></div>
+
+        <p>
+          At the bottom of the page is the &quot;Userinfo Endpoint&quot; section for the /userinfo route.
+          Pressing the [Fetch Data] button
+        </p>
+        <div><img src="images/web-fetch-3.png" alt="Example user information" width="486" height="228"></div>
+
+        <!-- zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz -->
+
+        <div class="desc-title">Part 3 of 4 - Mock REST API</div>
+
+        <p>
+          The collab-backend-api repository is a mock REST API using passport with
+          strategy passport-http-bearer.
+          The mock database includes one table to accept POST and GET requests.
+          In memory RAM variables are used to emulate database storage.
+          API access is restricted using Oauth 2.0 bearer tokens.
+          Token validation is performed by sending the tokens to the authorization
+          server for remote validation.
+          Individual route authorization may be further restricted based on token scope values that are
+          associated with the access_token.
+        </p>
+
+        <div class="section-title">Clone Repository</div>
+        <p>
+          This backend API will also run in a separate terminal window.
+          Leave the previous authorization server terminal and web server terminal open.
+          Open a third command line terminal for the backend API.
+          Use the following commands to clone the collab-backend-api repository and install
+          package dependencies.
+        </p>
+<pre class="pre-div">
+git clone git@github.com:cotarr/collab-backend-api.git
+cd collab-backend-api
+npm install
+</pre>
+        <div class="section-title">Start Backend API</div>
+        <p>
+          The environment variable NODE_ENV should not exist or it may
+          be set to NODE_ENV=development.
+        </p>
+        <p>
+          The application should run as-is. No configuration is necessary in development mode.
+          The backend API server may now be started in development mode from the command line using
+          the following command.
+          This will execute files specified in package.json.
+        </p>
+<pre class="pre-div">
+npm start
+</pre>
+        <p>
+          This will start a express/node.js server running in the foreground.
+          It may be stopped at any time by pressing Ctrl-c.
+          Check the output for errors. Response should appear as follows:
+        </p>
+<pre class="pre-div-out">
+> collab-backend-api@0.0.1 start
+> node bin/www
+
+Server timestamp: 2021-10-30T22:20:13.177Z
+Token cache enabled, lifetime: 60 seconds.
+HTTP Access Log: (console)
+NODE_ENV development starting http (non-encrypted)
+listening: :::4000 IPv6
+</pre>
+        <p>
+          The backend API also requires a different hostname than the authorization server.
+          Previously, we used &quot;127.0.0.1&quot; for the authorization server.
+          Alternately, for the backend API &quot;localhost&quot; will be used.
+          To confirm the backend API is running, open your web browser and visit
+          <a href="http://localhost:4000/status">http://localhost:4000/status</a>.
+          The server should respond with the following &quot;ok&quot; message
+        </p>
+<pre class="pre-div-out">
+{"status":"ok"}
+</pre>
+        <p>
+        In development mode, the backend API access log is sent to the console.
+        The status request should be visible in the terminal window.
+        </p>
+<pre class="pre-div-out">
+2021-10-30T22:23:16.771Z ::ffff:127.0.0.1 200 GET 1.1 localhost:4000/status
+</pre>
+        <div class="section-title">Mock Data Routes</div>
+
+        <div class="vh-20"></div>
+        <table>
+          <tbody>
+            <tr><th>Method</th><th>Route</th><th>Description</th></tr>
+            <tr><td>GET</td><td>/v1/data/iot-data/</td><td>List all mock records, maximum is 10</td></tr>
+            <tr><td>POST</td><td>/v1/data/iot-data/</td><td>Save mock record with following schema</td> </tr>
+          </tbody>
+        </table>
+        <p>
+          To submit data to the iot-data table in the database, the HTTP request should
+          use the POST method to the &quot;/v1/data/iot-data&quot;. An &quot;Authorization&quot; header is to be added to the HTTP request
+          containing &quot;Bearer xxxxxxxx&quot; where xxxxxxx should be a string containing the access token.
+          The data to be submitted should be encoded in JSON format and included
+          in the body of the POST request as follows:
+        </p>
+
+<pre class="pre-div">
+{
+  "deviceId": "iot-device-12",
+  "timestamp": "2021-09-17T15:33:07.743Z",
+  "data1": 25.486,
+  "data2": 25.946,
+  "data3": 24.609
+}
+</pre>
+        <p>
+          A successful request should return status 201 (Created). If the access token is missing,
+          expired, or otherwise invalid, the API will return 401 Unauthorized. If the request does not
+          have sufficient scope to access a specific route or database table, the API will return 403 Forbidden.
+          In this case scope of &quot;api.write&quot; is needed.
+        </p>
+        <p>
+          To retrieve data from the iot-data table in the database, the HTTP request should
+          use the GET method. An &quot;Authorization&quot; header be added to the HTTP request
+          containing &quot;Bearer xxxxxxxx&quot; where xxxxxxx should be a string containing the access token.
+          The access token should have possible scope of &quot;api.read&quot; or &quot;api.write&quot;, either scope will be accepted.
+          The mock API will append a record id using UUID.v4 format.
+          A createdAt and updatedAt timestamp will also be appended to the record.
+          The API will return an array of objects in JSON format.
+          Considering this is a demonstration, the array size is limited to a maximum of 10 elements, and the most recent 10
+          timestamped data points from the mock IOT device should be available in the array.
+        </p>
+<pre class="pre-div">
+[
+  {
+    "id": 1277,
+    "deviceId": "iot-device-12",
+    "timestamp": "2021-09-17T15:32:08.417Z",
+    "data1": 24.831,
+    "data2": 27.241,
+    "data3": 22.307
+    "updatedAt": "2021-09-17T15:33:07.797Z",
+    "createdAt": "2021-09-17T15:33:07.797Z"
+  }
+]
+</pre>
+
+        <div class="section-title">Try Browser Query</div>
+        <p>
+          Confirm the authorization server is still running in the first terminal window.
+          If it is not running, open a terminal window and restart as described above.
+        </p>
+        <p>
+          Confirm the web server is still running in the second terminal window.
+          If it is not running, open a terminal window and restart as described above.
+        </p>
+        <p>
+          Lastly, confirm the mock backend API should is running in the third terminal window.
+        </p>
+        <p>
+          Open your web browser and load the home page at
+          <a ref="http://localhost:3000">http://localhost:3000</a>.
+          Scroll to the section on the page that is  titled &quot;Try the API&quot;.
+          Press the [Fetch Data] button. JavaScript in the browser
+          will initiate a GET request to /api/v1/data/iot-data/.
+          When the web server receives the request, it will first
+          check the login status of the browsers cookie and return
+          a 401 Unauthorized error if the user's login is invalid.
+          The web server will then parse and remove the &quot;/api&quot;
+          prefix from the route and forward the request to the
+          reverse proxy route in the web server.
+           All requests prefixed with /api will pass to the reverse proxy.
+           The user's access_token is appended to the request headers as it is passed to the reverse
+          proxy.
+        </p>
+        <p>
+          Check the terminal window for the web server to see the web server access log.
+          Note the status value of 200. Also, the &quot/api/&quot prefix is included in the route.
+        </p>
+<pre class="pre-div">
+2021-10-31T14:54:24.042Z ::ffff:127.0.0.1 200 GET 1.1 localhost:3000/api/v1/data/iot-data/
+</pre>
+        <p>
+          The Backend API recieves the request. First the API will check to see if an
+          authorization header is present. It extracts the bearer token from the
+          request authorization header. The Backend API then sends the user's access_token,
+          and the API's client ID and client secret to the authorization server route
+          /oauth/introspect.
+        </p>
+        <p>
+          The authorization server does a lookup of the API clientID to see if the
+          API is allowed to validate tokens. In this case the API client account has
+          allowedScope auth.info which is accepted. The authorization server then validates
+          the access_token by performing a database lookup of the access_token and then
+          performing various validation checks. Assuming the token is valid, the authorization
+          server returns a response to the backend API containing the token metadata.
+          This will appear in the authorization server access log showing status 200.
+        </p>
+<pre class="pre-div">
+2021-10-31T15:03:27.482Z ::ffff:127.0.0.1 200 POST 1.1 127.0.0.1:3500/oauth/introspect
+</pre>
+        <p>
+          When the backend API recieves the response from the authorization server, it will
+          confirm response status equals 200. The token meta-data will be parsed to
+          confirm the property active equals true. The API will extract a string
+          containing the access_token's scope value. The scope restrictions may be
+          specific to an individual route or database table. In this case, api.read or
+          api.write is required to perform a database read. If the scope is insufficient
+          a 403 Forbidden response will be returned. If the access_token is expired or otherwise
+          invalid, a 401 Unauthorized response will be returned. If token is valid and scope
+          is sufficient, the requested database query will be performed and the response returned
+          to the web server in typical REST API format as JSON in the body of the request.
+          This will appear in the backend API access log showing status 200.
+          Note: the &quot;/api&quot part of the route was removed by the web server
+          bofore forwarding the request to the backend API.
+        </p>
+<pre class="pre-div">
+2021-10-31T15:04:50.428Z ::ffff:127.0.0.1 200 GET 1.1 localhost:4000/v1/data/iot-data/
+</pre>
+        <p>
+          During this time, JavaScript in the web browser was asynchronously waiting
+          for the GET request to complete. When it receives the response, the result is displayed
+          on the page for the user to see.
+        </p>
+        <p>
+          In this case, the database table is empty because we have not installed the
+          mock IOT device. This will be done in the next sections. The JSON response contains
+          and empty array []. The comment in red text is generated by the page javascript
+          for informational purposes, and will not be displayed if the array contains data.
+        </p>
+        <div><img src="images/web-fetch-4.png" alt="Example API Request" width="486" height="179"></div>
+        <!-- zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz -->
+
+        <div class="desc-title">Part 4 of 4 - Mock IOT device</div>
+        <p>
+          The collab-iot-device repository is a mock IOT device that will emulate
+          data collection from a physical device on a home network.
+          Oauth 2.0 access_token will be obtained from the authorization server using grant type client credentials.
+          Using a timer loop, mock data will be periodically sent to a mock database API.
+          New access_tokens are obtained as needed from the authorization server.
+        </p>
+
+        <p>
+          This demonstration is aimed toward using IOT devices on a home network.
+          One example would be a Raspberry Pi located at various places around the house.
+          Each Pi may have various sensors, such a outdoor temperature or refrigerator temperature.
+          For this demonstration 3 temperatures are being emulated.
+          A random number generator produces simulated temperatures.
+          New emulated data is generated once per minute.
+          The emulated IOT device produces JSON encoded data that would look like this:
+        </p>
+<pre class="info-div">
+{
+  "deviceId": "iot-device-12",
+  "timestamp": "2021-09-17T15:32:08.417Z",
+  "data1": 24.831,
+  "data2": 27.241,
+  "data3": 22.307
+},
+</pre>
+        <p>
+          IOT devices are automated machine devices that operate continuously.
+          The use of a user login and password is impractical for security
+          reasons, because each of multiple devices would need to store the user's password.
+          Oauth 2.0 allows IOT devices operate under their own authority without a user.
+          Oauth 2.0 supports a token grant type called &quot;Client Credentials&quot; grant.
+          This type of token is sometimes called a machine token, as opposed to a user token.
+          In order to demonstrate this method, a client record has already been created
+          in the Oauth 2.0 authorization server. The client_id and client_secret have been
+          placed in the configuration of the IOT device.
+        </p>
+        <p>
+          Looking at the network diagram on the <a href="index.html">home</a> page,
+          it can be seen that the database API resource server
+          requires a valid access_token to read or write data to the database.
+          Therefore, the IOT device must obtain a new valid Oauth 2.0 access_token.
+          The IOT device contacts the authorization server over the network.
+          Using the IOT device's client credentials, the IOT device will request a new
+          access token using client credentials grant type. Upon receipt of the token,
+          the IOT device can gain access to the database API server.
+        </p>
+        <p>
+          This implementation also supports token scope.
+          A database may include multiple different tables.
+          It is useful to provide further granularity so access can be restricted differently
+          for each database table.
+          This is done by assigning a scope value to the token,
+          such as api.read, api.write, or api.admin.
+          The &quot;api.write&quot; is the intended scope this for this demo.
+        </p>
+        <p>
+          A second scope is also needed for the authorization server to specificity
+          the type of token interactions that are allowed to issue token or inquire
+          token validity. The authorization server in this case accepts possible scopes of
+          auth.info, auth.token, auth.client.
+          The &quot;auth.client&quot; designates that the authorization server can
+          issue tokens directly to a client based on the clientId and
+          scope, without association with a specific user login.
+          Combined, the client account allowedScope value should include:
+        </p>
+        <ul>
+          <li>&quot;api.write&quot; - Provides access to API routes that allow this scope</li>
+          <li>&quot;token.client&quot; - Permits the authentication sever to issue client access_tokens.
+        </ul>
+        <p>
+          The Raspberry Pi or other IOT device would then perform the following steps:
+        </p>
+        <ul>
+          <li>A cycle timer is created to trigger data acquisition at fixed intervals</li>
+          <li>Each timer event triggers the IOT device to collect data from it's sensors</li>
+          <li>The IOT device checks it's token cache to see if has a non-expired access token</li>
+          <ul>
+            <li>If necessary, the IOT device requests a new access_token</li>
+            <li>The new access token is stored in the token cache along with it's expiration time.</li>
+          </ul>
+          <li>An HTTP POST request is prepared for transmission to the API database server</li>
+          <li>The access token is attached to the HTTP request Authorization header as a Bearer token.</li>
+          <li>The POST request is sent to the API.</li>
+          <ul>
+            <li>The expected HTTP response status is 201 (Created)</li>
+            <li>401 Unauthorized response indicates the token is likely expired or otherwise invalid.</li>
+            <li>403 Forbidden response indicated the client credentials do not have sufficient scope.</li>
+          </ul>
+        </ul>
+
+        <div class="section-title">Clone Repository</div>
+        <p>
+          This Mock IOT device will also run in a separate terminal window.
+          Leave the previous authorization server terminal, web server terminal open,
+          and the backend API terminal.
+          Open a fourth command line terminal for the Mock IOT device.
+          Use the following commands to clone the collab-iot-device repository and install
+          package dependencies.
+        </p>
+<pre class="pre-div">
+git clone git@github.com:cotarr/collab-iot-device.git
+cd collab-iot-device
+npm install
+</pre>
+        <div class="section-title">Start Mock IOT Device</div>
+        <p>
+          The environment variable NODE_ENV should not exist or it may
+          be set to NODE_ENV=development.
+        </p>
+        <p>
+          The application should run as-is. No configuration is necessary in development mode.
+          The web server may now be started in development mode from the command line using
+          the following command.
+          This will execute files specified in package.json.
+        </p>
+<pre class="pre-div">
+npm start
+</pre>
+        <p>
+          This will start a express/node.js server running in the foreground.
+          It may be stopped at any time by pressing Ctrl-c.
+        </p>
+        <p>
+          The mock IOT device is different from the other three terminal windows
+          because no express server is included. It is not capable to accept any
+          HTTP requests. It can be understood as an &quot;Output Only&quot; device.
+          Should an error occur, the error will be displayed in the terminal window
+          For example, if the backend API is not running a &quot;ECONNREFUSED&quot;
+          error message will be show in the terminal.
+          Starting the mock IOT device should show the following in the terminal:
+        </p>
+<pre class="pre-div-out">
+  > collab-iot-device@0.0.1 start
+  > node src/index.js
+  
+  2021-12-26T17:12:38.226Z collab-iot-device started with interval 60 seconds.
+  2021-12-26T17:12:39.269Z New token expires in 86400 seconds.
+  2021-12-26T17:12:39.336Z Mock Data (Record id=1)
+</pre>
+        <p>
+          Upon startup, the mock IOT device will initiate a cycle timer at 60 second intervals.
+          It will immediately generate emulated data and make it's first data submission
+          to the backend API. Additional data points will be submitted at 60 second
+          intervals thereafter.
+        </p>
+        <p>
+          The IOT device will check to see if it has a valid access token that has been
+          used previously and cached for future use. In this case, the IOT device was just
+          started for the first time so no token will be found. A new access_token will be
+          obtained by submitting a POST request to the authorization server /oauth/token route.
+          The request includes the clientID and clientSecret assigned to the IOT device, as well
+          as the grant type and requested scope. The client account assigned to the IOT device
+          must include allowedScope &quot;auth.client&quot; to allow issuance of tokens without user credentials.
+        </p>
+        <p>
+          The authorization server access log will show the token request.
+        </p>
+<pre class="pre-div-out">
+  2021-12-26T17:12:39.270Z ::ffff:127.0.0.1 200 POST 1.1 127.0.0.1:3500/oauth/token
+</pre>
+        <p>
+          The IOT device will then build a POST request to submit a new data point to the backend API.
+          For demonstration purposes, emulated data will be generated using random number generator.
+          The data object should appear like the following.
+        </p>
+<pre class="pre-div">
+{
+  "deviceId": "iot-device-12",
+  "timestamp": "2021-09-17T15:32:08.417Z",
+  "data1": 24.831,
+  "data2": 27.241,
+  "data3": 22.307
+},
+</pre>
+        <p>
+          The IOT device appends the IOT Device access_token to the POST request authorization
+          header as a bearer token. The request is submitted to the backend API.
+        </p>
+        <p>
+            Similar to the read operation described above, this database write request
+          is authorized by sending the access_token from the IOT Device POST request to the
+          authorization server for validation. This will show in the authorizaton server access log
+          with status 200.
+        </p>
+<pre class="pre-div-out">
+2021-12-26T17:12:39.320Z ::ffff:127.0.0.1 200 POST 1.1 127.0.0.1:3500/oauth/introspect
+</pre>
+        <p>
+          When the backend API receives the response from the token validation by the
+          authorization server, the backend API will honor the request and perform a
+          write query to the database, saving the data point. After successful addition
+          of the data to the database, the backend API will complete the IOT device by sending a
+          response to the IOT device with status 201 (Created) as shown in the backend API access log.
+        </p>
+<pre class="pre-div-out">
+2021-12-26T17:12:39.335Z ::ffff:127.0.0.1 201 POST 1.1 localhost:4000/v1/data/iot-data/
+</pre>
+        <p>
+          The database in the mock Backend API now contains 1 data point.
+          Return to the web page usign the browser. This time, when the [Fetch Data] button
+          in the &quot;Try the API&quot; section is pressed, one data point will be displayed.
+        </p>
+<div><img src="images/web-fetch-5.png" alt="Example API Request"  width="484" height="295"></div>
+        <p>
+          Wait approximately 1 minute for the next IOT Device timer cycle. It will submit a second
+          data point to the backend API. In this case the IOT Device already has a valid
+          access_token, so the stored access_token is used immediately for the IOT Device to
+          submit a new POST request to the backend API.
+          When the browser [Fetch Data] button is pressed, two data points will now be displayed.
+        </p>
+<div><img src="images/web-fetch-6.png" alt="Example API Request" width="482" height="450"></div>
+
+        <div class="section-title">Summary</div>
+        <p>
+          The steps on this page should have successfully demonstrated one way to use Oauth 2.0
+          for potential use on a home network with web server, SQL database, and IOT devices.
+        </p>
+        <p>
+          Due to the asynchronous nature of JavaScript, this is a very confusing concept.
+          The diagram at the top of the <a href="index.html">home</a> page should help clarify the network or architecture
+          part of the process. However there is an asynchronous time component as well.
+          Several Oauth 2.0 references are listed that have timing diagrams that may be helpful.
+        </p>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- scrollable-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/collab-auth">
+        https://github.com/cotarr/collab-auth</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

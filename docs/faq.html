@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>FAQ</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="head-fixed">
+      Documentation for
+      <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+    </div>
+    <div class="menu-div-fixed">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Install Demo</a></li>
+          <li><a href="deployment.html">Deployment</a></li>
+          <li><a href="admin.html">Admin Editor</a></li>
+          <li><a href="scope.html">Scope and Role</a></li>
+          <li><a href="env.html">Env Vars</a></li>
+          <li><a class="active" href="faq.html">FAQ</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div>
+    </div> <!-- /menu-div-->
+
+    <div class="scrollable-div">
+
+      <div class="text-div">
+        <div class="desc-title">
+          F.A.Q.
+        </div>
+        <div class="faq-spacer"></div>
+        <a href="#what-testing">What testing has been performed?</a><br>
+        <a href="#csrf-tokens">Why add csrf tokens?</a><br>
+        <a href="#input-val">Why add express-validator?</a><br>
+        <a href="#input-val-issues">Can input validation break oauth?</a><br>
+        <a href="#faq-refresh-tokens">Are refresh tokens supported?</a><br>
+        <div class="faq-spacer"></div>
+        <table class="table-generic">
+
+          <tr><td><a name="csrf-tokens">
+            <p>
+              Q: What testing has been performed?
+            </p>
+            <p>
+              A: During coding, functions were debugged manually, primarily using postman.
+              The postman collections were extracted and included in the repository.
+              The primary focus was on grant type: authorizaton code grant and client credentials grant. 
+              Less attention was spent on implicit grant and password grant.
+              Unused grant types can be disabled in the configuration.
+            </p>
+            <ul>
+              <li>No automated tests included.</li>
+              <li>No formal testing has been performed.</li>
+            </ul>
+          </a></td></tr>
+
+          <tr><td><a name="csrf-tokens">
+            <p>
+              Q: Why add csrf tokens?
+            </p>
+            <p>
+              A: Cross Site Request Forgery is generally a security issue where the cookie
+              for one web site is used to make a valid data submission to different web site
+              when both pages are using the same web browser.
+            </p>
+            <p>
+              Csrf protection is the addition of a random csrf token to the html code
+              of a web page html file by the web server before sending the file to the browser.
+              The csrf token can be submitted to the web server with future API requests 
+              to reduce the risk of cross-site data submissions.
+            </p>
+            <p>
+              Csrf protection was primarily added to protect the admin editor &lt;form&gt;
+              elements during critical security actions like creating a new user based on 
+              input data entered into the form.
+            </p>
+            <p>
+              Since it was available, csrf proection was added to the oauth login form, the 
+              password change form, and the oauth client trust decision form.
+              This may not be necessary, because the trust decision already includes a random 
+              oauthorize transaction code, and both login and password forms require 
+              a previously known valid user passwords. Thus, except for the admin editor, 
+              adding csrf protection to the oauth forms may be adding complexity 
+              and increasing the attack surface without a security benefit.
+              It's currently installed, but may be removed in the future.
+            </p>
+            <p>
+              Feedback? Suggestions? What is best practice?
+            </p>
+          </a></td></tr>
+
+          <tr><td><a name="input-val">
+            <p>
+              Q: Why add express-validator?
+            </p>
+            <p>
+              Express-validator is an express/node middleware that can provide syntax validation
+              to user data submission before action by additional request handlers. Syntax 
+              errors in user input will generate a status 422 Unprocessable Entity.
+            </p>
+            <p>
+              The primary purpose was to sanitize user input for the admin editor.
+              This is to prevent unsafe command characters from being included in 
+              user names, client names, or other string data stored in the database or 
+              potentially displayed in a web browser.
+            </p>
+          </a></td></tr>
+
+          <tr><td><a name="input-val-issues">
+            <p>
+              Q: Can input validation break oauth?
+            </p>
+            <p>
+              A: Possibly (see previous question). 
+            </p>
+            <p>
+              Input validation was added to the project to protect the admin editor when 
+              creating or editing user accounts. Since it was available, it was added to 
+              some of the oauth 2.0 routes.
+            </p>
+            <p>
+              The oauthorize server (library) appears to have it's own internal input validaiton.
+              The oauthorize npm repository has large user base and good history.
+              Adding input validation middleware infront of the oauthorize server may be of limited benefit.
+            </p>
+            <p>
+              Possible issues:
+            </p>
+            <ul>
+              <li>Prevent automated tests from reaching oauthorize and it's custom callback functions.</li>
+              <li>Different grant types require complex syntax rules</li>
+              <li>Various oauth data may be optional</li>
+              <li>Some oauth data can appear in either body, header, or query parameter</li>
+              <li>Possible error responses that are not RFC compliant with Oauth 2.0</li>
+            </ul>
+            <p>
+              It is currently installed on oauth routes, but with limited checks.
+              The input validation includes a custom error handler to 
+              generate the "WWW-Authenticate" header in oauth error responses.
+              In the future it may be adjusted or removed entirely from 
+              oauth routes.
+            </p>
+            <p>
+              Feedback? Suggestions? What is best practice?
+            </p>
+          </a></td></tr>
+
+
+          <tr><td><a name="faq-refresh-tokens">
+            <p>
+              Q: Are refresh tokens supported?<br>
+            </p>
+            <p>
+              A: Yes. Refresh tokens can be demonstrated in the development enviornment
+              using postman. The collection &quot;collab-auth (code grant)&quot;
+              can be run to obtain an access_token and refresh_token which are
+              stored in postman variables.
+              A second collection &quot;collab-auth (misc calls)&quot; contains a single
+              test called &quot;POST /oauth/token (refresh)&quot; that will retrieve
+              the refresh_token from postman variables and exchange the refresh_token
+              for a replacement access_token.
+            </p>
+            <p>
+              The collab-frontend demonstration web server supports the use of
+              refresh_tokens. The demo page allows inspection of the token
+              meta-data. After access_token expiration, the refresh_token is used
+              to automatically obtain a replacement access_token.
+              This can be seen by examining the token meta-data on the web page.
+              The property &quot;grant_type&quot; will change 
+              from &quot;authorization_code&quot; to &quot;refresh_token&quot;
+            </p>
+          </a></td></tr>
+
+        </table>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- scrollable-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/collab-auth">
+        https://github.com/cotarr/collab-auth</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

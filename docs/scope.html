@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Scope and Role</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="head-fixed">
+      Documentation for
+      <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+    </div>
+    <div class="menu-div-fixed">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Install Demo</a></li>
+          <li><a href="deployment.html">Deployment</a></li>
+          <li><a href="admin.html">Admin Editor</a></li>
+          <li><a class="active" href="scope.html">Scope and Role</a></li>
+          <li><a href="env.html">Env Vars</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div>
+    </div> <!-- /menu-div-->
+
+    <div class="scrollable-div">
+
+      <div class="text-div">
+        <div class="desc-title">
+          Scope and Role
+        </div>
+        <p>
+          When researching Oauth 2.0 to write this project, the concept of token scope
+          was an opaque concept in most documentation. A typical tutorial would
+          claim that scope is implementation dependent and the subject of scope would be
+          omitted entirely from a tutorial.
+        </p>
+        <p>
+          The implementation of scope permissions in this project is unique to
+          this project and does not follow a known standard. The specific scope definitions
+          used here have evolved over the course of project. The general goal was to
+          service a home network with web API in Raspberry Pi IOT devices visible through a
+          personal web page where the user base would be a limited set of family or friends.
+        </p>
+
+        <div class="vh-20"></div>
+        <div class="section-title">Scope Definitions</div>
+        <div class="vh-20"></div>
+
+        <table>
+          <tbody>
+            <tr><th>Scope</th><th>Used By</th><th>Permission</th><th>Component</th></tr>
+            <tr><td>auth.info</td><td>Client</td><td>Client permission to check token status</td><td>Oauth2 API</td></tr>
+            <tr><td>auth.client</td><td>Client</td><td>Client permission to issue client tokens</td><td>Oauth2 API</td></tr>
+            <tr><td>auth.token</td><td>Client</td><td>Client permission to Issue user tokens</td><td>Oauth2 API</td></tr>
+            <tr><td>auth.admin</td><td>Client</td><td>( Reserved for future)</td><td>Oauth2 API</td></tr>
+            <tr><td>user.password</td><td>User</td><td>User permission to change own password</td><td>Password Form</td></tr>
+            <tr><td>user.admin</td><td>User</td><td>User permission to edit any user or client record</td><td>Web control panel</td></tr>
+            <tr><td>api.read</td><td>Resource</td><td> API read requests (client && user)</td><td>Mock REST API</td></tr>
+            <tr><td>api.write</td><td>Resource</td><td> API write requests (client && user)</td><td>Mock REST API</td></tr>
+          </tbody>
+        </table>
+        <div class="vh-20"></div>
+        <div class="section-title">Terminology</div>
+        <p>
+          The following names are used to refer to scope properties in
+          database records, token requests, and token meta-data.
+        </p>
+        <table>
+          <tbody>
+            <tr><th>Use</th><th>Name</th></tr>
+            <tr><td>User</td><td>&quot;role&quot;</td></tr>
+            <tr><td>Client</td><td>&quot;allowedScope&quot;</td></tr>
+            <tr><td>Token Request</td><td>&quot;scope&quot;</td></tr>
+            <tr><td>Access Token</td><td>&quot;scope&quot;</td></tr>
+          </tbody>
+        </table>
+
+        <div class="vh-20"></div>
+        <div class="vh-20"></div>
+        <p>
+          There are 3 different ways scope permissions are used with this authorization server.
+        </p>
+
+        <div class="section-title">1 - Account Administration Permission</div>
+        <p>
+          This refers only to a user account for direct access to
+          the authorization server web pages. Any user who is assigned
+          the role &quot;user.password&quot; will permit a user to access to the
+          /changepassword route on the authorization server.
+          The user role &quot;user.admin&quot will permit a user access to
+          the admin editor on the /panel/menu route.
+          This would grant full access to modify all account records.
+          If user.password or user.admin were to appear in a client account or
+          in an access token it would be ignored.
+        </p>
+        <div class="section-title">2 - Oauth2 API Access Permission</div>
+        <p>
+          This refers only to web servers or other network hardware devices.
+          Servers and network devices can be configured to use a client account
+          where the clientId and clientSecret are used as credentials to
+          obtain access to the /oauth route on the authorization server.
+        </p>
+        <p>
+          A web server that has a client account with allowedScope
+          &quot;auth.token&quot; would have
+          permission to request new access tokens where the tokens are
+          associated with an authenticated user account. For example, a web
+          server would require access to the /oauth/token route in order to
+          exchange an authorization code for a user access_token. The web
+          server can then store the user's access_token tied to the
+          user web browser's cookie.
+        </p>
+        <p>
+          Data resources, such as a REST API database,
+          would use the allowedScope value of &quot;auth.info&quot; to
+          allow access to the  /oauth/introspect route to validate
+          the access_token and retrieve the token meta-data.
+          The REST API would use the results to allow access to data or deny the request.
+          This is a read only scope. Therefore a network resource using
+          a client account with allowedScope auth.info would not be able to
+          request new access tokens.
+        </p>
+        <p>
+          A third allowedScope value of &quot;auth.client&quot; can be
+          used to request access_tokens independent of any user account.
+          This would apply to data collection devices that require
+          permission to write data to a database API.
+          Some automated machine devices operate continuously.
+          The use of a user login and password is impractical for security
+          reasons, because each of multiple devices would need to store the user's password.
+          OAuth2 allows IOT devices operate under their own authority without a user.
+          Oauth2 supports a token grant type called &quot;client grant&quot; grant.
+          This type of token is sometimes called a machine token, as opposed to a user token.
+          Note that two set of credentials are required to issue user access_tokens,
+          user password and client secret. When using auth.client with client grant,
+          only one credential is needed to request tokens.
+        </p>
+        <p>
+          The authorization server will ignore scope values of auth.info,
+          auth.token, or auth.client should they be present in a user role or access_token.
+        </p>
+
+        <div class="section-title">3 - External Resource Permission Scopes</div>
+        <p>
+          Resource permissions are complex because resource permissions must
+          accommodate an arbitrary number of administrator configured scope values.
+        </p>
+        <p>
+          Access tokens are used to restrict access to an external resource server.
+          Scope values provide a granular method further restrict access assigned
+          to a given access token in a way that can be unique to a specific user.
+          Therefore, the authorization server assigns scope to an access_token
+          with knowledge of the user account permission values.
+        </p>
+        <p>
+          Independently, an external resource server must make a decision to
+          allow access to data or reject requests.
+          Resource servers parse token scope and make a decision based on internal
+          scope requirements configured in each resource server.
+          Resource servers can maintain their own independent list of configurable scopes.
+          These scope lists may be hardcoded into an API.
+          Therefore scopes must be configured in both the
+          user accounts and the data resource servers. This section refers only to the
+          scopes associated with access_tokens generated by the authorization server.
+        </p>
+        <p>
+          When the authorization server assigns a list of scope values to an
+          access_token, the token scope is the intersection of scope from 3 sources.
+        </p>
+        <div><img src="images/token-scope.png" alt="Scope intersection diagram" width="391" height="263" ></div>
+        <p>
+          For example consider the case of a database API. For the sake of discussion,
+          assume the database API is capable of 4 functions to create, read, write, and delete records.
+          This could be represented by 4 arbitrary scope values, &quot;data.create&quot;,
+          &quot;data.write&quot;, &quot;data.read&quot;, and &quot;data.delete&quot;.
+        </p>
+        <p>
+          Next, a frontend web server is created. It uses the authorization server
+          to handle user login and stores the user access_tokens in the web server.
+          The web server also has software to process API requests from the browser with
+          internal logic to handle browser API requests and utilize various external data API.
+          For this example, the web server software will have the capability for all 4
+          functions: create, read, write, and delete. Since the software has all 4 functions,
+          when the web server requests tokens, the token request that is
+          sent to the authorization server /dialog/authorize route would include
+          a query parameter for scope.
+          Since the software of the web server is capable of all 4 functions, all 4
+          possible functions are included in token request scope parameter. The token request would
+          look something similar to this example.
+          The scope values are separated ascii space characters, but for clarity
+          this example is not escaped and the line is wrapped.
+        </p>
+<pre class="pre-div">
+/dialog/authorize?response_type=code&redirect_uri=http://localhost:3000/login/callback&
+     scope=data.create data.read data.write data.delete&client_id=abc123
+</pre>
+        <p>
+          Next, consider the client account which is assigned to the web server
+          to allow access to the authorization server for the purpose of obtaining
+          new access tokens. The client account has a list of allowedScope.
+          For this example, we will restrict any server using this client
+          account to disable capability to delete records. Only create, read and write
+          are allowed. As described above, the additional scope value of auth.token
+          is required to permit the web server to access the /oauth/token API.
+          Note: data.detete is not present.
+          The web server client allowedScope would look something like this:
+        </p>
+<pre class="pre-div">
+{
+  "allowedScope: [
+    "data.create",
+    "data.read",
+    "data.write",
+    "auth.token"
+  ]
+}
+</pre>
+        <p>
+          Now consider the user account. Perhaps we don't trust this user and therefore
+          the user is restricted to read only access to the database. The scope value listed
+          in the user's role would be data.read. Note user.password is included so the
+          user would have capability to change passwords as described above.
+        </p>
+<pre class="pre-div">
+{
+  "role": [
+    "data.read",
+    "user.password"
+  ]
+}
+</pre>
+          Next the authorization server creates a new access token for the user.
+          It will contain the intersection all 3 scope sources.
+          The only value appearing in all three is &quot;data.read&quot;.
+          Therefore the token would include the following scope property inherent to the
+          token meta-data stored in the authorization server.
+        </p>
+<pre class="pre-div">
+{
+  "scope": [
+    "data.read"
+  ]
+}
+</pre>
+        <p>
+          Now consider any external data resource server that receives an API request
+          where a valid access_token in included as a bearer token in the authorization header.
+          The resource server will send the token to the authorization server for validation.
+          The resource server will first check that the token was valid.
+          Having validated the token, it will extract the scope and compare the token
+          scope value against configured scope values for each route.
+          The data request will be accepted or denied.
+        </p>
+
+        <div class="section-title">Comments</div>
+        <p>
+          Token requests are typically submitted as a browser 302 redirect.
+          Therefore the contents of the scope query parameter could be altered by
+          a user. Use of a intersection with client allowedScope and user role
+          will prevent extraneous scope values being introduced by a user.
+
+        </p>
+
+
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- scrollable-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/collab-auth">
+        https://github.com/cotarr/collab-auth</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

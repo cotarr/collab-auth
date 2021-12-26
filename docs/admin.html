@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Admin Editor</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="head-fixed">
+      Documentation for
+      <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+    </div>
+    <div class="menu-div-fixed">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Install Demo</a></li>
+          <li><a href="deployment.html">Deployment</a></li>
+          <li><a class="active" href="admin.html">Admin Editor</a></li>
+          <li><a href="scope.html">Scope and Role</a></li>
+          <li><a href="env.html">Env Vars</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div>
+    </div> <!-- /menu-div-->
+
+    <div class="scrollable-div">
+
+      <div class="text-div">
+        <div class="desc-title">
+          Admin Editor
+        </div>
+        <p>
+          Considering the limited use case for this oauth2 server would involve
+          use with a personal web server and access to home network IOT devices
+          for a limited number of friends or family,
+          it was not necessary to build an administration API. To perform
+          management of user accounts, a simple form editor was incorporated
+          directly in to the authorization server.
+          Comprehensive user data including
+          contact information was not included in the user records over privacy considerations.
+          Access to the admin editor requires a user account with
+          role &quot;user.admin&quot;. The Admin Editor can be opened
+          on the authorization server at the following path:
+        </p>
+<pre class="pre-div">
+/panel/menu
+</pre>
+        <p>
+          In the case where the authorization server is operating in
+          a development environment in demonstration mode, the user
+          database is emulated using RAM memory variables. The Admin Editor
+          will display a warning indicating this as shown in the screen capture below.
+          In this mode, editing of accounts will function, but any
+          edit of accounts will be lost when the server is shut down.
+        </p>
+        <p>
+          Alternately, when the server is configured to use a PostgreSQL database,
+          the user account and client account records are stored in PostgreSQL database tables.
+        </p>
+
+        <div><img src="images/admin-menu.png" alt="Admin Menu" width="559" height="628" ></div>
+
+        <div class="section-title">User Account Administration</div>
+
+        <p>
+          This screen capture shows the form used to edit user account records.
+          A similar form is used to create new user records.
+          The subsequent table explains each user property and it's use.
+        </p>
+
+        <div><img src="images/edit-user.png" alt="Edit User Form" width="789" height="695"></div>
+
+        <div class="vh-20"></div>
+
+        <table>
+          <tbody>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>V4 UUID</td>
+              <td>Unique identifier for the user record.
+                <br>The value generated automatically.
+                <br>It is not editable after the record is created.</td>
+            </tr>
+            <tr>
+              <td>number</td>
+              <td>Integer ( > 0)</td>
+              <td>Secondary user identifier.
+                <br>The value is checked for uniqueness when the record is created.
+                <br>It is not editable after the record is created.
+                <br>This was added for purpose of compatibility with an existing database</td>
+            </tr>
+            <tr>
+              <td>Name</td>
+              <td>String</td>
+              <td>Real name of user.
+                <br>Allowed characters:
+                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@'</td>
+            </tr>
+            <tr>
+              <td>username</td>
+              <td>String</td>
+              <td>
+                  The unique username used in the login form along side password.
+                  <br>Allowed characters:
+                  <br>'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@';
+                  <br>It is not editable after the record is created.</td>
+            </tr>
+            <tr>
+              <td>password</td>
+              <td>String</td>
+              <td>User's password used in the login form.</td>
+            </tr>
+            <tr>
+              <td>loginDisabled</td>
+              <td>Boolean</td>
+              <td>Disabled = true (checked).
+                <br>Disallow token issuance and validation of token with same username
+                <br>Disallow user password login and password changes
+                <br>Note: This does not invalidate any cookie or session authentication state.
+                <br>Disabled account would prevent future access to admin editor,
+                <br>but not remove current access as long as cookie and session are valid.</td>
+            </tr>
+            <tr>
+              <td>role</td>
+              <td>Array of String</td>
+              <td>The user role represents a scope value for access to a resource server.
+                See the <a href="scope.html">Scope</a> section.
+                <br>This should be entered in the editor form as comma separated strings without quotes.
+                <br>Example: api.read, user.password
+                <br>Allowed Characters:
+                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_'</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="vh-20"></div>
+
+        <div class="section-title">Client Account Administration</div>
+        <p>
+          In the above section, user accounts are used to delegate permissions to a person.
+          Client accounts are used to delegate permissions to a server or other network resource.
+          For example, during login, a user will present his username and password to get an
+          authorization code. The web server then will use the clientId and clientSecret to exchange
+          the authorization code for an access token. The server client account would require some
+          type of permission to request tokens, in addition to permissions of the user account.
+          Client accounts for a REST API would need permission to validate access tokens using the
+          authorization server API, but a REST API may be restricted from requesting new access tokens.
+        </p>
+        <p>
+          This screen capture shows the form used to edit client account records.
+          A similar form is used to create new client account records.
+          The subsequent table explains each client property and it's use.
+        </p>
+        <div><img src="images/edit-client.png" alt="Edit Client Form" width="790" height="651"></div>
+
+        <div class="vh-20"></div>
+
+        <table>
+          <tbody>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+            <tr>
+              <td>id</td>
+              <td>V4 UUID</td>
+              <td>Unique identifier for the client record.
+                <br>The value is generated automatically.
+                <br>It is not editable after the record is created.</td>
+            </tr>
+            <tr>
+              <td>Name</td>
+              <td>String</td>
+              <td>Descrptive Name of the client account
+                <br>When trustedClient is set to false, the client name will
+                display on the confirmation dialog for access to specific resource.
+                <br>Allowed characters:
+                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@'</td>
+            </tr>
+            <tr>
+              <td>clientId</td>
+              <td>String</td>
+              <td>
+                  The unique client id used to form credentials for authorization.
+                  <br>Allowed characters:
+                  <br>'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@';
+                  <br>It is not editable after the record is created.</td>
+            </tr>
+            <tr>
+              <td>clientSecret</td>
+              <td>String</td>
+              <td>A password type string used to form credentials for authorization.
+                  <br>Client secret stored as plain text in development configuration
+                  <br>Client secret is encrypted using crypto-js/aes with postgresql storage.
+                  <br>Visible in editor when OAUTH2_EDITOR_SHOW_CLIENT_SECRET=true
+              </td>
+            </tr>
+            <tr>
+              <td>trustedClient</td>
+              <td>Boolean</td>
+              <td>Trusted = true (checked).
+                When set to true, the oauth2 workflow will present the user with a
+                confirmation dialog to confirm permission for a specific resource.
+                <br>When set to false, the oauth2 workflow will proceed directly
+                to authorization code.
+            </tr>
+            <tr>
+              <td>allowedScope</td>
+              <td>Array of String</td>
+              <td>The client allowedScope represents a scope value for the server using the
+                client account. See the <a href="scope.html">Scope</a> section.
+                <br>This should be entered in the editor form as comma separated strings without quotes.
+                <br>Example: api.read, auth.token
+                <br>Allowed Characters:
+                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_'</td>
+            </tr>
+            <tr>
+              <td>allowedRedirectURI</td>
+              <td>Array of Strings</td>
+              <td>During the oauth workflow for code grant or implicit grant, the user
+                web browser submits the redirect URI. The redirectURI is used to designate the
+                return address after the authorization server completes authentication of the user.
+                In order to prevent submission of malicious redirectURI addresses from the user web browser,
+                the authorization server maintains a list of allowed addresses for each client account.
+                This is not applicable to grant types client grant and password grant and would be left blank.
+                A mismatch will generate an error and the workflow will fail.
+                <br>This should be entered in the editor form as comma separated strings without quotes.
+                <br>Example: http://localhost:3000/login/callback, http://www.example.com/login/callback
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+        <div class="vh-20"></div>
+        <div class="section-title">View Statistics</div>
+        <p>
+          The authorization server contains some counters that can be viewed in the admin editor.
+        </p>
+        <div><img src="images/stats.png" alt="Statistics Page" width="293" height="512" ></div>
+
+        <div class="vh-20"></div>
+        <div class="section-title">Remove all tokens and sessions</div>
+        <p>
+          This function will remove all access-tokens and refresh-tokens
+          from the database. All remote web servers and resource servers
+          will need to obtain new tokens to continue access. Authorization
+          server stored sessions are also cleared, requiring users to
+          login to the authorization server with a username and password.
+          Note: Sessions and cookies of remote web servers are not
+          impacted, however, stored tokens on these remote web servers
+          will have been revoked.
+        </p>
+
+        <div class="desc-title">
+          Changes by User
+        </div>
+        <p>
+          This program does not support the capability of a user to view, modify or
+          delete their own user record.
+        </p>
+        <div class="section-title">Change Password</div>
+        <p>
+          If a user account has been assigned role &quot;auth.password&quot; or
+          &quot;auth.admin&quot; the user will be able to change their
+          own password using the &quot;/changepassword&quot; route on
+          the authorization server.
+        </p>
+        <div><img src="images/password.png" alt="Password Form" width="348" height="417" ></div>
+
+        <div class="vh-20"></div>
+
+      </div> <!-- /text-div -->
+
+    </div> <!-- scrollable-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/collab-auth">
+        https://github.com/cotarr/collab-auth</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>

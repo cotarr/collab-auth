@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+
+		<title>Deployment</title>
+    <link rel="stylesheet" href="css/styles.css">
+	</head>
+	<body>
+    <div class="head-fixed">
+      Documentation for
+      <a href="https://github.com/cotarr/collab-auth">collab-auth</a>
+    </div>
+    <div class="menu-div-fixed">
+      <div class="menu-div">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="installation.html">Install Demo</a></li>
+          <li><a class="active" href="deployment.html">Deployment</a></li>
+          <li><a href="admin.html">Admin Editor</a></li>
+          <li><a href="scope.html">Scope and Role</a></li>
+          <li><a href="env.html">Env Vars</a></li>
+          <li><a href="faq.html">FAQ</a></li>
+          <li><a href="references.html">References</a></li>
+          <li><a href="license.html">License</a></li>
+        </ul>
+      </div>
+    </div> <!-- /menu-div-->
+
+    <div class="scrollable-div">
+
+      <div class="text-div">
+        <div class="desc-title">
+          Deployment
+        </div>
+        <div class="section-title">Discalimer</div>
+        <p>
+          This project was created and deployed one time on a personal server as a learning exercise.
+          This does NOT imply the project is deployment ready for other use cases.
+
+        </p>
+        <div class="section-title">Deployment Experience</div>
+        <ul>
+          <li>Deployed one time successfully</li>
+          <li>Commercial cloud VPS Droplet</li>
+          <li>1 Core</li>
+          <li>1024 MB RAM</li>
+          <li>Debian 10</li>
+          <li>PostgreSQL 11</li>
+          <li>Node 14</li>
+          <li>IPV4 and IPV6</li>
+          <li>Start: user crontab script</li>
+          <li>Certs: Lets Encrypt</li>
+        </ul>
+
+        <div class="section-title">General Recommendations</div>
+        <ul>
+          <li>
+            Review the code - No formal code review has been performed.
+          </li>
+          <li>
+            Test before use - Testing was limited to general debugging during coding.
+          </li>
+          <li>
+            Use &quot;npm outdated&quot; and &quot;npm audit&quot to check to package dependencies.
+          </li>
+          <li>
+            Run the instance of node.js as a non-privledged user.
+          </li>
+          <li>
+            Require TLS 1.2 or greater for encryption to protect submitted credentials.
+          </li>
+          <li>
+            Protect postgresql port from direct internet access using a firewall such as iptables.
+          </li>
+          <li>
+            Use unix enviornment variables for credentials.
+            When using a &quot;.env&quot; file remove public access file permissions.
+          </li>
+          <li>Consider using a dedicated server for the oauth server.</li>
+          </ol>
+          </ol>
+          <li>
+            Develop a backup and recovery strategy. Test it.
+          </li>
+          <li>
+            Consider risk assessment tools - All use cases differ. It may be useful to
+            identify possible weaknesses and develop mitigating actions
+          </li>
+        </ul>
+
+        <div class="section-title">Install Repository</div>
+        <p>
+          This will assume you are have experience and are comfortable deploying
+          express/nodejs servers in a command line shell.
+        </p>
+        <p>
+          Create a dedicated non-privileged user. Login as the non-privledged user.
+          Open a command line terminal in the user's home directory or other
+          directory where the repository will be installed.
+          Clone the collab-auth repository and install the npm package dependencies.
+          The &quot;ci&quot clean install option will remove previous packages before install.
+          An environment variable NODE_ENV=production is required.
+          &quot;export NODE_ENV=production&quot; may be added to the .bashrc script
+          for the non-privledged user.
+        </p>
+<pre class="pre-div">
+git clone git@github.com:cotarr/collab-auth.git
+cd collab-auth
+npm ci
+</pre>
+        <p>
+          If you do not wish to install the entire repository with the documentation and
+          git commit history, only the following files and folders are required for deployment.
+          Sub-folder contents should be included.
+          Folders for node_modules and logs will be created automatically.
+        </p>
+<pre class="pre-div">
+bin/
+data/
+public/
+server/
+SQL-tools/
+views/
+
+package.json
+package-lock.json
+</pre>
+        <div class="section-title">Configuration Variables</div>
+        <p>
+          Program default configuration is stored in the &quot;server/config/index.js&quot;
+          Configuration parameters can be overridden using unix environment variables.
+          The configuration file will load the npm dotenv package in order to support
+          an optional &quot;.env&quot file in the base folder of the repository.
+          Boolean values should be set as environment variable string values
+          &quot;true&quot; or &quot;false&quot;.
+          Configuration items discussed in the following sections may be modified in
+          either the configuration file or in the environment variables.
+        </p>
+        <div class="section-title">Server TCP Listening Port</div>
+        <p>
+          The default server port is TCP port 3500. In Debian 10 and node 14,
+          the server will accept connection using IPV4 and IPV6 on all interfaces.
+          The configured port number will be printed to console.log on program start.
+          Use the following environment variable assignment to configure a custom port number.
+        </p>
+<pre class="pre-div">
+SERVER_PORT=3500
+</pre>
+        <div class="section-title">Firewall Configuration</div>
+        <p>
+          Firewall filter rules can be quite complex and therefore beyond the scope
+          of these instructions. However, at minimum, one port must be opened to
+          allowing incoming TCP connections to the authorization server port.
+        </p>
+        <p>
+          If you intend to include rate limiting rules at the firewall, the authorization
+          server will need to accommodate access_token validation requests from resource servers,
+          such as a REST API, that may occur as users navigate web pages.
+        </p>
+        <p>
+          Assuming you will be using PostgreSQL database locally, the PostgreSQL
+          ports must also be protected from external internet access (see below).
+        </p>
+        <p>
+          Non-privledged unix accounts do not have access to reserved port 443 to use
+          HTTPS connections for TLS. There are several ways for a non-privledged user to
+          access port 443 including reverse proxy, docker container, or firewall rules
+          to exchange port numbers at the network level.
+        </p>
+        <p>
+          When this was deployed for personal use as a learning exercise,
+          the ports were switched using the following iptables rules.
+          These rules must be temporarily disabled and replaced with standard port 443 INPUT rules
+          in order to use Lets Encrypt certbot renew.
+          Caution: You should not try something like this unless you have reviewed other rules
+          in your firewall to make sure there are no conflicts that could block other
+          connections such as SSH on port 22.
+        </p>
+
+<pre class="pre-div">
+# Allow access to port 443 for oauth server
+/sbin/iptables  -A INPUT -p tcp --dport 3500  -m comment --comment "INPUT ACCEPT 443 --> 3500" -j ACCEPT
+/sbin/ip6tables -A INPUT -p tcp --dport 3500  -m comment --comment "INPUT ACCEPT 443 --> 3500" -j ACCEPT
+
+# redirect port 443 for oauth server
+/sbin/iptables  -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3500
+/sbin/ip6tables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3500
+
+# port 999 is reserved and blocked port to catch connections to original 3500 port.
+/sbin/iptables  -A PREROUTING -t nat -i eth0 -p tcp --dport 3500 -j REDIRECT --to-port 999
+/sbin/ip6tables -A PREROUTING -t nat -i eth0 -p tcp --dport 3500 -j REDIRECT --to-port 999
+</pre>
+
+        <div class="section-title">Domain Name Configuration</div>
+        <p>
+          To function properly on the internet, a fully qualified domain name must be used.
+          It is required that the full domain name of the authorization server be different
+          from any of the web servers or resource server that use the authorization server.
+          This would avoid overlap of any cookies related to the authorization server domain name.
+        </p>
+        <p>
+          If you are familiar with running express/nodejs servers, then you are familiar with
+          this process of registering a unique domain name and creating DNS A and AAAA
+          records for the domain name using the IP address of the authorization server.
+        </p>
+        <p>
+          The authorization server will need to know it's full URL starting with the https:// protocol.
+          It will also need to know the full hostname of the sever without the https:// protocol.
+          If there is a non-standard port number, it should be appended to both as shown below.
+          Do not append 443 when using the standard port.
+          This refers to the internet visible port, which may be different from the server
+          listen port if they were changed by the firewall or reverse proxy.
+        </p>
+        <p>
+          Example using standard 443 port with TLS.
+        </p>
+
+<pre class="pre-div">
+SITE_AUTH_URL=https://auth.example.com
+SITE_OWN_HOST=auth.example.com
+</pre>
+        <p>Or, with non-standard ports:</p>
+<pre class="pre-div">
+SITE_AUTH_URL=https://auth.example.com:3500
+SITE_OWN_HOST=auth.example.com:3500
+</pre>
+
+        <div class="section-title">Virtual Host Configuration</div>
+        <p>
+          This is optional. By default the vhost configuration is set to &quot;*&quot;
+          which will disable hostname checking. If a vhost domain name is configured, any http
+          request not matching the intended hostname will return a 404 Not Found response.
+          This is not intended to allow multiple vhosts, but rather it is intended to
+          reduce attack surface by blocking requests that are addressed to the server
+          numeric IP address and only permitting requests to the servers domain name.
+          The port number is not included.
+        </p>
+<pre class="pre-div">
+SITE_VHOST=auth.example.com
+</pre>
+        <div class="section-title">TLS Configuration</div>
+        <p>
+          When deployed for use on the internet, valid domain certificates
+          should be used for encryption of https requests to the server and
+          verification of the hostname. Use of TLS is critical to protecting
+          passwords and access_tokens in transit on the internet.
+          Generation of TLS certificates for a domain name is beyond the scope of this
+          document.
+        </p>
+        <p>
+          When this was deployed as as a learning exercise, the Lets Encrypt certbot
+          was used to generate TLS certificates.
+          In this case, there was an issue because the non-privileged user account
+          did not have access to the /etc/letsencrypt system folder.
+          This was solved by using a bash script to copy the Lets Encrypt TLS certificates
+          to the non-privileged user folder and set file permissions.
+          Obviously, there are other ways to address this.
+          The full chain file was used to include the CA certificates.
+        </p>
+        <p>
+          TLS is enabled by setting &quot;SERVER_TLS&quot; to the string value &quot;true&quot;
+          as shown below. By default, the minimum TLS version is set to TLS 1.2 in
+          the bin/www file, which seemed reasonable considering this is an authorization server.
+        </p>
+        <p>
+          The express/node.js web server will read TLS certificates at startup
+          using configuration settings. The following can be set using
+          Unix environment variables or including in a .env file.
+          A relative path can be used. Edit the filenames as needed.
+        </p>
+
+<pre class="pre-div">
+SERVER_TLS_KEY=/home/someuser/tls/auth_privkey.pem
+SERVER_TLS_CERT=/home/someuser/tls/auth_fullchain.pem
+SERVER_TLS=true
+</pre>
+
+        <div class="section-title">Token Certificates</div>
+
+        <p>
+          Openssl is used as a command line tool to generate a pair of files containing the RSA keys.
+          The RSA private key is used add a digital signature to a new token using the "RS256" algoithm.
+          The RSA public key is used to verify the signature whe then token is decoded.
+          Although the "certifiacte.pem" file is a standard self signed SSL/TLS web certificate,
+          only the RSA Public-Key within the certificate appears to be relevant.
+          The certificate attributes for "Validity Not After:..." and "Subject: CN..."
+          appear to be ignored. The presence of an expired TLS certificate expiration date
+          does not appear to generate any errors when decoding the JWT token.
+          Therefore, these files can be considered as non-expiring credentials and 
+          the certificate validity dates, which default to 30 days, are ignored.
+        </p>
+        <p>
+          In the case of this program, each JWT token will have it's own unique expiration 
+          within the digitally signed token payload, so ignoring the alternate 
+          certificate date this does not appear to an issue.         
+        </p>
+        <p>
+          The following commands can be used to generate the RSA keys.          
+        </p>
+
+        <pre class="pre-div">
+cd data/token-certs/
+openssl req -newkey rsa:2048 -nodes -keyout privatekey.pem -x509 -out certificate.pem -subj "/CN=collab-auth"
+cd ../..
+</pre>
+      <ul>
+        <li>Token certificates are located in data/token-certs/</li>
+        <li>The .gitignore should include  data/token-certs/*.pem</li>
+      </ul>
+
+        <div class="section-title">Log File Configuration</div>
+
+        <p><b>TBD</b> log files, location, filter, PID for logrotate</p>
+<pre class="pre-div">
+SERVER_PID_FILENAME=
+</pre>
+
+        <div class="section-title">PostgreSQL User Database</div>
+        <p>
+          By default, when operating in the development environment,
+          the database is emulated using data storage in RAM variables.
+          This is not suitable for deployment because all data will be
+          lost when the program is stopped.
+        </p>
+        <p>
+          For deployment to production, configuration options enable use of a PostgreSQL database
+          for storage of access tokens, refresh tokens, user accounts and client accounts.
+          When the database option is enabled, user passwords are hashed using bcrypt.
+          Client secrets are encrypted using crypto-js/aes for storage in the database.
+          Client secrets may be visible in plain text using the editor in the administration page
+          if this is enabled in the configuration.
+        </p>
+        <p>
+          Requirements:
+        </p>
+        <ul>
+          <li>This program was developed using PostgreSQL version 11.</li>
+
+          <li>It is assumed you are familiar with installation of PostgreSQL.</li>
+          <li>Postgresql access restrictions have been configured in the pg_hba.conf file.</li>
+          <li>Dedicated postgresql user account and password have been created.</li>
+          <li>The postgresql UUID extension has been installed for the user account.</li>
+          <li>Database named &quot;collabauth&quot; created with ownership by the dedicated postgres user account</li>
+          <li>The database is running locally and the connection
+            will use localhost 127.0.0.1 without TLS encryption.</li>
+          <li>The firewall must protect the PostgreSQL port from external internet connections.</li>
+          <li>The npm package "pg" is used as a PostgreSQL client.</li>
+        </ul>
+        <p>
+          The pg client will use the following environment variables
+          to connect to the database at startup. Use of a .env file is supported by dotenv.
+        </p>
+<pre class="pre-div">
+PGUSER=xxxxxxx
+PGPASSWORD=xxxxxxxx
+PGHOSTADDR=127.0.0.1
+PGPORT=5432
+PGDATABASE=collabauth
+PGSSLMODE=disable
+</pre>
+        <p>
+          Database storage is enabled with the following environment variable.
+          If this is not defined or not contain the string value "true" then
+          the program will revert back to the RAM memory storage option.
+        </p>
+<pre class="pre-div">
+DATABASE_ENABLE_POSTGRES=true
+</pre>
+        <p>
+          Storage of program data requires 4 tables.
+          These tables can be created using the database command line client &quot;psql&quot.
+          The file: &quot;SQL-tools/create-oauth-tables.sql&quot; includes SQL query utility commands.
+          These can by copy/paste directly into the psql client to better observe
+          the result and check for errors.
+        </p>
+        <p>
+          This is a list of required tables
+        </p>
+        <table>
+          <tbody>
+            <tr><th>Table</th><th>Description</th></tr>
+            <tr><td>accesstokens</td><td>Issued access token meta-data</td></tr>
+            <tr><td>refreshtokens</td><td>Issued refresh token meta-data</td></tr>
+            <tr><td>authclients</td><td>Client id, name, client secret</td></tr>
+            <tr><td>authusers</td><td>IUser id, name, hashed password</td></tr>
+          </tbody>
+        </table>
+        <p>
+          A javascript utility located at &quot;SQL-tools/create-postgres-admin-user.js&quot;
+          can be used to create the an initial admin user account.
+          It is then possible to use the admin panel at "/panel/menu"
+          to login as the "admin" user and create any additional user or
+          client accounts that may be needed.
+          When run from the command line terminal, this will prompt
+          for input: User number (default=1000), Username (default=&quot;admin&quot;),
+          Name (default=&quot;Admin Account&quot;), and Password.
+          Further instructions can be found in the
+          <a href="admin.html">Admin Editor</a> section.
+          The utility should be run from base folder of repository folder using:
+        </p>
+<pre class="pre-div">
+npm run create-postgres-admin-user
+</pre>
+
+
+        <div class="section-title">Session database storage</div>
+        <p>
+          The default development configuration uses the npm package "memorystore"
+          to store session information from express-session. Memorystore is a
+          memory safe implementation of RAM memory storage of HTTP sessions.
+          Each time the server is restarted, previous session data is lost,
+          so users must login each time the server is restarted.
+        </p>
+        <p>
+          Optionally, the npm package "connect-pg-simple" can be used to
+          store session data in a PostgreSQL database.
+        </p>
+        <p>
+          Session storage will use the same PostgreSQL database that was used previously
+          to store user and client accounts.
+          It is assumed the database has been created and the environment variables have been
+          configured to allow the pg client to connect at program startup (see instructions above).
+        </p>
+        <p>
+          One table needs to be created for storage of session data. There is a SQL script
+          located at &quot;SQL-tools/create-session-table.sql&quot; that contains SQL query commands
+          to create the required database table. The contents can be copy/pasted into the
+          psql terminal database client.
+        </p>
+        <p>
+          After the table has been created, PostgreSQL database storage is enabled using
+          the following environment variable.
+          If this is not defined or not contain the string value "true" then
+          the program will revert back to memorystore.
+        </p>
+<pre class="pre-div">
+SESSION_ENABLE_POSTGRES=true
+</pre>
+
+        <div class="section-title">Security.txt Contacts</div>
+        <p>
+          The authorization server supports use of a security.txt file as
+          described at <a href="https://securitytxt.org/">https://securitytxt.org/</a>.
+          The specification defines a URL route at &quot;.well-known/security.txt&quot;
+          that is intended to provide a method to notify the owner of the server in the
+          event that a security issue is detected. This is disabled by default.
+          To enable the security.txt notification, set the following environment variables.
+          Remember to replace the contact with your contact.
+          The time must be in standard unix format typically 1 year ahead.
+          (Suggested bash command: &quot;date --date='1 year' --iso-8601=seconds&quot;)
+        </p>
+<pre class="pre-div">
+SITE_SECURITY_CONTACT=security@example.com
+SITE_SECURITY_EXPIRES="2022-12-26T05:39:02-06:00"
+</pre>
+        <p>
+          Server response to &quot;.well-known/security.txt&quot;
+        </p>
+<pre class="pre-div-out">
+# Website security contact
+Contact: security@example.com
+Expires: 2022-12-26T05:39:02-06:00
+</pre>
+
+        <div class="section-title">Disable Features</div>
+        <p>
+          There is a common security suggestion that states:
+          If you are not using something on a server, remove it.
+          It decreases the attack surface should a vulnerability be found in the future.
+        </p>
+        <p>
+          This oauth2orize library supports Oauth 2.0 grant types:
+          code grant, client grant, password grant, implicit grant, and refresh token grant.
+          In the event that some grant types are not required for your use case, each grant type
+          may be disabled individually in the configuration. This will prevent the oauth2orize server
+          from loading the associated callback. Requests would be treated as an error for
+          unsupported grant type. In addition, the input validation checker would
+          block the request should the request parameters contain an improper grant_type parameter.
+          The boolean value should be an environment variable string &quottrue&quot.
+          By default, if the environment variable is missing, the grant type is enabled.
+          This is optional. Disable as needed.
+          It is necessary to restart the nodejs server after making changes.
+        </p>
+<pre class="pre-div">
+OAUTH2_DISABLE_TOKEN_GRANT=true
+OAUTH2_DISABLE_CODE_GRANT=true
+OAUTH2_DISABLE_CLIENT_GRANT=true
+OAUTH2_DISABLE_PASSWORD_GRANT=true
+OAUTH2_DISABLE_REFRESH_TOKEN_GRANT=true
+</pre>
+        <p>
+          Likewise, the authorization server includes an administration page that can be used
+          to add, edit, or delete user account records and client account records. Access to the
+          admin editor requires a user account to have scope &quot;auth.admin&quot;
+          listed as a user role.
+        </p>
+        <p>
+          If the user database does not require frequent changes, the administration page found at
+          &quot;/panel/menu&quot may be disabled in the configuration.
+          Requests to &quot;/panel/menu&quot; will return 404 Not Found.
+          It is necessary to restart the nodejs server after making changes.
+        </p>
+<pre class="pre-div">
+DATABASE_DISABLE_WEB_ADMIN_PANEL=true
+</pre>
+        <p>
+          When using the PostreSQL database option, client secrets are encrypted before storage
+          in the database using crypto-js/aes. During deployment on a personal server and
+          home network, numerous Raspberry Pi IOT devices were configured to use access_tokens.
+          It was useful to have the capability to view existing client secrets in plain text.
+          By default, the client edit form will present an empty input element
+          for the client secret. Entry of a new client secret will replace the previous client
+          secret. As a configuration option the visibility of the client secret may be enabled
+          in the configuration and the server restarted.
+        </p>
+<pre class="pre-div">
+OAUTH2_EDITOR_SHOW_CLIENT_SECRET=true
+</pre>
+
+        <div class="section-title">Cookie/Session Configuration</div>
+<pre class="pre-div">
+SESSION_SET_ROLLING_COOKIE=false
+SESSION_NOT_SESSION_COOKIE=false
+SESSION_EXPIRE_SEC=3600
+SESSION_PRUNE_INTERVAL_SEC=3600
+SESSION_SECRET="A Secret That Should Be Changed"
+</pre>
+
+        <div class="section-title">Oauth 2.0 Token Configuration</div>
+<pre class="pre-div">
+OAUTH2_CLIENT_SECRET_AES_KEY="A Secret That Should Be Changed"
+OAUTH2_TOKEN_EXPIRES_IN_SECONDS=3600
+OAUTH2_REFRESH_TOKEN_EXPIRES_IN_SECONDS=2592000
+OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=86400
+</pre>
+
+        <div class="section-title">Hard Coded Configuration</div>
+        <p>
+          This following options are hard coded. Changes would require
+          modification of repository javascript code.
+        </p>
+        <ul>
+          <li>Login form display title (views/login.ejs)</li>
+          <li>Site content security policy CSP (server/app.js)</li>
+          <li>Robot exclusion policy (server/app.js)</li>
+          <li>Various cookie and session parameters (server/app.js)</li>
+          <li>Minimum TLS version 1.2 (bin/www)</li>
+          <li>Server bound to all network interfaces (bin/www)</li>
+          <li>Log file configuration (server/log-config.js)</li>
+          <li>Access token contents and cipher</li>
+        </ul>
+
+
+        <div class="section-title">Starting the Server</div>
+        <p>
+          Ideally the server should be run in the background using the non-privledged account.
+          This can easily be done using a user crontab and shell script.
+          In it's current form, this is not capable to run as a unix service using systemd.
+          The following commands are examples of server startup to run in the
+          foreground of the non-privileged user command line terminal.
+        </p>
+<pre class="pre-div">
+export NODE_ENV=production
+npm start
+</pre>
+        <p>Or equivalently:</p>
+<pre class="pre-div">
+export NODE_ENV=production
+node bin/www
+</pre>
+        <p>
+          While in production mode (NODE_ENV=production) the log output can
+          be redirected to the terminal by running the server in the foreground
+          with the following command. (NODE_DEBUG_LOG variable not supported in .env file.)
+        </p>
+<pre class="pre-div">
+export NODE_ENV=production
+NODE_DEBUG_LOG=1 npm start
+</pre>
+
+        <p>
+          When the server has successfully started, the following
+          startup information will be logged to logs/node.log.
+        </p>
+
+<pre class="pre-div-out">
+Server timestamp: 2021-11-06T15:01:00.337Z
+Using PostgreSQL for OAuth2 storage.
+Auth activity Log: /home/someuser/node/collab-auth/logs/auth.log
+Vhost: auth.example.com
+logFolder /home/someuser/node/collab-auth/logs
+HTTP Access Log: /home/someuser/node/collab-auth/logs/access.log
+Using PostgreSQL connect-pg-simple for session storage
+Serving static files from /home/someuser/node/collab-auth/public
+NODE_ENV production starting https  (TLS encrypted)
+listening: :::3500 IPv6
+</pre>
+        <div class="vh-20"></div>
+
+
+      <div class="section-title">Testing comments</div>
+      <p>
+        The authorization server includes some additional middleware. 
+        <ul>
+          <li>express-validator - input syntax validation (422 Unprocessable Entity)</li>
+          <li>csurf - cross-site protection, csurf tokens (403 Forbidden)</li>
+          <li>express-rate-limit - brute force mitigation (429 Too many requests)</li>
+        </ul>
+        In most cases, this mitigation middleware is applied before a submission reaches
+        the core oauthorize server and it's customized callback functions.
+        The addition of secondary middleware protections can make it difficult to test oauth code.
+      </p>
+      <p>
+        For example, consider a test to challenge a user password form submission 
+        for a case of missing password data. What would happend if the oauthorize custom 
+        callback function for user database lookup and password hash comparrison actually had 
+        a coding error that failed to reject submissions with missing password data?
+        This coding error could be overlooked because the test expected an error, but 
+        the expected error may have been generated by input validation or rate limit 
+        and viewed as a successful test without actually challenging the password lookup.
+      </p>
+      <p>
+        One way to approach testing is to disable the different middleware and test independently.
+        In order to manage this, the chained node/express middleware functions 
+        are written with one middleware per line to allow 
+        each middleware to be disabled for testing by prefixing the line with 
+        javascript // comment caracters.
+        Below is an example of the oauth 2.0 decision dialog route showing 
+        the input validation and scrf protection middlewares. The core oauth2 function 
+        is server.decision(), shown here following the other middleware.
+      </p>
+<pre class="pre-div">
+exports.decision = [
+  login.ensureLoggedIn(),
+  inputValidation.dialogAuthDecision,
+  csrfProtection,
+  server.decision(),
+  server.authorizationErrorHandler(),
+  server.errorHandler()
+];
+</pre>
+        <p>
+          These critical routes with concurrent middleware should be limited to 
+          the following 3 files.
+          <ul>
+            <li>admin-panel.js</li>
+            <li>oauth2.js</li>
+            <li>site.js</li>
+          </ul>
+        </p>
+        <p>
+          As a side note, an argument can be made that the oauthorize library 
+          is robustly coded and has a good track record. 
+          Therefore the addition of csrf protection and input validation 
+          may not be necessary for the oauth routes. On the other hand, 
+          they may needlessly increase the attack surface and make things worse. 
+          However, they are likely needed for the admin panel account editor 
+          as it is a simple form editor.
+        </p>
+
+      </div> <!-- /text-div -->
+      <div class="vh-20"></div>
+      <div class="vh-20"></div>
+
+    </div> <!-- scrollable-div -->
+
+    <div class="footer-div">
+      Repository:
+      <a href="https://github.com/cotarr/collab-auth">
+        https://github.com/cotarr/collab-auth</a>
+    </div> <!-- /footer-div -->
+	</body>
+</html>
