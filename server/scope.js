@@ -292,6 +292,7 @@ exports.toScopeString = (scopeArray) => {
  * @returns {Array} Returns aray of scope strings
  */
 exports.toScopeArray = (scopeString) => {
+  if (typeof scopeString !== 'string') return [];
   let cleanString = '';
   const scopeStringLength = scopeString.length;
   for (let i = 0; i < scopeStringLength; i++) {
