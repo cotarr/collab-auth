@@ -230,7 +230,7 @@ if (!config.database.disableWebAdminPanel) {
 // Secure link to challenge cookie
 // ---------------------------------
 app.get('/secure', (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (req.isAuthenticated && req.isAuthenticated()) {
     res.json({ authenticated: true });
   } else {
     res.set('Content-Type', 'text/plain').status(401).send('Unauthorized');
