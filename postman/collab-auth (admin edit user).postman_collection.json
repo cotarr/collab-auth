@@ -113,7 +113,6 @@
 							"    pm.globals.unset('testUserNumber');",
 							"    pm.globals.unset('testUserNumber');",
 							"    pm.globals.unset('createdUserUuid');",
-							"",
 							"});",
 							""
 						],

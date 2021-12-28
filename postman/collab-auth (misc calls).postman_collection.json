@@ -188,46 +188,6 @@
 			"response": []
 		},
 		{
-			"name": "/logout (session)",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{auth_host}}/logout",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "2 /login (form, csrfToken)",
 			"event": [
 				{
@@ -249,7 +209,11 @@
 							"        }",
 							"    } // next i",
 							"    // console.log('csrf_token: ', csrfToken);",
-							"    pm.globals.set('csrf_token', csrfToken);",
+							"    if (csrfToken) {",
+							"        pm.globals.set('csrf_token', csrfToken);",
+							"    } else {",
+							"        throw new Error('A csrf token was not found in html form');",
+							"    }",
 							"});",
 							""
 						],
@@ -297,6 +261,15 @@
 							"    pm.response.to.have.status(302);",
 							"});",
 							"",
+							"pm.test(\"Redirect address is /dialog/authorize\", function () {",
+							"    let location = pm.response.headers.get('Location');",
+							"    if (location) {",
+							"        location = location.split('?')[0];",
+							"        pm.expect(location).to.equal('/dialog/authorize');",
+							"    } else {",
+							"        throw new Error('Location header not found in 302 redirect')",
+							"    }",
+							"});",
 							""
 						],
 						"type": "text/javascript"
@@ -372,7 +345,11 @@
 							"        }",
 							"    } // next i",
 							"    // console.log('csrf_token: ', csrfToken);",
-							"    pm.globals.set('csrf_token', csrfToken);",
+							"    if (csrfToken) {",
+							"        pm.globals.set('csrf_token', csrfToken);",
+							"    } else {",
+							"        throw new Error('csrf token not found in html page.')",
+							"    }",
 							"});"
 						],
 						"type": "text/javascript"
@@ -744,6 +721,22 @@
 		},
 		{
 			"name": "/secure",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Your test name\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    if ((!('authenticated' in jsonData)) || (!jsonData.authenticated)) {",
+							"        throw new Error('Expected { authenticated: true }');",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"request": {
 				"method": "GET",
 				"header": [],

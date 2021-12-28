@@ -12,8 +12,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 404\", function () {",
-							"    pm.response.to.have.status(404);",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
 							"});",
 							"",
 							"pm.test(\"Unset global variables\", function () {",
@@ -42,12 +42,12 @@
 					}
 				],
 				"url": {
-					"raw": "{{auth_host}}/not-found",
+					"raw": "{{auth_host}}/status",
 					"host": [
 						"{{auth_host}}"
 					],
 					"path": [
-						"not-found"
+						"status"
 					]
 				}
 			},
@@ -60,14 +60,23 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Extract tokens to global variables\", function () {",
-							"    let accessToken = pm.response.json()['access_token'];",
-							"    pm.globals.set('access_token', accessToken);",
-							"    pm.globals.set('refresh_token', null);",
-							"});",
-							"",
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Extract tokens to global variables\", function () {",
+							"    pm.globals.set('access_token', null);",
+							"    pm.globals.set('refresh_token', null);",
+							"    let accessToken = pm.response.json()['access_token'];",
+							"    if (accessToken) {",
+							"        pm.globals.set('access_token', accessToken);",
+							"    } else {",
+							"        throw new Error('An access_token was not found in response');",
+							"    }",
+							"    let refreshToken = pm.response.json()['refresh_token'];",
+							"    if ((refreshToken) && (refreshToken.length > 0)) {",
+							"        throw new Error('Client grant should not have refresh_token')",
+							"    }",
 							"});",
 							""
 						],
@@ -130,7 +139,7 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
-							"pm.test(\"body has grant type password\", function () {",
+							"pm.test(\"body has grant type client_credentials\", function () {",
 							"    var jsonData = pm.response.json();",
 							"    pm.expect(jsonData.grant_type).to.eql(\"client_credentials\");",
 							"});",
