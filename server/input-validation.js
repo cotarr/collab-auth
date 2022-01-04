@@ -105,7 +105,7 @@ const handleErrorOauth = (req, res, next) => {
 /**
  * Middleware to check input for extraneous keys.
  *
- * check all keys in query object, extraneous keyes are error
+ * check all keys in query object, extraneous keys are error
  *
  * Accepts req.query or req.body or req.params as checkObject
  * modifies req object
@@ -118,6 +118,9 @@ const handleErrorOauth = (req, res, next) => {
  *       checkExtraneousKeys(req, allowedKeys, location);
  *       next();
  *     },
+ *
+ * @param {Array} allowedKeys - Array containing allowed key string
+ * @param {string|Array} location - Allowed: body, query, params, noquery
  */
 const checkExtraneousKeys = function (allowKeys, location) {
   return (req, res, next) => {
@@ -213,6 +216,8 @@ exports.loginPostRequest = [
 
 /**
  * Validate input for ?id=UUID.v4
+ *
+ * Array of middleware functions for input validation
  */
 exports.viewByUUID = [
   checkExtraneousKeys(['id'], 'query'),
@@ -223,6 +228,8 @@ exports.viewByUUID = [
 
 /**
  * Validate input for ?id=UUID.v4
+ *
+ * Array of middleware functions for input validation
  */
 exports.deleteByUUID = [
   checkExtraneousKeys(['_csrf', 'id'], 'body'),
@@ -448,6 +455,11 @@ exports.createClient = [
   handleErrorHTTP
 ]; // createClient
 
+/**
+ * Edit Client POST request
+ *
+ * Array of middleware functions for input validation
+ */
 exports.editClient = [
   checkExtraneousKeys([
     '_csrf',
@@ -503,6 +515,11 @@ exports.editClient = [
   handleErrorHTTP
 ]; // editClient
 
+/**
+ * Authorization GET request with query parameters in URL at /dialog/authorize
+ *
+ * Array of middleware functions for input validation
+ */
 exports.dialogAuthorization = [
   checkExtraneousKeys([
     'redirect_uri',
@@ -532,6 +549,11 @@ exports.dialogAuthorization = [
   handleErrorOauth
 ];
 
+/**
+ * Decision POST request with query parameters in URL at /dialog/authorize/decision
+ *
+ * Array of middleware functions for input validation
+ */
 exports.dialogAuthDecision = [
   checkExtraneousKeys([
     '_csrf',
@@ -542,6 +564,8 @@ exports.dialogAuthDecision = [
 ];
 
 /**
+ * Token Request POST request /oauth/token
+ *
  *                client code pass token refresh
  *  grant_type       x     x    x          x
  *  scope            x          x
@@ -594,6 +618,11 @@ exports.oauthToken = [
   handleErrorOauth
 ];
 
+/**
+ * Token Revoke POST request /oauth/token/revoke
+ *
+ * Array of middleware functions for input validation
+ */
 exports.oauthTokenRevoke = [
   checkExtraneousKeys([
     'access_token',
@@ -605,6 +634,11 @@ exports.oauthTokenRevoke = [
   handleErrorOauth
 ];
 
+/**
+ * Token introspect POST request /oauth/introspect
+ *
+ * Array of middleware functions for input validation
+ */
 exports.oauthIntrospect = [
   checkExtraneousKeys([
     'access_token',

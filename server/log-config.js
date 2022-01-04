@@ -49,6 +49,11 @@ if (logToFile) {
   }
 }
 
+/**
+ * Morgan logger configuration
+ * @property {string} logConfig.format - Morgan format string
+ * @property {Object} logConfig.options - Morgan options
+ */
 const logConfig = {};
 
 logConfig.format = ':date[iso] :remote-addr :status :method :http-version :req[host]:url';

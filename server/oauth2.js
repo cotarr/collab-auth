@@ -7,7 +7,7 @@
  * applications limited access to their protected resources.  It does this
  * through a process of the user granting access, and the client exchanging
  * the grant for an access token.
-*/
+ */
 
 // NPM packages
 const login = require('connect-ensure-login');

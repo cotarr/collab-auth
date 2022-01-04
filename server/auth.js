@@ -44,7 +44,7 @@ passport.use(new LocalStrategy({ passReqToCallback: true }, (req, username, pass
 /**
  * BasicStrategy & ClientPasswordStrategy
  *
- * Basic Stratecy ('basic')
+ * Basic Strategy ('basic')
  *
  * These strategies are used to authenticate registered OAuth clients.  They are
  * employed to protect the `token` endpoint, which consumers use to obtain
@@ -81,7 +81,7 @@ passport.use(new ClientPasswordStrategy({ passReqToCallback: true },
   }
 ));
 
-// Register serialialization and deserialization functions.
+// Register serialization and deserialization functions.
 //
 // When a client redirects a user to user authorization endpoint, an
 // authorization transaction is initiated.  To complete the transaction, the

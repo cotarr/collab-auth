@@ -25,6 +25,8 @@ const logUtils = require('./log-utils');
  *
  * Previous failed login message added by ejs when query
  * parameter retry is yes, example: /login?retry=yes
+ *
+ * Array of middleware functions
  */
 exports.loginForm = [
   inputValidation.loginGetRequest,
@@ -59,6 +61,8 @@ exports.redirectError = [
  * Password submission rate limiter using express-rate-limit
  * Limit per IP address for POST request to /login
  * Successful request add to count.
+ *
+ * Middleware function
  */
 const passwordRateLimit = rateLimit({
   windowMs: config.limits.passwordRateLimitTimeMs,
@@ -73,6 +77,8 @@ const passwordRateLimit = rateLimit({
  * POST /login (credentials in body)
  * Upon success return to saved URL, else show redirect error message.
  * Includes rate limiter, input validation, csrf token.
+ *
+ * Array of middleware functions
  */
 exports.login = [
   passwordRateLimit,
@@ -119,7 +125,7 @@ const validateAndHashPassword = (req, res, user) => {
 };
 
 /**
- * Change Password Form
+ * Change Password <form> GET /password
  */
 exports.changePassword = [
   ensureLoggedIn(),
@@ -154,6 +160,8 @@ exports.changePassword = [
  *    req.body.oldpassword
  *    req.body.newpassword1
  *    req.body.newpassword2
+ *
+ *  Array of middleware
  */
 exports.changePasswordHandler = [
   ensureLoggedIn(),

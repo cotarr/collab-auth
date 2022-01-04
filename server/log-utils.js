@@ -26,9 +26,11 @@ if (logToFile) {
   console.log('Auth activity Log: (Console)');
 }
 
-//
-// Authorization log file (Option: setup to fail2ban to block IP addresses)
-//
+/**
+ * Write string to authorization log file: logs/auth.log
+ * @param {Object} req - Express request object
+ * @param {string} message - Message to write to log file
+ */
 const _addMessageWithAddress = (req, message) => {
   const now = new Date();
   let logEntry = now.toISOString();
@@ -59,6 +61,12 @@ const _addMessageWithAddress = (req, message) => {
   }
 };
 
+/**
+ * Function to handle user login entry to log file
+ * @param {*} req - Express request object
+ * @param {*} user - Object containing user properties
+ * @returns {Promise} Resolves to user object (unmodified)
+ */
 const logPassportLocalLogin = function (req, user) {
   return new Promise((resolve) => {
     const message = 'Successful login: ' + user.username;
@@ -68,15 +76,30 @@ const logPassportLocalLogin = function (req, user) {
   });
 };
 
+/**
+ * Function to handle errors entry to log file
+ * @param {Object} req - Express request object
+ * @param {Error} err - Error object
+ */
 const logPassportLocalError = function (req, err) {
   const message = 'Login failure: ' + err.message;
   _addMessageWithAddress(req, message);
 };
 
+/**
+ * Function to handle admin activity entry to log file
+ * @param {Object} req - Express request object
+ * @param {string} message - Message to log
+ */
 const adminLogActivity = function (req, message) {
   _addMessageWithAddress(req, 'Admin activity: ' + message);
 };
 
+/**
+ * Function to handle user activity entry to log file
+ * @param {Object} req - Express request object
+ * @param {string} message - Message to log
+ */
 const userLogActivity = function (req, message) {
   _addMessageWithAddress(req, 'User activity: ' + message);
 };

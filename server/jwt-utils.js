@@ -22,7 +22,7 @@ const publicKey = fs.readFileSync(path.join(__dirname, '../data/token-certs/cert
  * payload.sub - Subject, user ID (UUID), or if client token, client ID (UUID)
  * payload.jti - Json Token ID (UUID generated here)
  *
- * @param  {Object} payload JWT Token payload
+ * @param  {Object} payload - JWT Token payload
  * @return {String} The JWT Token
  */
 exports.createToken = (payload) => {

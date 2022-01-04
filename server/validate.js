@@ -17,7 +17,7 @@ const validate = Object.create(null);
 /**
  * Timing safe compare, from express-basic-auth
  * @param   {Stromg} userInput - Express request object
- * @param   {String} secret username from passport change form
+ * @param   {String} secret - username from passport change form
  * @returns {Boolean} Return true if successful match, else false
  */
 const safeCompare = function (userInput, secret) {
@@ -101,7 +101,7 @@ validate.userExists = (user) => {
  * Compares cookie/session authenticated username in http request to string username
  * This is used for change password form to make sure matches user
  * @param   {Object} req - Express request object
- * @param   {String} username username from passport change form
+ * @param   {String} username - username from passport change form
  * @returns {Promise} Promise resolving to useraname as String
  */
 validate.usernameMatchesSession = (req, username) => {
@@ -277,7 +277,7 @@ validate.authCode = (code, authCode, client, redirectURI) => {
 };
 
 /**
- * This is a place where new refresh_tokens can be disabled independant of
+ * This is a place where new refresh_tokens can be disabled independent of
  * the access_token. THe scope parameter can be used exclude refresh_token
  * based on scope. THis is currently disabled by commenting out the line.
  *

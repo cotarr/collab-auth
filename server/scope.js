@@ -76,7 +76,7 @@ exports.requireScopeForOauthHTTP = (requiredScope) => {
 /**
  * Middleware for enforcing client scope /oauth/token route (pre-check)
  *
- * This scope is checked and bloced in the oauth2orize callback.
+ * This scope is checked and blocked in the oauth2orize callback.
  * However, errors are difficult to trap in the callback, so
  * the scope is also pre-checked here to make elegant errors messages.
  *
@@ -91,6 +91,9 @@ exports.requireScopeForOauthHTTP = (requiredScope) => {
  * into the passport client authorization strategy, where req.locals.clientScope is added.
  *
  * If scope found, passes next(), else returns HTTP error
+ *
+ * @param {string|array} requiredUserScope - User role(s)
+ * @param {string|array} requiredClientScope - Client allowedScope(s)
  */
 exports.clientScopePrecheckForTokenHTTP = (requiredUserScope, requiredClientScope) => {
   if ((requiredUserScope == null) ||
@@ -178,6 +181,7 @@ exports.clientScopePrecheckForTokenHTTP = (requiredUserScope, requiredClientScop
  *    req.user.name (for page header)
  *
  * If scope found, passes next(), else returns HTTP error
+ * @param {string|array} requiredScope - User role(s) for admin access.
  */
 exports.requireScopeForWebPanel = (requiredScope) => {
   if ((requiredScope == null) ||

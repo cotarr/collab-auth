@@ -88,7 +88,7 @@ router.get('/listusers',
 /**
  * View user record endpoint
  *
- * User record ID is passed as a GET query paraeter
+ * User record ID is passed as a GET query parameter
  */
 router.get('/viewuser',
   ensureLoggedIn(),
@@ -441,7 +441,7 @@ router.get('/listclients',
 /**
  * View client record endpoint
  *
- * Client record ID is passed as a GET query paraeter
+ * Client record ID is passed as a GET query parameter
  */
 router.get('/viewclient',
   ensureLoggedIn(),

@@ -2,7 +2,7 @@
 
 'use strict';
 
-// Read /.env file and set enviornment variables in process.env
+// Read /.env file and set environment variables in process.env
 require('dotenv').config();
 
 const config = require('../server/config/');

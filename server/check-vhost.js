@@ -22,8 +22,8 @@ if (vhost) {
 }
 /**
  * Express middleware to accept HTTP request by passing to next()
- * when the HTTP request domain name matchs configuration value
- * otherise return 404 not found.
+ * when the HTTP request domain name matches configuration value
+ * otherwise return 404 not found.
  */
 const rejectNotVhost = function (req, res, next) {
   if (vhost) {
@@ -43,10 +43,9 @@ const rejectNotVhost = function (req, res, next) {
 };
 
 /**
- * isVhostMatch returns true if HTTP request domain name
- * matches configuration file, else return false.
+ * Function to detect hostname match
  * @param   {Object} req - Express request object
- * @returns {boolean}
+ * @returns {boolean} Returns true when configured domain name matches, else return false.
  */
 const isVhostMatch = function (req) {
   if (vhost) {
@@ -64,10 +63,9 @@ const isVhostMatch = function (req) {
 };
 
 /**
- * notVhostMatch returns false if HTTP request domain name
- * matches configuration file, else return true for mis-match.
+ * Function to detect hostname not match
  * @param   {Object} req - Express request object
- * @returns {boolean}
+ * @returns {boolean} Returns false when configured domain name matches, else return true.
  */
 const notVhostMatch = function (req) {
   if (vhost) {
@@ -87,6 +85,9 @@ const notVhostMatch = function (req) {
   }
 };
 
+/**
+ * Virtual host rejection middleware
+ */
 module.exports = {
   rejectNotVhost: rejectNotVhost,
   isVhostMatch: isVhostMatch,

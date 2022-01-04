@@ -25,7 +25,7 @@ const pgPool = require('./pg-pool');
 
 /**
  * Returns a client if it finds one, otherwise returns null if a client is not found.
- * @param   {String}   id   - The unique id of the client to find
+ * @param   {String}   id - The unique id of the client to find
  * @returns {Promise}  resolved promise with the client if found, otherwise undefined
  */
 exports.find = (id) => {
@@ -72,7 +72,7 @@ exports.findAll = () => {
 
 /**
  * Save a new client record to the database
- * @param   {Object}   client Object containing client properties
+ * @param   {Object}   client - Object containing client properties
  * @returns {Promise}  resolved promise with the client if found, otherwise throws error
  */
 exports.save = (client) => {
@@ -121,7 +121,7 @@ exports.save = (client) => {
 
 /**
  * Modify an existing client record
- * @param   {Object}   client Object containing modified client properties
+ * @param   {Object}   client - Object containing modified client properties
  * @returns {Promise}  resolved promise with the modifiedclient, otherwise throws error
  */
 exports.update = (client) => {
@@ -175,7 +175,7 @@ exports.update = (client) => {
 
 /**
  * Delete a client record by marking property deleted = true
- * @param   {Object}   id The id of the object to delete
+ * @param   {Object}   id - The id of the object to delete
  * @returns {Promise}  resolved promise with celeted client object, otherwise throws error
  */
 exports.delete = (id) => {

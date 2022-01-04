@@ -12,7 +12,7 @@ let codes = Object.create(null);
 
 /**
  * Returns an authorization code if it finds one, otherwise returns null if one is not found.
- * @param   {String}  code - Theauthorization code to find.
+ * @param   {String}  code - The authorization code to find.
  * @returns {Promise} resolved with the authorization code if found, otherwise undefined
  */
 exports.find = (code) => {
@@ -30,7 +30,7 @@ exports.find = (code) => {
  * @param   {String}  redirectURI    - Redirect URI of where to send access tokens once exchanged
  * @param   {String}  userID         - The user ID (required)
  * @param   {Number}  expirationDate - The code expiration milliseconds
- * @param   {String}  scope          - The scope (optional)
+ * @param   {Array}   scope          - The scope array (optional)
  * @returns {Promise} resolved with the saved token
  */
 exports.save = (code, clientID, redirectURI, userID, expirationDate, scope) => {

@@ -20,6 +20,9 @@
 
 const config = require('./config');
 
+/**
+ * Route handler for security.txt
+ */
 module.exports = (req, res, next) => {
   if (config.site.securityContact.length > 0) {
     res.set('Content-Type', 'text/plain').send(

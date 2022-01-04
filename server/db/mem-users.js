@@ -33,7 +33,7 @@ try {
  * from making unintended changes to RAM database.
  * JSON parse errors to be trapped in parent function
  *
- * @param   {Object} user User object
+ * @param   {Object} user - User object
  * @returns {Object} New deep copy user object
  */
 const _deepCopyUser = (user) => {
@@ -91,6 +91,7 @@ exports.findAll = () => {
 
 /**
  * Updates the lastLogin column of user record to the current date/time
+ * @param {Object} user - Object containing user properties
  * @returns {Promise} resolved to modified user, otherwise resolves undefined
  */
 exports.updateLoginTime = (user) => {
@@ -108,7 +109,7 @@ exports.updateLoginTime = (user) => {
 
 /**
  * Save a new user record to the database
- * @param   {Object}   user Object containing new created user properties
+ * @param   {Object}   user - Object containing new created user properties
  * @returns {Promise}  resolved promise created use, otherwise user exist throws error
  */
 exports.save = (user) => {
@@ -143,7 +144,7 @@ exports.save = (user) => {
 
 /**
  * Modify an existing user record
- * @param   {Object}   user Object containing modified user properties
+ * @param   {Object}   user - Object containing modified user properties
  * @returns {Promise}  resolved promise with the modified user, otherwise throws error
  */
 exports.update = (user) => {
@@ -172,8 +173,8 @@ exports.update = (user) => {
 
 /**
  * Modify password for existing user by user id
- * @param   {String}  id String containing UUID for record
- * @param   {String}  password String containing new password entry
+ * @param   {String}  id - String containing UUID for record
+ * @param   {String}  password - String containing new password entry
  * @returns {Promise} resolved promise with the modified user, otherwise throws error
  */
 exports.updatePassword = (id, password) => {
@@ -200,7 +201,7 @@ exports.updatePassword = (id, password) => {
 
 /**
  * Delete a user record
- * @param   {Object}   id The id of the object to delete
+ * @param   {Object}   id - The id of the object to delete
  * @returns {Promise}  resolved promise with celeted user object, otherwise throws error
  */
 exports.delete = (id) => {

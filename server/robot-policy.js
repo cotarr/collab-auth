@@ -9,9 +9,9 @@
 // ----------------------------------------------
 'use strict';
 
-//
-// Robot exclusion policy (robots.txt)
-//
+/**
+ * Route handler for /robots.txt
+ */
 module.exports = (req, res) => {
   res.set('Content-Type', 'text/plain').send(
     'User-agent: *\n' +
