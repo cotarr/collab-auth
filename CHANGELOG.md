@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Untagged 2021-12-30
+## Untagged 2022-01-05
 
 ### Fixed
 
@@ -14,6 +14,7 @@ and this project adheres to
 
 ### Changed
 
+- Edit JavaScript comments (no code changes) 2022-01-05
 - Updated postman collections. 2021-12-28
 
 ## [v0.0.2](https://github.com/cotarr/collab-auth/releases/tag/v0.0.2) - 2021-12-27
