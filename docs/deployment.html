@@ -133,7 +133,7 @@ package-lock.json
           Configuration parameters can be overridden using unix environment variables.
           The configuration file will load the npm dotenv package in order to support
           an optional &quot;.env&quot file in the base folder of the repository.
-          Boolean values should be set as environment variable string values
+          Boolean values should be set as environment variable lower case string values
           &quot;true&quot; or &quot;false&quot;.
           Configuration items discussed in the following sections may be modified in
           either the configuration file or in the environment variables.
@@ -281,7 +281,7 @@ SERVER_TLS=true
 
         <p>
           Openssl is used as a command line tool to generate a pair of files containing the RSA keys.
-          The RSA private key is used add a digital signature to a new token using the "RS256" algoithm.
+          The RSA private key is used to add a digital signature to a new token using the "RS256" algoithm.
           The RSA public key is used to verify the signature whe then token is decoded.
           Although the "certifiacte.pem" file is a standard self signed SSL/TLS web certificate,
           only the RSA Public-Key within the certificate appears to be relevant.
@@ -321,8 +321,9 @@ SERVER_PID_FILENAME=
         <p>
           By default, when operating in the development environment,
           the database is emulated using data storage in RAM variables.
-          This is not suitable for deployment because all data will be
-          lost when the program is stopped.
+          This is not suitable for deployment in a production enviornment 
+          because passwords and client secrets are stored in plain text, and 
+          all account edits will be lost each time the program is stopped.
         </p>
         <p>
           For deployment to production, configuration options enable use of a PostgreSQL database
@@ -411,11 +412,24 @@ npm run create-postgres-admin-user
           to store session information from express-session. Memorystore is a
           memory safe implementation of RAM memory storage of HTTP sessions.
           Each time the server is restarted, previous session data is lost,
-          so users must login each time the server is restarted.
+          so users must login to the authorization server each time the collab-auth server is restarted.
+          This will not impact collab-frontend web server, or other web servers, as they have their own cookies.
         </p>
         <p>
           Optionally, the npm package "connect-pg-simple" can be used to
-          store session data in a PostgreSQL database.
+          store session data in a PostgreSQL database. This would permit cookies to remain 
+          persistent across restarts of the collab-auth authorization server.
+        </p>
+        <p>  
+          Some online discussion claim using PostgreSQL for session storage may be slow 
+          compared to RAM memory cached alternatives like Redis or memorystore.
+          However, with collab-auth, the cookie and session storage are only relevant 
+          during interactive browser calls like password entry or using the admin panel.
+          This occurs infrequently, therefore postgresql seems reasonable 
+          for session storage where persistence is needed. 
+          Since memorystore includes pruning of obsolete records, either postgresql or memorystore 
+          options should be acceptable for session storage when used with 
+          limited deployments, like a home network.
         </p>
         <p>
           Session storage will use the same PostgreSQL database that was used previously
@@ -479,7 +493,7 @@ Expires: 2022-12-26T05:39:02-06:00
           unsupported grant type. In addition, the input validation checker would
           block the request should the request parameters contain an improper grant_type parameter.
           The boolean value should be an environment variable string &quottrue&quot.
-          By default, if the environment variable is missing, the grant type is enabled.
+          By default all grant type are enabled (Disabled false).
           This is optional. Disable as needed.
           It is necessary to restart the nodejs server after making changes.
         </p>
@@ -520,6 +534,19 @@ OAUTH2_EDITOR_SHOW_CLIENT_SECRET=true
 </pre>
 
         <div class="section-title">Cookie/Session Configuration</div>
+        <p>
+          By default, browser cookies for the collab-auth authorization server
+          are created as session cookies. The cookie will not be issued an 
+          expiration date, but remain valid until the browser is closed.
+        </p>
+        <p>
+          Setting SESSION_NOT_SESSION_COOKIE=true will instruct the server to 
+          add a cookie expiration time as specified in SESSION_EXPIRE_SEC.
+          Optionally, this can become a rolling cookie by setting 
+          SESSION_SET_ROLLING_COOKIE=true so a new cookie expiration date 
+          is issued with each browser interaction.
+        </p>
+
 <pre class="pre-div">
 SESSION_SET_ROLLING_COOKIE=false
 SESSION_NOT_SESSION_COOKIE=false
@@ -557,7 +584,7 @@ OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=86400
         <p>
           Ideally the server should be run in the background using the non-privledged account.
           This can easily be done using a user crontab and shell script.
-          In it's current form, this is not capable to run as a unix service using systemd.
+          In it's current form, collab-auth is not capable to run as a unix service using systemd.
           The following commands are examples of server startup to run in the
           foreground of the non-privileged user command line terminal.
         </p>
@@ -642,7 +669,7 @@ exports.decision = [
 ];
 </pre>
         <p>
-          These critical routes with concurrent middleware should be limited to 
+          These critical routes with concurrent middleware should only appear in 
           the following 3 files.
           <ul>
             <li>admin-panel.js</li>

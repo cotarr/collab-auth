@@ -171,8 +171,8 @@ listening: :::3500 IPv6
           steps fail, check the address bar to see if http is
           being automatically upgrade to http(s) TLS request by the browser.
           In my development VM in October 2021, the Linux version of the
-          Chrome web browser still worked without issue issuing
-          non-encrypted http requests to localhost or 127.0.0.1.
+          both Chromium and Chrome web browser still worked without issue when sending
+          non-encrypted http requests to localhost or 127.0.0.1.    
         </p>
         <p>
           If your web browser requires a temporary self signed TLS 
@@ -259,7 +259,7 @@ cat users-db.json
 
         <p>
           The diagram below shows the frontend web server at the center.
-          The overall purpose of the collab-frontend repository demonstrate the relationship
+          The overall purpose of the collab-frontend repository is to demonstrate the relationship
           between the user's cookie stored in the web browser on the left, the user's
           Oauth 2.0 access_token, stored in the frontend
           web server in the middle, and use of the token to access resources on the
@@ -297,7 +297,7 @@ npm install
 npm start
 </pre>
         <p>
-          This will start a express/node.js server running in the foreground.
+          This will start an express/node.js server running in the foreground.
           It may be stopped at any time by pressing Ctrl-c.
           Check the output for errors. Response should appear as follows:
         </p>
@@ -354,8 +354,8 @@ listening: :::3000 IPv6
           the web server searches the session store for a matching cookie.
           No cookie is found. The connection is assumed to be unauthorized.
           The web server will send a redirect (302) to the
-          browser to redirect to a URL for a landing page at
-          &quot;/unauthorized&quot; path on the web server.
+          browser to redirect to a URL for a landing page at path 
+          &quot;/unauthorized&quot; on the web server.
         </p>
         <div><img src="images/landing.png" alt="Unauthorized landing page" width="506" height="94"></div>
         <p>
@@ -704,8 +704,7 @@ QkseSgdL9TrTsLg
         <div class="desc-title">Part 3 of 4 - Mock REST API</div>
 
         <p>
-          The collab-backend-api repository is a mock REST API using passport with
-          strategy passport-http-bearer.
+          The collab-backend-api repository is a mock REST API.
           The mock database includes one table to accept POST and GET requests.
           In memory RAM variables are used to emulate database storage.
           API access is restricted using Oauth 2.0 bearer tokens.
@@ -889,9 +888,9 @@ listening: :::4000 IPv6
 2021-10-31T15:03:27.482Z ::ffff:127.0.0.1 200 POST 1.1 127.0.0.1:3500/oauth/introspect
 </pre>
         <p>
-          When the backend API recieves the response from the authorization server, it will
+          When the backend API receives the response from the authorization server, it will
           confirm response status equals 200. The token meta-data will be parsed to
-          confirm the property active equals true. The API will extract a string
+          confirm the property &quot;active&quot; equals true. The API will extract a string
           containing the access_token's scope value. The scope restrictions may be
           specific to an individual route or database table. In this case, api.read or
           api.write is required to perform a database read. If the scope is insufficient
@@ -1015,8 +1014,8 @@ listening: :::4000 IPv6
         <div class="section-title">Clone Repository</div>
         <p>
           This Mock IOT device will also run in a separate terminal window.
-          Leave the previous authorization server terminal, web server terminal open,
-          and the backend API terminal.
+          Leave the previous authorization server terminal, web server terminal,
+          and the backend API terminal open.
           Open a fourth command line terminal for the Mock IOT device.
           Use the following commands to clone the collab-iot-device repository and install
           package dependencies.
@@ -1113,7 +1112,7 @@ npm start
           When the backend API receives the response from the token validation by the
           authorization server, the backend API will honor the request and perform a
           write query to the database, saving the data point. After successful addition
-          of the data to the database, the backend API will complete the IOT device by sending a
+          of the data to the database, the backend API will complete the request to the IOT device by sending a
           response to the IOT device with status 201 (Created) as shown in the backend API access log.
         </p>
 <pre class="pre-div-out">

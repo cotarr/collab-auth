@@ -73,6 +73,10 @@
                 <td>Mock REST API using tokens to authorize requests</td>
               </tr>
               <tr>
+                <td><a href="https://github.com/cotarr/collab-backend-token-auth">collab-backend-token-auth</a></td>
+                <td>(npm package) authorization middleware for collab-backend-api</td>
+              </tr>
+              <tr>
                 <td><a href="https://github.com/cotarr/collab-iot-device">collab-iot-device</a></td>
                 <td>Mock IOT Device with data acquisition saved to DB</td>
               </tr>
@@ -129,7 +133,7 @@
         <p>
           My personal web pages were put together using an
           <a href="https://expressjs.com/">Express.js</a>
-          web server running under <a href="https://nodejs.org/">Node.js</a> on a Debian Linux server.
+          web server running under <a href="https://nodejs.org/">Node.js</a> on a Debian 10 Linux server.
           I was most comfortable with a solution that could run in that environment.
         </p>
         <p>
@@ -154,7 +158,9 @@
           Expanding on the examples in Oauth2orizeRecipes, passport is an elegant way
           to insert authentication into an express server request/response flow as
           an express middleware. Passport has individual "strategy" modules that
-          fully support Oauth 2.0.
+          fully support Oauth 2.0. However, since this was a learning project, it is also instructive
+          to replace some of the passport middleware with custom code. The collab-backend-api and
+          collab-iot-device do not use passport.
         </p>
         <p>
           <a href="https://www.postman.com/downloads/">Postman</a> -
@@ -195,6 +201,8 @@
           so the user's web browser would be redirected to authorization server for password entry,
           then redirected back to the mock web server URL with an authorizaton code.
           The web server then exchanged the code for an access_token which it stores on the user's behalf.
+          It currently uses passport-oauth2 to obtain the first token, then upon expiration, use 
+          custom code to exchange refresh tokens for replacement access tokens.
         </p>
         <p>
           Mock Backend API - A third github repository
@@ -203,6 +211,8 @@
           using in-memory variables. The purpose of the mock REST API server is to accept
           HTTP requests containing an Oauth 2.0 bearer token. The token is validated by
           sending it to the authorization server before fulfilling the database query.
+          Version 0.0.1 used passport-http-bearer as authorization middleware, but this
+          was replaced with custom middleware in v0.0.2.
         </p>
         <p>
           Mock IOT Device - Lastly, a forth repository

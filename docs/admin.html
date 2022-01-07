@@ -88,7 +88,7 @@
               <td>id</td>
               <td>V4 UUID</td>
               <td>Unique identifier for the user record.
-                <br>The value generated automatically.
+                <br>The value is generated automatically.
                 <br>It is not editable after the record is created.</td>
             </tr>
             <tr>
@@ -104,7 +104,7 @@
               <td>String</td>
               <td>Real name of user.
                 <br>Allowed characters:
-                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@'</td>
+                <br>abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@</td>
             </tr>
             <tr>
               <td>username</td>
@@ -112,13 +112,18 @@
               <td>
                   The unique username used in the login form along side password.
                   <br>Allowed characters:
-                  <br>'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@';
+                  <br>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@;
                   <br>It is not editable after the record is created.</td>
             </tr>
             <tr>
               <td>password</td>
               <td>String</td>
-              <td>User's password used in the login form.</td>
+              <td>
+                User's password used in the login form.
+                <br>Users password is stored as plain text in development configuration
+                <br>Users password is hashed using bcrypt when used with postgresql storage.
+
+              </td>
             </tr>
             <tr>
               <td>loginDisabled</td>
@@ -138,7 +143,7 @@
                 <br>This should be entered in the editor form as comma separated strings without quotes.
                 <br>Example: api.read, user.password
                 <br>Allowed Characters:
-                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_'</td>
+                <br>abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_</td>
             </tr>
           </tbody>
         </table>
@@ -186,7 +191,7 @@
                 <br>When trustedClient is set to false, the client name will
                 display on the confirmation dialog for access to specific resource.
                 <br>Allowed characters:
-                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@'</td>
+                <br>abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@</td>
             </tr>
             <tr>
               <td>clientId</td>
@@ -194,7 +199,7 @@
               <td>
                   The unique client id used to form credentials for authorization.
                   <br>Allowed characters:
-                  <br>'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@';
+                  <br>abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.-_@
                   <br>It is not editable after the record is created.</td>
             </tr>
             <tr>
@@ -223,7 +228,7 @@
                 <br>This should be entered in the editor form as comma separated strings without quotes.
                 <br>Example: api.read, auth.token
                 <br>Allowed Characters:
-                <br>'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_'</td>
+                <br>abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_</td>
             </tr>
             <tr>
               <td>allowedRedirectURI</td>
@@ -237,6 +242,8 @@
                 A mismatch will generate an error and the workflow will fail.
                 <br>This should be entered in the editor form as comma separated strings without quotes.
                 <br>Example: http://localhost:3000/login/callback, http://www.example.com/login/callback
+                <br>Allowed Characters:
+                <br>abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:,"\'/%._-?&
               </td>
             </tr>
           </tbody>

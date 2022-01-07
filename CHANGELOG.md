@@ -16,6 +16,7 @@ and this project adheres to
 ### Changed
 
 - Update helmet version from v4 to v5.0.1 2022-01-08
+- Additional improvement of /docs 2022-01-08
 - Edit JavaScript comments (no code changes) 2022-01-05
 - Updated postman collections. 2021-12-28
 
