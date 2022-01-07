@@ -9,7 +9,8 @@ and this project adheres to
 ## Untagged 2022-01-05
 
 ### Fixed
-
+- mem-clients.js RAM memory database, update function for edit client record missing trustedClient property causing change to be ignored 2022-01-08
+- input-validation.js create client missing trustedClient property causing 422 response 2022-01-08
 - input-validation.js create or edit client would not accept multiple redirect URI due to missing comma in `usrAllowedChars` 2021-12-30
 
 ### Changed

@@ -148,6 +148,7 @@ exports.update = (client) => {
     if (!err) {
       // write changes to RAM database
       foundClient.name = client.name;
+      foundClient.trustedClient = client.trustedClient;
       if ((client.clientSecret) && (client.clientSecret.length > 0)) {
         foundClient.clientSecret = client.clientSecret;
       }

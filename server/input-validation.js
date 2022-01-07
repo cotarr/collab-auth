@@ -406,6 +406,7 @@ exports.createClient = [
     'name',
     'clientId',
     'clientSecret',
+    'trustedClient',
     'allowedScope',
     'allowedRedirectURI'], 'body'),
   // Forbidden body keys
