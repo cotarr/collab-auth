@@ -6,12 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Untagged
+## [v0.0.4](https://github.com/cotarr/collab-auth/releases/tag/v0.0.4) - 2022-03-19
 
 ### Changed
 
 - server/site.js - Upgrade options for express-rate-limit upgrade to v6 2022-03-19
 - app.js update comments for helmet v5.0.1 (no code change) 2022-01-08
+- .github/workflows/codeql-analysis.yml - Disable CodeQL cron schedule.
 
 ### Package updates
 
