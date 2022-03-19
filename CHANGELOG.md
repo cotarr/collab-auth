@@ -15,7 +15,7 @@ and this project adheres to
 
 ### Package updates
 
-express-rate-limit@6.3.0
+dotenv@16.0.0, express@4.17.3, express-rate-limit@6.3.0, helmet@5.0.2, memorystore@1.6.7, pg@8.7.3
 
 ## [v0.0.3](https://github.com/cotarr/collab-auth/releases/tag/v0.0.3) - 2022-01-08
 
