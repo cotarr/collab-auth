@@ -69,7 +69,8 @@ const passwordRateLimit = rateLimit({
   max: config.limits.passwordRateLimitCount,
   statusCode: 429,
   message: 'Too many requests',
-  headers: false
+  standardHeaders: false,
+  legacyHeaders: false
 });
 
 /**

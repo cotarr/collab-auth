@@ -10,9 +10,14 @@ and this project adheres to
 
 ### Changed
 
+- server/site.js - Upgrade options for express-rate-limit upgrade to v6 2022-03-19
 - app.js update comments for helmet v5.0.1 (no code change) 2022-01-08
 
-## [v0.0.3](https://github.com/cotarr/collab-auth/releases/tag/v0.0.3) -2022-01-08
+### Package updates
+
+express-rate-limit@6.3.0
+
+## [v0.0.3](https://github.com/cotarr/collab-auth/releases/tag/v0.0.3) - 2022-01-08
 
 ### Fixed
 - mem-clients.js RAM memory database, update function for edit client record missing trustedClient property causing change to be ignored 2022-01-08
