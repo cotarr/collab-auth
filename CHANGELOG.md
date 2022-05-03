@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.0.6](https://github.com/cotarr/collab-auth/releases/tag/v0.0.5) - 2022-05-03
+
+### Changed
+
+- Update ejs package version from 3.1.6 to 3.1.7 to address github dependabot security advisory.
+
 ## [v0.0.5](https://github.com/cotarr/collab-auth/releases/tag/v0.0.5) - 2022-03-30
 
 ### Changed

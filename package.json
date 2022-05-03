@@ -1,6 +1,6 @@
 {
   "name": "collab-auth",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
@@ -26,7 +26,7 @@
     "crypto-js": "^4.1.1",
     "csurf": "^1.11.0",
     "dotenv": "^16.0.0",
-    "ejs": "^3.1.6",
+    "ejs": "^3.1.7",
     "express": "^4.17.3",
     "express-rate-limit": "^6.3.0",
     "express-session": "^1.17.2",
