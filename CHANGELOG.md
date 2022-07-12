@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next 2022-07-12
+## [v0.0.7](https://github.com/cotarr/collab-auth/releases/tag/v0.0.7) 2022-07-12
 
 ### Changed
 
@@ -20,7 +20,7 @@ and this project adheres to
 - Update express 4.17.3 to 4.18.1, express-rate-limit 6.3.0 to 6.4.0, express-session from 1.17.2 to 1.17.3, express-validator from 6.14.0 to 6.14.2
 - Update dotenv from 16.0.0 to 16.0.1, ejs 3.1.7 to 3.1.8, helmet 5.0.2 to 5.1.0
 
-## [v0.0.6](https://github.com/cotarr/collab-auth/releases/tag/v0.0.5) - 2022-05-03
+## [v0.0.6](https://github.com/cotarr/collab-auth/releases/tag/v0.0.6) - 2022-05-03
 
 ### Changed
 
