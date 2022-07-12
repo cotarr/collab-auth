@@ -231,6 +231,9 @@ app.post('/oauth/token/revoke', oauth2.revoke);
 // --------------------------------------------------
 if (!config.database.disableWebAdminPanel) {
   app.use('/panel', adminPanel);
+  console.log('Admin panel: Enabled');
+} else {
+  console.log('Admin panel: Disabled');
 }
 
 // ---------------------------------

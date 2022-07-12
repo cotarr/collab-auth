@@ -14,6 +14,7 @@ and this project adheres to
 - package.json - Bumped passport from v0.5.2 to v0.6.0 to address github dependabot security advisory realted to session fixation attack.
 - server/site.js - Added callback function to req.logout() to support required breaking change in passport v0.6.0
 - server/site.js - Added `keepSessionInfo: true` to passport.authenticate() to preserve callback URI after passport v0.6.0 upgrade.
+- server/app.js - On startup, console log shows admin panel status as Enabled or Disabled
 
 ### Changed
 - Update express 4.17.3 to 4.18.1, express-rate-limit 6.3.0 to 6.4.0, express-session from 1.17.2 to 1.17.3, express-validator from 6.14.0 to 6.14.2
