@@ -86,7 +86,14 @@ exports.login = [
   inputValidation.loginPostRequest,
   csrfProtection,
   passport.authenticate('local',
-    { successReturnToOrRedirect: '/redirecterror', failureRedirect: '/login?retry=yes' }
+    {
+      // V0.0.7 - Notes
+      // The keepSessionInfo was added to support passport 0.6.0.
+      // The value is set to true to retain the callback URI stored in the user's session.
+      successReturnToOrRedirect: '/redirecterror',
+      failureRedirect: '/login?retry=yes',
+      keepSessionInfo: true
+    }
   )
 ];
 
@@ -94,8 +101,14 @@ exports.login = [
  * Logout of the system and render logout info page
  */
 exports.logout = (req, res, next) => {
-  req.logout();
-  return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
+  // V0.0.7 Note: callback function added to support passport v0.6.0 update
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    } else {
+      return res.set('Cache-Control', 'no-store').render('logout', { name: '' });
+    }
+  });
 };
 
 /**

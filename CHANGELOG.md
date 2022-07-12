@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Next 2022-07-12
+
+### Changed
+
+- package.json - Bumped passport from v0.5.2 to v0.6.0 to address github dependabot security advisory realted to session fixation attack.
+- server/site.js - Added callback function to req.logout() to support required breaking change in passport v0.6.0
+- server/site.js - Added `keepSessionInfo: true` to passport.authenticate() to preserve callback URI after passport v0.6.0 upgrade.
+
 ## [v0.0.6](https://github.com/cotarr/collab-auth/releases/tag/v0.0.5) - 2022-05-03
 
 ### Changed

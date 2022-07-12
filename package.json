@@ -36,7 +36,7 @@
     "memorystore": "^1.6.7",
     "morgan": "^1.10.0",
     "oauth2orize": "^1.11.1",
-    "passport": "^0.5.2",
+    "passport": "^0.6.0",
     "passport-http": "^0.3.0",
     "passport-local": "^1.0.0",
     "passport-oauth2-client-password": "^0.1.2",
