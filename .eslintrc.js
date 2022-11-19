@@ -8,7 +8,7 @@ module.exports = {
     'standard'
   ],
   parserOptions: {
-    ecmaVersion: 12
+    ecmaVersion: 'latest'
   },
   ignorePatterns: ['*.ejs'],
   rules: {
@@ -18,6 +18,7 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     'max-len': ['error', { code: 100, tabWidth: 2, ignoreUrls: true }],
     // 'max-len': 'off',
-    semi: ['error', 'always']
+    semi: ['error', 'always'],
+    'object-shorthand': 'off'
   }
 };
