@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Changed
+
+- Update dev dependency eslint@8.28.0 with new eslint dependencies an update eslintrc.js
+- Update express@4.18.2, dotenv@16.0.3, express-rate-limit@6.7.0, helmet@6.0.0
+
 ## [v0.0.8](https://github.com/cotarr/collab-auth/releases/tag/v0.0.8) 2022-11-13
 
 ### Changed
