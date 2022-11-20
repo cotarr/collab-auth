@@ -26,13 +26,23 @@ if (config.server.tls) {
   const options = {
     key: fs.readFileSync(config.server.serverTlsKey),
     cert: fs.readFileSync(config.server.serverTlsCert),
-    minVersion: 'TLSv1.2'
+    minVersion: 'TLSv1.2',
+    handshakeTimeout: 5000
   };
   server = https.createServer(options, app);
 } else {
   console.log('NODE_ENV ' + nodeEnv + ' starting http (non-encrypted)');
   server = http.createServer(app);
 }
+
+// See TLS/SSL handshakeTimeout above
+//
+// Timeout to receive entire client request
+server.requestTimeout = 5000;
+
+// Socket idle timeout
+server.timeout = 5000;
+
 server.listen(config.server.port);
 
 server.on('listening', function () {

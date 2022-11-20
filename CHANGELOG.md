@@ -6,7 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next
+## [v0.0.9](https://github.com/cotarr/collab-auth/releases/tag/v0.0.9) 2022-11-20
+
+### Added
+
+Node/Express configuration change.
+
+- Added 5 second web server timeout for new connections to perform TLS handshake
+- Added 5 second web server timeout for web browser to complete the initial HTTP request
 
 ### Changed
 
