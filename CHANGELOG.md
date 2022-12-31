@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+### Changed
+
+Replaced deprecated package `csurf` with forked repository `@dr.pogodin/csurf`. 
+This package is used to validate CSRF tokens included with POST requests to 
+reduce risk of cross site request forgery attempts. 
+The previous csurf package was deprecated because the author did 
+not have sufficient resources to maintain the package.
+
 ## [v0.0.10](https://github.com/cotarr/collab-auth/releases/tag/v0.0.10) 2022-12-23
 
 ### Changed

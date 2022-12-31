@@ -14,7 +14,7 @@ const login = require('connect-ensure-login');
 const passport = require('passport');
 const oauth2orize = require('oauth2orize');
 const uid2 = require('uid2');
-const csrf = require('csurf');
+const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });
 
 // Custom modules
