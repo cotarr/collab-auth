@@ -13,8 +13,8 @@ and this project adheres to
 Replaced deprecated package `csurf` with forked repository `@dr.pogodin/csurf`. 
 This package is used to validate CSRF tokens included with POST requests to 
 reduce risk of cross site request forgery attempts. 
-The previous csurf package was deprecated because the author did 
-not have sufficient resources to maintain the package.
+
+The forked version is a direct replacement for csurf@1.11.0. No code changes were required.
 
 ## [v0.0.10](https://github.com/cotarr/collab-auth/releases/tag/v0.0.10) 2022-12-23
 
