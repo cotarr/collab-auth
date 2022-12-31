@@ -8,7 +8,7 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
-const csrf = require('csurf');
+const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });
 
 // Custom modules

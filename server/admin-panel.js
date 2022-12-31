@@ -13,7 +13,7 @@ const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scop
 const logUtils = require('./log-utils');
 const stats = require('./stats');
 
-const csrf = require('csurf');
+const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });
 
 const config = require('./config/');
