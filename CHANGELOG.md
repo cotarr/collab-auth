@@ -16,6 +16,10 @@ reduce risk of cross site request forgery attempts.
 
 The forked version is a direct replacement for csurf@1.11.0. No code changes were required.
 
+Update dependencies: connect-pg-simple@8.0.0, helmet@6.0.1, pg@8.8.0, uuid@9.0.0
+
+Update dev-dependencies: eslint@8.31.0 + new eslint dependencies
+
 ## [v0.0.10](https://github.com/cotarr/collab-auth/releases/tag/v0.0.10) 2022-12-23
 
 ### Changed
