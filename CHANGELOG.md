@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.0.12](https://github.com/cotarr/collab-auth/releases/tag/v0.0.12) 2023-01-11
+
+### Changed
+
+This is to address npm audit warning for npm dependency debug<=3.1.0
+
+- Deleted package-lock.json
+- Upgrade dev dependency eslint-plugin-n@15.6.1
+- In package-lock.json, to fix npm audit advisory replace all instance of debug<=3.10 with current debug@4.3.4
+
 ## [v0.0.11](https://github.com/cotarr/collab-auth/releases/tag/v0.0.11) 2023-01-01
 
 ### Changed
