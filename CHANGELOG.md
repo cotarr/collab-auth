@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v0.0.13](https://github.com/cotarr/collab-auth/releases/tag/v0.0.13) 2023-01-11
+
+### Changed
+
+The npm security advisory for debug package has been updated to 
+to incorporate backport debug@2.6.9 as safe. Manual edit of package-lock.json is 
+no longer required.
+
+- Deleted package-lock.json. Ran npm install to create a new package-lock.json.
+
 ## [v0.0.12](https://github.com/cotarr/collab-auth/releases/tag/v0.0.12) 2023-01-11
 
 ### Changed
