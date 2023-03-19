@@ -32,7 +32,9 @@ exports.server = {
     path.join(__dirname, '../../data/tls-certs/certificate.pem'),
   tls: (process.env.SERVER_TLS === 'true') || false,
   port: parseInt(process.env.SERVER_PORT || '3500'),
-  pidFilename: process.env.SERVER_PID_FILENAME || ''
+  pidFilename: process.env.SERVER_PID_FILENAME || '',
+  logRotateInterval: process.env.SERVER_LOG_ROTATE_INTERVAL || '',
+  logFilter: process.env.SERVER_LOG_FILTER || ''
 };
 
 exports.session = {

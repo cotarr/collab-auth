@@ -312,7 +312,49 @@ cd ../..
 
         <div class="section-title">Log File Configuration</div>
 
-        <p><b>TBD</b> log files, location, filter, PID for logrotate</p>
+        <p>
+          Logging to disk file is enabled when the server is started 
+          with NODE_ENV=production, otherwise logging is sent to stdout.
+          Log files are located in the &quot;logs/&quot; folder located in the repository base folder. 
+          The log folder will be created automatically if it does not exist.
+        </p>
+          End user login events and administrative modifications of the client/user 
+          database are logged to the file &quot;logs/auth.log&quot;
+        <p>
+          HTTP access log events will be written to the file &quot;logs/access.log&quot;.
+        </p>
+        <p>
+          HTTP access log filename rotation available, but disabled by default. 
+          Access log filename rotation can be enabled by 
+          assigning the environment variable &quot;SERVER_LOG_ROTATE_INTERVAL&quot;
+          to a configuration string. Log rotate time units (s, m, h, d) 
+          are used to specify the interval string. (Example: '5m', '2h', '1d').
+          This will allow access log file log rotation similar to Linux system files.
+          Files will be renamed access.log.1, access.log.2, up to access.log.5.
+          Older files are discarded when log rotation is enabled.
+        </p>
+        <p> 
+          In some cases the access log may contain excessive entries due to
+          continuous checking of access tokens. It is possible to filter
+          the log file to limit logging to only include HTTP errors where
+          HTTP status codes &lt;400 and 404 will be excluded from the log. 
+          The error filter may be enabled by setting the environment 
+          variable SERVER_LOG_FILTER to the string value &quot;error&quot;
+        </p>
+<pre class="pre-div">
+SERVER_LOG_ROTATE_INTERVAL=7d
+SERVER_LOG_FILTER=error
+</pre>
+        <p>
+          The &quot;auth.log&quot; file is not rotated, filtered, or managed for size.
+        </p>
+        <p>
+          In the case where log files are managed outside the scope of the program,
+          it will be necessary to restart the web server after rename or deletion 
+          of the access log file. The environment variable SERVER_PID_FILENAME
+          can be used to specify the full path filename of a PID file to be 
+          written by the server when it is started.
+        </p>
 <pre class="pre-div">
 SERVER_PID_FILENAME=
 </pre>

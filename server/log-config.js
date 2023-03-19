@@ -12,21 +12,23 @@
 
 const fs = require('fs');
 const path = require('path');
+const rotatingFileStream = require('rotating-file-stream');
+
+// CUstom modules
+const config = require('./config');
 
 const nodeEnv = process.env.NODE_ENV || 'development';
 // in the case of NODE_ENV=production, force logging to console.
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
-let logToFile = (nodeEnv === 'production');
-let errorFilter = (nodeEnv === 'production');
+let logToFile = (nodeEnv   !== 'production');
+let errorFilter = ((nodeEnv   !== 'production') && (config.server.logFilter === 'error'));
 
 // enable console logging in production by export NODE_DEBUG_LOG=1
 if (nodeDebugLog) {
   logToFile = false;
   errorFilter = false;
 }
-// disable
-errorFilter = false;
 
 const logFolder = path.join(__dirname, '../logs');
 const logFilename = logFolder + '/access.log';
@@ -65,16 +67,28 @@ let logStream = '(console)';
 if (logToFile) {
   // for start up message
   logStream = logFilename;
-  // Function to write log entries to file as option property
-  logConfig.options.stream = fs.createWriteStream(logFilename, {
-    encoding: 'utf8',
-    mode: 0o644,
-    flags: 'a'
-  });
+  if ((config.server.logRotateInterval) && (config.server.logRotateInterval.length > 1)) {
+    // Function to write log entries to file as option property
+    logConfig.options.stream = rotatingFileStream.createStream(logFilename, {
+      encoding: 'utf8',
+      mode: 0o644,
+      interval: config.server.logRotateInterval,
+      rotate: 5,
+      initialRotation: false
+    });
+    logStream += ' (Rotate: ' + config.server.logRotateInterval + ')';
+  } else {
+    // Function to write log entries to file as option property
+    logConfig.options.stream = fs.createWriteStream(logFilename, {
+      encoding: 'utf8',
+      mode: 0o644,
+      flags: 'a'
+    });
+  }
 }; // nodeEnv === production
 
 //
-// Filter function: If enabled, log only requrests with error status codes
+// Filter function: If enabled, log only requests with error status codes
 //
 if (errorFilter) {
   // for start up message

@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next 2023-03-19
+
+### Added
+
+Added optional http access log filename rotation using the npm rotating-file-stream package.
+Log rotation can be enabled by setting the env variable SERVER_LOG_ROTATE_INTERVAL 
+to a string value such as "1h" or "7d". 
+
+Added env variable SERVER_LOG_FILTER that when set to the string value "error",
+the http access log will filtered so that http status codes <400 and 404
+will be excluded.
+
+Log rotation and filtering is only applicable to the http access log (logs/access.log).
+The auth.log file is not rotated.
+
 ## [v0.0.13](https://github.com/cotarr/collab-auth/releases/tag/v0.0.13) 2023-01-11
 
 ### Changed
