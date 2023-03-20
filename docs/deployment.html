@@ -336,8 +336,8 @@ cd ../..
         <p> 
           In some cases the access log may contain excessive entries due to
           continuous checking of access tokens. It is possible to filter
-          the log file to limit logging to only include HTTP errors where
-          HTTP status codes &lt;400 and 404 will be excluded from the log. 
+          the HTTP access log file to limit logging to include only 
+          HTTP errors where status codes &gt;=400. 
           The error filter may be enabled by setting the environment 
           variable SERVER_LOG_FILTER to the string value &quot;error&quot;
         </p>

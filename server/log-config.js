@@ -21,8 +21,8 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 // in the case of NODE_ENV=production, force logging to console.
 const nodeDebugLog = process.env.NODE_DEBUG_LOG || 0;
 
-let logToFile = (nodeEnv   !== 'production');
-let errorFilter = ((nodeEnv   !== 'production') && (config.server.logFilter === 'error'));
+let logToFile = (nodeEnv === 'production');
+let errorFilter = ((nodeEnv === 'production') && (config.server.logFilter === 'error'));
 
 // enable console logging in production by export NODE_DEBUG_LOG=1
 if (nodeDebugLog) {
@@ -95,7 +95,7 @@ if (errorFilter) {
   logStream += ' (Errors Only)';
   // Function to filter log entries as option property
   logConfig.options.skip = (req, res) => {
-    return ((res.statusCode < 400) || (res.statusCode === 404));
+    return (res.statusCode < 400);
   };
 } // if (errorFilter)
 

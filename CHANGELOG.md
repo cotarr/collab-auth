@@ -15,8 +15,7 @@ Log rotation can be enabled by setting the env variable SERVER_LOG_ROTATE_INTERV
 to a string value such as "1h" or "7d". 
 
 Added env variable SERVER_LOG_FILTER that when set to the string value "error",
-the http access log will filtered so that http status codes <400 and 404
-will be excluded.
+the http access log will filtered so the log will include only http status codes >=400.
 
 Log rotation and filtering is only applicable to the http access log (logs/access.log).
 The auth.log file is not rotated.
