@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next v0.0.16-Dev 2023-04-30
+
+Upgrade express-validator from v6 to v7 with edits in server/input-validation.js 
+to accommodate breaking changes in v7.
+
 ## [v0.0.15](https://github.com/cotarr/collab-auth/releases/tag/v0.0.15) 2023-04-12
 
 - Update all npm packages to latest version

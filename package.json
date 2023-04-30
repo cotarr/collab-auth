@@ -1,6 +1,6 @@
 {
   "name": "collab-auth",
-  "version": "0.0.15",
+  "version": "0.0.16-dev",
   "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
@@ -30,7 +30,7 @@
     "express": "^4.18.2",
     "express-rate-limit": "^6.7.0",
     "express-session": "^1.17.3",
-    "express-validator": "^6.15.0",
+    "express-validator": "^7.0.1",
     "helmet": "^6.1.5",
     "jsonwebtoken": "^9.0.0",
     "memorystore": "^1.6.7",
@@ -46,7 +46,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.38.0",
+    "eslint": "^8.39.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",

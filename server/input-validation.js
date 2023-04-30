@@ -140,8 +140,9 @@ const checkExtraneousKeys = function (allowKeys, location) {
       for (const key of keys) {
         if (allowKeys.indexOf(key) < 0) {
           req.locals.errors.push({
+            type: 'field',
             msg: 'Invalid param',
-            param: key,
+            path: key,
             location: locationString
           });
         }
@@ -164,8 +165,9 @@ const checkExtraneousKeys = function (allowKeys, location) {
       const queryKeys = Object.keys(req.query);
       for (const key of queryKeys) {
         req.locals.errors.push({
+          type: 'field',
           msg: 'Invalid param',
-          param: key,
+          path: key,
           location: 'query'
         });
       } // next key
@@ -181,8 +183,10 @@ const checkExtraneousKeys = function (allowKeys, location) {
  */
 exports.loginGetRequest = [
   checkExtraneousKeys(['retry'], 'query'),
-  query(['retry']).optional()
-    .isLength({ min: 0, max: 16 }),
+  query(['retry'])
+    .optional()
+    .isLength({ min: 0, max: 16 })
+    .withMessage('Invalid string length'),
   handleErrorHTTP
 ]; // Login GET Request
 
@@ -200,17 +204,21 @@ exports.loginPostRequest = [
   body([
     '_csrf',
     'username',
-    'password'], 'Required values')
-    .exists(),
+    'password'])
+    .exists()
+    .withMessage('Required value'),
   //
   // Validate Required keys
   //
-  body('username', 'Invalid string length')
-    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
-  body('username', 'Invalid characters in string')
-    .isWhitelisted(idAllowedChars),
-  body('password', 'Invalid string length')
-    .isLength({ min: 1, max: config.data.userPasswordMaxLength }),
+  body('username')
+    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength })
+    .withMessage('Invalid string length'),
+  body('username')
+    .isWhitelisted(idAllowedChars)
+    .withMessage('Invalid characters in string'),
+  body('password')
+    .isLength({ min: 1, max: config.data.userPasswordMaxLength })
+    .withMessage('Invalid string length'),
   handleErrorHTTP
 ]; // Login POST Request
 
@@ -221,8 +229,12 @@ exports.loginPostRequest = [
  */
 exports.viewByUUID = [
   checkExtraneousKeys(['id'], 'query'),
-  query('id', 'Required values').exists(),
-  query('id', 'Invalid UUID.v4').isUUID(4),
+  query('id')
+    .exists()
+    .withMessage('Required values'),
+  query('id')
+    .isUUID(4)
+    .withMessage('Invalid UUID.v4'),
   handleErrorHTTP
 ]; // viewByUUID
 
@@ -233,8 +245,12 @@ exports.viewByUUID = [
  */
 exports.deleteByUUID = [
   checkExtraneousKeys(['_csrf', 'id'], 'body'),
-  body('id', 'Required values').exists(),
-  body('id', 'Invalid UUID.v4').isUUID(4),
+  body('id')
+    .exists()
+    .withMessage('Required values'),
+  body('id')
+    .isUUID(4)
+    .withMessage('Invalid UUID.v4'),
   handleErrorHTTP
 ]; // deleteByUUID
 
@@ -257,8 +273,9 @@ exports.createUser = [
   body([
     'id',
     'updatedAt',
-    'createdAt'], 'Server generated values not allowed')
-    .not().exists(),
+    'createdAt'])
+    .not().exists()
+    .withMessage('Forbidden property (Server generated)'),
   // Required Body Keys
   body([
     '_csrf',
@@ -266,37 +283,48 @@ exports.createUser = [
     'username',
     'newpassword1',
     'name',
-    'role'], 'Required values')
-    .exists(),
+    'role'])
+    .exists()
+    .withMessage('Required value'),
   //
   // Validate Required keys
   //
-  body('number', 'Invalid positive integer value')
-    .isInt({ min: 0, max: 1000000000 }),
-  body('name', 'Invalid string length')
-    .isLength({ min: config.data.userNameMinLength, max: config.data.userNameMaxLength }),
-  body('name', 'Invalid characters in string')
-    .isWhitelisted(nameAllowedChars),
-  body('username', 'Invalid string length')
-    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
-  body('username', 'Invalid characters in string')
-    .isWhitelisted(idAllowedChars),
+  body('number')
+    .isInt({ min: 0, max: 1000000000 })
+    .withMessage('Invalid positive integer value'),
+  body('name')
+    .isLength({ min: config.data.userNameMinLength, max: config.data.userNameMaxLength })
+    .withMessage('Invalid string length'),
+  body('name')
+    .isWhitelisted(nameAllowedChars)
+    .withMessage('Invalid characters in string'),
+  body('username')
+    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength })
+    .withMessage('Invalid string length'),
+  body('username')
+    .isWhitelisted(idAllowedChars)
+    .withMessage('Invalid characters in string'),
   // Password length validated in javascript, 72 is max bcrypt byte length
-  body('newpassword1', 'Invalid string length')
-    .isLength({ min: 1, max: 72 }),
-  body('newpassword2', 'Invalid string length')
-    .isLength({ min: 1, max: 72 }),
-  body('loginDisabled').optional()
+  body('newpassword1')
+    .isLength({ min: 1, max: 72 })
+    .withMessage('Invalid string length'),
+  body('newpassword2')
+    .isLength({ min: 1, max: 72 })
+    .withMessage('Invalid string length'),
+  body('loginDisabled')
+    .optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
         throw new Error('Checkbox requires on/off');
       }
       return true;
     }),
-  body('role', 'Invalid string length')
-    .isLength({ max: config.data.allScopesMaxLength }),
-  body('role', 'Invalid characters in string')
-    .isWhitelisted(scopeAllowedChars),
+  body('role')
+    .isLength({ max: config.data.allScopesMaxLength })
+    .withMessage('Invalid string length'),
+  body('role')
+    .isWhitelisted(scopeAllowedChars)
+    .withMessage('Invalid characters in string'),
   handleErrorHTTP
 ]; // createUser
 
@@ -317,33 +345,44 @@ exports.editUser = [
   // Forbidden body keys
   body([
     'number',
-    'username'], 'Read only value')
-    .not().exists(),
+    'username'])
+    .not().exists()
+    .withMessage('Forbidden property (read only)'),
   // Forbidden Body Keys
   body([
     'updatedAt',
-    'createdAt'], 'Server generated values not allowed')
-    .not().exists(),
+    'createdAt'])
+    .not().exists()
+    .withMessage('Server generated values not allowed'),
   // Required Body Keys
   body([
     '_csrf',
     'id',
     'name',
-    'role'], 'Required values')
-    .exists(),
+    'role'])
+    .exists()
+    .withMessage('Required value'),
   //
   // Validate Required keys
   //
-  body('id').isUUID(4),
-  body('name', 'Invalid string length')
-    .isLength({ min: config.data.userNameMinLength, max: config.data.userNameMaxLength }),
-  body('name', 'Invalid characters in string')
-    .isWhitelisted(nameAllowedChars),
+  body('id')
+    .isUUID(4)
+    .withMessage('Invalid UUID.v4'),
+  body('name')
+    .isLength({ min: config.data.userNameMinLength, max: config.data.userNameMaxLength })
+    .withMessage('Invalid string length'),
+  body('name')
+    .isWhitelisted(nameAllowedChars)
+    .withMessage('Invalid characters in string'),
   // Password length validated in javascript, 72 is max bcrypt byte length
-  body('newpassword1', 'Invalid string length').optional()
-    .isLength({ min: 0, max: 72 }),
-  body('newpassword2', 'Invalid string length').optional()
-    .isLength({ min: 0, max: 72 }),
+  body('newpassword1')
+    .optional()
+    .isLength({ min: 0, max: 72 })
+    .withMessage('Invalid string length'),
+  body('newpassword2')
+    .optional()
+    .isLength({ min: 0, max: 72 })
+    .withMessage('Invalid string length'),
   body('loginDisabled').optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
@@ -351,10 +390,12 @@ exports.editUser = [
       }
       return true;
     }),
-  body('role', 'Invalid string length')
-    .isLength({ max: config.data.allScopesMaxLength }),
-  body('role', 'Invalid characters in string')
-    .isWhitelisted(scopeAllowedChars),
+  body('role')
+    .isLength({ max: config.data.allScopesMaxLength })
+    .withMessage('Invalid string length'),
+  body('role')
+    .isWhitelisted(scopeAllowedChars)
+    .withMessage('Invalid characters in string'),
   handleErrorHTTP
 ]; // editUser
 
@@ -376,22 +417,31 @@ exports.changePassword = [
     'username',
     'oldpassword',
     'newpassword1',
-    'newpassword2'], 'Required values')
-    .exists(),
+    'newpassword2'])
+    .exists()
+    .withMessage('Required value'),
   //
   // Validate Required keys
   //
-  body('username', 'Invalid string length')
-    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength }),
-  body('username', 'Invalid characters in string')
-    .isWhitelisted(idAllowedChars),
+  body('username')
+    .isLength({ min: config.data.userUsernameMinLength, max: config.data.userUsernameMaxLength })
+    .withMessage('Invalid string length'),
+  body('username')
+    .isWhitelisted(idAllowedChars)
+    .withMessage('Invalid characters in string'),
   // String length checked in javascript, 72 is maximum bytes for bcrypt
-  body('newpassword1', 'Invalid string length').optional()
-    .isLength({ min: 1, max: 72 }),
-  body('newpassword1', 'Invalid string length').optional()
-    .isLength({ min: 1, max: 72 }),
-  body('newpassword2', 'Invalid string length').optional()
-    .isLength({ min: 1, max: 72 }),
+  body('newpassword1')
+    .optional()
+    .isLength({ min: 1, max: 72 })
+    .withMessage('Invalid string length'),
+  body('newpassword1')
+    .optional()
+    .isLength({ min: 1, max: 72 })
+    .withMessage('Invalid string length'),
+  body('newpassword2')
+    .optional()
+    .isLength({ min: 1, max: 72 })
+    .withMessage('Invalid string length'),
   handleErrorHTTP
 ]; // Change Password
 
@@ -413,8 +463,9 @@ exports.createClient = [
   body([
     'id',
     'updatedAt',
-    'createdAt'], 'Server generated values not allowed')
-    .not().exists(),
+    'createdAt'])
+    .not().exists()
+    .withMessage('Server generated values not allowed'),
   // Required Body Keys
   body([
     '_csrf',
@@ -422,37 +473,48 @@ exports.createClient = [
     'clientId',
     'clientSecret',
     'allowedScope',
-    'allowedRedirectURI'], 'Required values')
-    .exists(),
+    'allowedRedirectURI'])
+    .exists()
+    .withMessage('Required value'),
   //
   // Validate Required keys
   //
-  body('name', 'Invalid string length')
-    .isLength({ min: config.data.clientNameMinLength, max: config.data.clientNameMaxLength }),
-  body('name', 'Invalid characters in string')
-    .isWhitelisted(nameAllowedChars),
-  body('clientId', 'Invalid string length')
-    .isLength({ min: config.data.clientIdMinLength, max: config.data.clientIdMaxLength }),
-  body('clientId', 'Invalid characters in string')
-    .isWhitelisted(idAllowedChars),
+  body('name')
+    .isLength({ min: config.data.clientNameMinLength, max: config.data.clientNameMaxLength })
+    .withMessage('Invalid string length'),
+  body('name')
+    .isWhitelisted(nameAllowedChars)
+    .withMessage('Invalid characters in string'),
+  body('clientId')
+    .isLength({ min: config.data.clientIdMinLength, max: config.data.clientIdMaxLength })
+    .withMessage('Invalid string length'),
+  body('clientId')
+    .isWhitelisted(idAllowedChars)
+    .withMessage('Invalid characters in string'),
   // length also checked in admin-panel.js, this is general input validation
-  body('clientSecret', 'Invalid string length')
-    .isLength({ min: 0, max: 1024 }),
-  body('trustedClient').optional()
+  body('clientSecret')
+    .isLength({ min: 0, max: 1024 })
+    .withMessage('Invalid string length'),
+  body('trustedClient')
+    .optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
         throw new Error('Checkbox requires on/off');
       }
       return true;
     }),
-  body('allowedScope', 'Invalid string length')
-    .isLength({ max: config.data.allScopesMaxLength }),
-  body('allowedScope', 'Invalid characters in string')
-    .isWhitelisted(scopeAllowedChars),
-  body('allowedRedirectURI', 'Invalid string length')
-    .isLength({ max: config.data.allScopesMaxLength }),
-  body('allowedRedirectURI', 'Invalid characters in string')
-    .isWhitelisted(uriAllowedChars),
+  body('allowedScope')
+    .isLength({ max: config.data.allScopesMaxLength })
+    .withMessage('Invalid string length'),
+  body('allowedScope')
+    .isWhitelisted(scopeAllowedChars)
+    .withMessage('Invalid characters in string'),
+  body('allowedRedirectURI')
+    .isLength({ max: config.data.allScopesMaxLength })
+    .withMessage('Invalid string length'),
+  body('allowedRedirectURI')
+    .isWhitelisted(uriAllowedChars)
+    .withMessage('Invalid characters in string'),
   handleErrorHTTP
 ]; // createClient
 
@@ -472,12 +534,14 @@ exports.editClient = [
     'allowedRedirectURI'], 'body'),
   // Forbidden body keys
   body([
-    'clientId'], 'Read only value')
-    .not().exists(),
+    'clientId'])
+    .not().exists()
+    .withMessage('Forbidden property (read only'),
   body([
     'updatedAt',
-    'createdAt'], 'Server generated values not allowed')
-    .not().exists(),
+    'createdAt'])
+    .not().exists()
+    .withMessage('Server generated values not allowed'),
   // Required Body Keys
   body([
     '_csrf',
@@ -485,34 +549,45 @@ exports.editClient = [
     'name',
     'clientSecret',
     'allowedScope',
-    'allowedRedirectURI'], 'Required values')
-    .exists(),
+    'allowedRedirectURI'])
+    .exists()
+    .withMessage('Required value'),
   //
   // Validate Required keys
   //
-  body('id').isUUID(4),
-  body('name', 'Invalid string length')
-    .isLength({ min: config.data.clientNameMinLength, max: config.data.clientNameMaxLength }),
-  body('name', 'Invalid characters in string')
-    .isWhitelisted(nameAllowedChars),
+  body('id')
+    .isUUID(4)
+    .withMessage('Invalid UUID.v4'),
+  body('name')
+    .isLength({ min: config.data.clientNameMinLength, max: config.data.clientNameMaxLength })
+    .withMessage('Invalid string length'),
+  body('name')
+    .isWhitelisted(nameAllowedChars)
+    .withMessage('Invalid characters in string'),
   // length also checked in admin-panel.js, this is general input validation
-  body('clientSecret', 'Invalid string length')
-    .isLength({ min: 0, max: 1024 }),
-  body('trustedClient').optional()
+  body('clientSecret')
+    .isLength({ min: 0, max: 1024 })
+    .withMessage('Invalid string length'),
+  body('trustedClient')
+    .optional()
     .custom(function (value, { req }) {
       if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
         throw new Error('Checkbox requires on/off');
       }
       return true;
     }),
-  body('allowedScope', 'Invalid string length')
-    .isLength({ max: config.data.allScopesMaxLength }),
-  body('allowedScope', 'Invalid characters in string')
-    .isWhitelisted(scopeAllowedChars),
-  body('allowedRedirectURI', 'Invalid string length')
-    .isLength({ max: config.data.allScopesMaxLength }),
-  body('allowedRedirectURI', 'Invalid characters in string')
-    .isWhitelisted(uriAllowedChars),
+  body('allowedScope')
+    .isLength({ max: config.data.allScopesMaxLength })
+    .withMessage('Invalid string length'),
+  body('allowedScope')
+    .isWhitelisted(scopeAllowedChars)
+    .withMessage('Invalid characters in string'),
+  body('allowedRedirectURI')
+    .isLength({ max: config.data.allScopesMaxLength })
+    .withMessage('Invalid string length'),
+  body('allowedRedirectURI')
+    .isWhitelisted(uriAllowedChars)
+    .withMessage('Invalid characters in string'),
   handleErrorHTTP
 ]; // editClient
 
@@ -532,8 +607,9 @@ exports.dialogAuthorization = [
     'redirect_uri',
     'response_type',
     'client_id',
-    'scope'], 'Required query values')
-    .exists(),
+    'scope'])
+    .exists()
+    .withMessage('Required query value'),
   query('response_type')
     .custom(function (value, { req }) {
       if ((value === 'token') && (config.oauth2.disableTokenGrant)) {
@@ -560,7 +636,12 @@ exports.dialogAuthDecision = [
     '_csrf',
     'cancel',
     'transaction_id'], 'body'),
-  body('transaction_id').exists().isLength({ min: 1, max: 64 }),
+  body('transaction_id')
+    .exists()
+    .withMessage('Required value'),
+  body('transaction_id')
+    .isLength({ min: 1, max: 64 })
+    .withMessage('Invalid string length'),
   handleErrorOauth
 ];
 
@@ -578,7 +659,7 @@ exports.dialogAuthDecision = [
  *  redirect_uri           x               x
  *  refresh_token                          x
  *
- * Alternately: client_id and cient_secret can be
+ * Alternately: client_id and client_secret can be
  * supplied as base64 Basic authorization header.
  */
 exports.oauthToken = [
@@ -615,7 +696,10 @@ exports.oauthToken = [
       }
       return true;
     }),
-  body('refresh_token', 'Invalid JWT Token').optional().isJWT(),
+  body('refresh_token')
+    .optional()
+    .isJWT()
+    .withMessage('Invalid JWT Token'),
   handleErrorOauth
 ];
 
@@ -630,8 +714,14 @@ exports.oauthTokenRevoke = [
     'refresh_token',
     'client_id',
     'client_secret'], 'body'),
-  body('access_token', 'Invalid JWT Token').optional().isJWT(),
-  body('refresh_token', 'Invalid JWT Token').optional().isJWT(),
+  body('access_token')
+    .optional()
+    .isJWT()
+    .withMessage('Invalid JWT Token'),
+  body('refresh_token')
+    .optional()
+    .isJWT()
+    .withMessage('Invalid JWT Token'),
   handleErrorOauth
 ];
 
@@ -645,7 +735,11 @@ exports.oauthIntrospect = [
     'access_token',
     'client_id',
     'client_secret'], 'body'),
-  body('access_token', 'Required values').exists(),
-  body('access_token', 'Invalid JWT Token').isJWT(),
+  body('access_token')
+    .exists()
+    .withMessage('Required values'),
+  body('access_token')
+    .isJWT()
+    .withMessage('Invalid JWT Token'),
   handleErrorOauth
 ];
