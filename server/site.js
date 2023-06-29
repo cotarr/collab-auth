@@ -74,6 +74,21 @@ const passwordRateLimit = rateLimit({
 });
 
 /**
+ * Check that HTTP cookie exists.
+ * If cookie not found, response status 403 with message.
+ *
+ * Middleware function
+ */
+const checkCookieExists = function (req, res, next) {
+  if ((req.headers) && (!(req.headers.cookie))) {
+    console.log('Error: /login Cookie not found.');
+    res.status(403).send('Forbidden, cookie not found. Cookies may be blocked by browser');
+  } else {
+    next();
+  }
+};
+
+/**
  * Authenticate normal login page using strategy of authenticate
  * POST /login (credentials in body)
  * Upon success return to saved URL, else show redirect error message.
@@ -83,6 +98,7 @@ const passwordRateLimit = rateLimit({
  */
 exports.login = [
   passwordRateLimit,
+  checkCookieExists,
   inputValidation.loginPostRequest,
   csrfProtection,
   passport.authenticate('local',

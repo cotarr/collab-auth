@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.0.17-dev 2023-06-29
+
+Issue: when attempting to authenticate with browser cookies disabled
+the response error showed "Forbidden, invalid csrf token".
+The csrf message is misleading. Added a new middleware function
+to server/site.js for the POST /login route to check for existence of a cookie. 
+If no cookie is found, respond with status 403 "Forbidden, cookie not 
+found. Cookies may be blocked by browser"
+
 ## [v0.0.16](https://github.com/cotarr/collab-auth/releases/tag/v0.0.16) 2023-06-29
 
 Dependency updates...
