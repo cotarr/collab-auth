@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v0.0.16-Dev 2023-06-29
+## [v0.0.16](https://github.com/cotarr/collab-auth/releases/tag/v0.0.16) 2023-06-29
+
+Dependency updates...
 
 - Npm audit: install semver@7.5.3, edit package-lock.json, run npm audit-fix, successfully cleared audit warnings.
 - Upgrade dependencies pg@8.11.1, dotenv@16.3.1, connect-pg-simple@9.0.0, @dr.pogodin/csurf@1.13.0
