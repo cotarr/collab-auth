@@ -3,7 +3,7 @@
 ## Authentication server description
 
 This application is an OAuth 2.0 authentication server.
-A simple administration editor is included to confgure client accounts and user accounts.
+A simple administration editor is included to configure client accounts and user accounts.
 
 ## Postman Global Settings
 
@@ -11,11 +11,11 @@ A simple administration editor is included to confgure client accounts and user 
 
 ## Import postman collections
 
-Import enviornment applies to all collections in this repository
+Import environment applies to all collections in this repository
 
-- Import "postman/collab-auth.postman_environment.json" (enviornment for collab-auth)
+- Import "postman/collab-auth.postman_environment.json" (environment for collab-auth)
 
-All indivudual collections may be imported as a set.
+All individual collections may be imported as a set.
 
 - Import "postman/collab-auth (admin edit user).postman_collection.json"
 - Import "postman/collab-auth (client grant).postman_collection.json"
@@ -36,11 +36,11 @@ Note: auth_host must be different domain from frontend and backend
 - backend_host   (http://localhost:4000)
 - redirect_uri   (http://localhost:3000/login/callback)
 - user_username  (bob)
-- user_password  (secret)
+- user_password  (bobssecret)
 - client_id      (abc123)
 - client_secret  (ssh-secret)
 - client_base64  (YWJjMTIzOnNzaC1zZWNyZXQ=)
-- scopes         (api.read)
+- scopes         (api.read api.write) (space character between)
 
 ## Rate Limiter Issues
 
@@ -82,7 +82,7 @@ This is similar to code grant, but returns token directly instead of authorizato
 ## Collection: "collab-auth (misc calls)"
 
 This collection is various single route debug tests.
-This in not a test suite. Do to run it as a colleciton runner.
+This in not a test suite. Do to run it as a collection runner.
 
 ## Collection: "collab-auth (session auth)"
 

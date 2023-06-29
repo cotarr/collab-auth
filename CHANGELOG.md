@@ -8,6 +8,8 @@ and this project adheres to
 
 ## v0.0.17-dev 2023-06-29
 
+- Minor updates to postman collections
+
 Issue: when attempting to authenticate with browser cookies disabled
 the response error showed "Forbidden, invalid csrf token".
 The csrf message is misleading. Added a new middleware function

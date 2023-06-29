@@ -38,7 +38,8 @@
 					"path": [
 						"not found"
 					]
-				}
+				},
+				"description": "This is a hard abort to prevent this collection from being run as a collection. It is multiple unrelated individual tests."
 			},
 			"response": []
 		},
@@ -265,7 +266,7 @@
 							"    let location = pm.response.headers.get('Location');",
 							"    if (location) {",
 							"        location = location.split('?')[0];",
-							"        pm.expect(location).to.equal('/dialog/authorize');",
+							"        pm.expect(location).to.equal('/redirecterror');",
 							"    } else {",
 							"        throw new Error('Location header not found in 302 redirect')",
 							"    }",
@@ -720,13 +721,54 @@
 			"response": []
 		},
 		{
+			"name": "/redirecterror",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body matches string\", function () {",
+							"        pm.expect(pm.response.text()).to.include(\"Oops, something seems to have gone wrong.\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{auth_host}}/redirecterror",
+					"host": [
+						"{{auth_host}}"
+					],
+					"path": [
+						"redirecterror"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "/secure",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Your test name\", function () {",
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Authenticated response matches\", function () {",
 							"    let jsonData = pm.response.json();",
 							"    if ((!('authenticated' in jsonData)) || (!jsonData.authenticated)) {",
 							"        throw new Error('Expected { authenticated: true }');",
