@@ -8,7 +8,9 @@ and this project adheres to
 
 ## Next v0.0.16-Dev 2023-04-30
 
-Upgrade express-validator from v6 to v7 with edits in server/input-validation.js 
+- Upgrade helmet@7.0.0 and edit app.js to address 7.0.0 changes.
+- Upgrade eslint and dependencies to eslint@8.43.0 and fix new linting errors.
+- Upgrade express-validator from v6 to v7 with edits in server/input-validation.js 
 to accommodate breaking changes in v7.
 
 ## [v0.0.15](https://github.com/cotarr/collab-auth/releases/tag/v0.0.15) 2023-04-12
