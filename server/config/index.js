@@ -34,6 +34,7 @@ exports.server = {
   port: parseInt(process.env.SERVER_PORT || '3500'),
   pidFilename: process.env.SERVER_PID_FILENAME || '',
   logRotateInterval: process.env.SERVER_LOG_ROTATE_INTERVAL || '',
+  logRotateSize: process.env.SERVER_LOG_ROTATE_SIZE || '',
   logFilter: process.env.SERVER_LOG_FILTER || ''
 };
 

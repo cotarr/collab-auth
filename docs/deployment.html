@@ -320,18 +320,30 @@ cd ../..
         </p>
           End user login events and administrative modifications of the client/user 
           database are logged to the file &quot;logs/auth.log&quot;
+          Log file rotation is not available for the auth.log.
         <p>
           HTTP access log events will be written to the file &quot;logs/access.log&quot;.
         </p>
         <p>
           HTTP access log filename rotation available, but disabled by default. 
-          Access log filename rotation can be enabled by 
-          assigning the environment variable &quot;SERVER_LOG_ROTATE_INTERVAL&quot;
-          to a configuration string. Log rotate time units (s, m, h, d) 
-          are used to specify the interval string. (Example: '5m', '2h', '1d').
-          This will allow access log file log rotation similar to Linux system files.
+          Optional log file rotation may enabled by assigning the 
+          &quot;SERVER_LOG_ROTATE_INTERVAL&quot; environment variable or the 
+          &quot;SERVER_LOG_ROTATE_SIZE&quot; environment variable to the proper string value. 
+          Log rotate time interval available time units (s, m, h, d) are used 
+          to specify the interval string. (Example: '5m', '2h', '1d'). 
+          Minutes and hours are a time divisor, but the day interval is a 
+          simple timer that is re-initialized each time the application is restarted. 
+          Log rotate file size available time units (B, K, M, G) are used to 
+          specify the file size string. (Example: '100K', '1M'). 
+          Optionally either interval, size, both, or neither may be used. 
+          This will allow log file log rotation similar to Linux system files. 
           Files will be renamed access.log.1, access.log.2, up to access.log.5.
-          Older files are discarded when log rotation is enabled.
+          Older files are discarded when log rotation is enabled.          For more information see 
+          <a href="https://github.com/iccicci/rotating-file-stream#readme">rotating-file-stream</a>
+          documentation. 
+          In the case where neither interval nor size properties exist 
+          or both are empty strings, then no log rotation will occur, 
+          and file size management must be done manually.,
         </p>
         <p> 
           In some cases the access log may contain excessive entries due to
@@ -343,6 +355,7 @@ cd ../..
         </p>
 <pre class="pre-div">
 SERVER_LOG_ROTATE_INTERVAL=7d
+SERVER_LOG_ROTATE_SIZE=1M
 SERVER_LOG_FILTER=error
 </pre>
         <p>

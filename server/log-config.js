@@ -67,21 +67,29 @@ let logStream = '(console)';
 if (logToFile) {
   // for start up message
   logStream = logFilename;
-  if ((config.server.logRotateInterval) && (config.server.logRotateInterval.length > 1)) {
-    // Function to write log entries to file as option property
-    logConfig.options.stream = rotatingFileStream.createStream(logFilename, {
+  if (((config.server.logRotateInterval) && (config.server.logRotateInterval.length > 1)) ||
+    ((config.server.logRotateSize) && (config.server.logRotateSize.length > 1))) {
+    const rotateOptions = {
       encoding: 'utf8',
-      mode: 0o644,
-      interval: config.server.logRotateInterval,
-      rotate: 5,
-      initialRotation: false
-    });
-    logStream += ' (Rotate: ' + config.server.logRotateInterval + ')';
+      mode: 0o600,
+      rotate: 5
+    };
+    logStream += ' (Rotate';
+    if ((config.server.logRotateInterval) && (config.server.logRotateInterval.length > 1)) {
+      rotateOptions.interval = config.server.logRotateInterval;
+      logStream += ' interval:' + config.server.logRotateInterval;
+    }
+    if ((config.server.logRotateSize) && (config.server.logRotateSize.length > 1)) {
+      rotateOptions.size = config.server.logRotateSize;
+      logStream += ' size:' + config.server.logRotateSize;
+    }
+    logStream += ')';
+    logConfig.options.stream = rotatingFileStream.createStream(logFilename, rotateOptions);
   } else {
     // Function to write log entries to file as option property
     logConfig.options.stream = fs.createWriteStream(logFilename, {
       encoding: 'utf8',
-      mode: 0o644,
+      mode: 0o600,
       flags: 'a'
     });
   }
