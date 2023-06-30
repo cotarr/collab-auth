@@ -6,12 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.0.17-dev 2023-06-29
+## [v0.0.17](https://github.com/cotarr/collab-auth/releases/tag/v0.0.17) 2023-06-30
 
 - Log file rotation now allows by file size using env variable SERVER_LOG_ROTATE_SIZE.
 - Log file permission changed from 0o644 to 0o600.
 - Update /docs/ and README.md to show log rotation configuration.
-
 
 - Minor updates to postman collections
 
