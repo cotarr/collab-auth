@@ -1,6 +1,6 @@
 {
   "name": "collab-auth",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {

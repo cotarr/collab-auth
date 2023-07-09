@@ -46,9 +46,9 @@
           <li>Commercial cloud VPS Droplet</li>
           <li>1 Core</li>
           <li>1024 MB RAM</li>
-          <li>Debian 10</li>
-          <li>PostgreSQL 11</li>
-          <li>Node 14</li>
+          <li>Debian 10, Debian 11</li>
+          <li>PostgreSQL 11, PostgreSQL 13</li>
+          <li>Node 18</li>
           <li>IPV4 and IPV6</li>
           <li>Start: user crontab script</li>
           <li>Certs: Lets Encrypt</li>
@@ -140,7 +140,7 @@ package-lock.json
         </p>
         <div class="section-title">Server TCP Listening Port</div>
         <p>
-          The default server port is TCP port 3500. In Debian 10 and node 14,
+          The default server port is TCP port 3500. In Debian 11 and node 18,
           the server will accept connection using IPV4 and IPV6 on all interfaces.
           The configured port number will be printed to console.log on program start.
           Use the following environment variable assignment to configure a custom port number.
@@ -164,34 +164,19 @@ SERVER_PORT=3500
           ports must also be protected from external internet access (see below).
         </p>
         <p>
-          Non-privledged unix accounts do not have access to reserved port 443 to use
-          HTTPS connections for TLS. There are several ways for a non-privledged user to
-          access port 443 including reverse proxy, docker container, or firewall rules
-          to exchange port numbers at the network level.
+          For security, it is recommended to run collab-auth as a non-privileged user.
+          Non-privileged unix accounts do not have access to reserved port 443 to use
+          HTTPS connections for TLS. There are several ways for a non-privileged user to
+          access port 443. One option is use a reverse proxy such as nginx. 
+          Running an application inside a docker container allows port redirection.
+          A network load balancer may have port redirection capabilities.
+          When collab-auth was deployed on a VPS cloud droplet with LetsEncrypt TLS certificates,
+          A firewall using nftables rules was written to exchange the port port 443 
+          the the server non-privileged port as the connection passed through the 
+          firewall. When using redirected ports, there must be a temporary way to restore the original 
+          ports without redirection for the purpose of renewing the LetsEncrypt TLS certificates.
+          This type of firewall rules are beyond the scope of this tutorial.
         </p>
-        <p>
-          When this was deployed for personal use as a learning exercise,
-          the ports were switched using the following iptables rules.
-          These rules must be temporarily disabled and replaced with standard port 443 INPUT rules
-          in order to use Lets Encrypt certbot renew.
-          Caution: You should not try something like this unless you have reviewed other rules
-          in your firewall to make sure there are no conflicts that could block other
-          connections such as SSH on port 22.
-        </p>
-
-<pre class="pre-div">
-# Allow access to port 443 for oauth server
-/sbin/iptables  -A INPUT -p tcp --dport 3500  -m comment --comment "INPUT ACCEPT 443 --> 3500" -j ACCEPT
-/sbin/ip6tables -A INPUT -p tcp --dport 3500  -m comment --comment "INPUT ACCEPT 443 --> 3500" -j ACCEPT
-
-# redirect port 443 for oauth server
-/sbin/iptables  -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3500
-/sbin/ip6tables -A PREROUTING -t nat -i eth0 -p tcp --dport 443 -j REDIRECT --to-port 3500
-
-# port 999 is reserved and blocked port to catch connections to original 3500 port.
-/sbin/iptables  -A PREROUTING -t nat -i eth0 -p tcp --dport 3500 -j REDIRECT --to-port 999
-/sbin/ip6tables -A PREROUTING -t nat -i eth0 -p tcp --dport 3500 -j REDIRECT --to-port 999
-</pre>
 
         <div class="section-title">Domain Name Configuration</div>
         <p>

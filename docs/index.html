@@ -36,7 +36,7 @@
         </div>
         <div class="center">
           <div class="vh-20"></div>
-          <img class="image" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="1130" height="612">
+          <img class="image-photo" src="images/home-network-oauth2.png" alt="home network oauth2 network" width="80%" height="80%">
         </div>
         <div class="vh-20"></div>
         <p>
@@ -80,6 +80,10 @@
                 <td><a href="https://github.com/cotarr/collab-iot-device">collab-iot-device</a></td>
                 <td>Mock IOT Device with data acquisition saved to DB</td>
               </tr>
+              <tr>
+                <td><a href="https://github.com/cotarr/collab-iot-client-token">collab-iot-client-token</a></td>
+                <td>IOT device client credentials grant for collab-iot-device</td>
+              </tr>
             </table>
           </div>
           <div class="div-flex-inline"></div>
@@ -107,7 +111,7 @@
         <p>
           First, there is already an excessive quantity of resources on the internet that explain Oauth 2.0,
           so that will not be reproduced here.
-          For me, this was a learning project, not a teaching project. None, the less, I have been asked to share
+          For me, this was a learning project, not a teaching project. None the less, I have been asked to share
           my example because it because it may be interesting or useful.
         <p>
         </p>
@@ -133,7 +137,7 @@
         <p>
           My personal web pages were put together using an
           <a href="https://expressjs.com/">Express.js</a>
-          web server running under <a href="https://nodejs.org/">Node.js</a> on a Debian 10 Linux server.
+          web server running under <a href="https://nodejs.org/">Node.js</a> on a Debian Linux server.
           I was most comfortable with a solution that could run in that environment.
         </p>
         <p>
@@ -185,9 +189,9 @@
           <li>Incorporate scope permissions.</li>
           <li>Optional use of PostgreSQL to store user and client accounts.</li>
           <li>Optional use of PostgreSQL to persist user sessions.</li>
-          <li>Incorporate csrf tokens using <a href="https://www.npmjs.com/package/csurf">csurf</a> to reduce risk of cross-site issues</li>
+          <li>Incorporate csrf tokens using <a href="https://www.npmjs.com/package/@dr.pogodin/csurf">csurf</a> to reduce risk of cross-site issues</li>
           <li>Input validation using express-validator</li>
-          <li>Development postman  collecitons included.</li>
+          <li>Development postman  collections included.</li>
         </ul>
         <p>
           The following 3 repositories were created solely to demonstrate the authorization server.
@@ -199,7 +203,7 @@
           were configured to use oauth 2.0 authorization code grant.
           The purpose of the mock web server was to setup passport
           so the user's web browser would be redirected to authorization server for password entry,
-          then redirected back to the mock web server URL with an authorizaton code.
+          then redirected back to the mock web server URL with an authorization code.
           The web server then exchanged the code for an access_token which it stores on the user's behalf.
           It currently uses passport-oauth2 to obtain the first token, then upon expiration, use 
           custom code to exchange refresh tokens for replacement access tokens.
@@ -211,8 +215,7 @@
           using in-memory variables. The purpose of the mock REST API server is to accept
           HTTP requests containing an Oauth 2.0 bearer token. The token is validated by
           sending it to the authorization server before fulfilling the database query.
-          Version 0.0.1 used passport-http-bearer as authorization middleware, but this
-          was replaced with custom middleware in v0.0.2.
+          One route is setup to demonstrate the use of scope restrictions on specific routes.
         </p>
         <p>
           Mock IOT Device - Lastly, a forth repository

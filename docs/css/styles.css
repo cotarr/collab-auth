@@ -184,7 +184,10 @@ th, td {
   vertical-align: top;
 }
 .image-photo {
-  display: inline-block;
+  border: 2px solid black;
+  margin-left: 30px;
+  min-width: 600px;
+  max-width: 1000px;
 }
 .websocket-table {
   margin-left: 60px;
