@@ -16,13 +16,11 @@
 							"    pm.response.to.have.status(200);",
 							"});",
 							"",
-							"pm.test(\"Unset global variables\", function () {",
-							"    pm.globals.unset('transaction_id');",
-							"    pm.globals.unset('auth_code');",
-							"    pm.globals.unset('access_token');",
-							"    pm.globals.unset('refresh_token');",
-							"    pm.globals.unset('csrf_token');",
-							"});",
+							"// Clear global variables",
+							"pm.globals.unset('access_token');",
+							"pm.globals.unset('refresh_token');",
+							"",
+							"",
 							""
 						],
 						"type": "text/javascript"
@@ -39,6 +37,11 @@
 						"key": "Authorization",
 						"value": "Bearer {{access_token}}",
 						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
 					}
 				],
 				"url": {
@@ -94,22 +97,16 @@
 						"key": "Authorization",
 						"value": "Basic {{client_base64}}",
 						"type": "text"
+					},
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "default"
 					}
 				],
 				"body": {
-					"mode": "urlencoded",
-					"urlencoded": [
-						{
-							"key": "grant_type",
-							"value": "client_credentials",
-							"type": "text"
-						},
-						{
-							"key": "scope",
-							"value": "{{scopes}}",
-							"type": "text"
-						}
-					],
+					"mode": "raw",
+					"raw": "{\n  \"grant_type\": \"client_credentials\",\n  \"scope\": \"{{scopes}}\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"

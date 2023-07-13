@@ -9,6 +9,13 @@ A simple administration editor is included to configure client accounts and user
 
 - Automatically follow redirects = OFF
 
+## Cookie whitelist
+
+- Select the cookies panel
+- At the bottom select "Whitelist Domains"
+- Add 127.0.0.1
+- Add localhost
+
 ## Import postman collections
 
 Import environment applies to all collections in this repository

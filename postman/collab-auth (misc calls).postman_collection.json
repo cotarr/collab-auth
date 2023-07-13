@@ -83,7 +83,7 @@
 			"response": []
 		},
 		{
-			"name": "Clear Global Variables",
+			"name": "Clear all collab-auth global variables",
 			"event": [
 				{
 					"listen": "test",
@@ -93,13 +93,14 @@
 							"    pm.response.to.have.status(404);",
 							"});",
 							"",
-							"pm.test(\"Unset global variables\", function () {",
-							"    pm.globals.unset('transaction_id');",
-							"    pm.globals.unset('auth_code');",
-							"    pm.globals.unset('access_token');",
-							"    pm.globals.unset('refresh_token');",
-							"    pm.globals.unset('csrf_token');",
-							"});",
+							"pm.globals.unset('transaction_id');",
+							"pm.globals.unset('auth_code');",
+							"pm.globals.unset('access_token');",
+							"pm.globals.unset('refresh_token');",
+							"pm.globals.unset('csrf_token');",
+							"pm.globals.unset('testUsername');   ",
+							"pm.globals.unset('testUserNumber');",
+							"pm.globals.unset('createdUserUuid');",
 							""
 						],
 						"type": "text/javascript"

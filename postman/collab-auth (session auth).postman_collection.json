@@ -5,7 +5,7 @@
 	},
 	"item": [
 		{
-			"name": "/logout (session)",
+			"name": "/logout clear cookies and variables",
 			"event": [
 				{
 					"listen": "test",
@@ -14,6 +14,15 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
+							"",
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('127.0.0.1', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
+							"pm.globals.unset('csrf_token');",
 							""
 						],
 						"type": "text/javascript"
@@ -39,53 +48,6 @@
 					],
 					"path": [
 						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "clear 127.0.0.1 cookies",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
-							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
-							"const jar = pm.cookies.jar();",
-							"jar.clear('127.0.0.1', (err) => {",
-							"    if (err) console.log(err);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{auth_host}}/status",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"status"
 					]
 				}
 			},

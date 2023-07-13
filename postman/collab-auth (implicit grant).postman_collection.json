@@ -6,7 +6,7 @@
 	},
 	"item": [
 		{
-			"name": "0a /logout",
+			"name": "0 /logout clear cookies and variables",
 			"event": [
 				{
 					"listen": "test",
@@ -15,6 +15,18 @@
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
 							"});",
+							"",
+							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
+							"const jar = pm.cookies.jar();",
+							"jar.clear('127.0.0.1', (err) => {",
+							"    if (err) console.log(err);",
+							"});",
+							"",
+							"// Clear global vaariables",
+							"pm.globals.unset('transaction_id');",
+							"pm.globals.unset('access_token');",
+							"pm.globals.unset('refresh_token');",
+							"pm.globals.unset('csrf_token');",
 							""
 						],
 						"type": "text/javascript"
@@ -40,101 +52,6 @@
 					],
 					"path": [
 						"logout"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "0b clear 127.0.0.1 cookies",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"// The domain 127.0.0.1 must be whitelisted in postman to avoid error:",
-							"// \"CookieStore: programmatic access to \"localhost\" is denied\"}",
-							"const jar = pm.cookies.jar();",
-							"jar.clear('127.0.0.1', (err) => {",
-							"    if (err) console.log(err);",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{auth_host}}/status",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"status"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "0c Clear Global Variables",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is status\", function () {",
-							"    pm.response.to.have.status(200);",
-							"});",
-							"",
-							"pm.test(\"Unset global variables\", function () {",
-							"    pm.globals.unset('transaction_id');",
-							"    pm.globals.unset('auth_code');",
-							"    pm.globals.unset('access_token');",
-							"    pm.globals.unset('refresh_token');",
-							"    pm.globals.unset('csrf_token');",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "noauth"
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{access_token}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "{{auth_host}}/status",
-					"host": [
-						"{{auth_host}}"
-					],
-					"path": [
-						"status"
 					]
 				}
 			},
