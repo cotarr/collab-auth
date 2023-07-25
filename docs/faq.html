@@ -50,9 +50,11 @@
             <p>
               A: During coding, functions were debugged manually, primarily using postman.
               The postman collections were extracted and included in the repository.
-              The primary focus was on grant type: authorizaton code grant and client credentials grant. 
+              The primary focus was on grant type: authorization code grant and client credentials grant. 
               Less attention was spent on implicit grant and password grant.
               Unused grant types can be disabled in the configuration.
+              In July 2023 after the Postman desktop deprecated use of local files,
+              the API tests were converted to VSCode Thunder Client format.
             </p>
             <ul>
               <li>No automated tests included.</li>
@@ -158,13 +160,11 @@
             </p>
             <p>
               A: Yes. Refresh tokens can be demonstrated in the development enviornment
-              using postman. The collection &quot;collab-auth (code grant)&quot;
+              using Thunder Client. The collection &quot;collab-auth-demo&quot; has  
+              folder &quot;Authorization Code Grant&quot; that 
               can be run to obtain an access_token and refresh_token which are
-              stored in postman variables.
-              A second collection &quot;collab-auth (misc calls)&quot; contains a single
-              test called &quot;POST /oauth/token (refresh)&quot; that will retrieve
-              the refresh_token from postman variables and exchange the refresh_token
-              for a replacement access_token.
+              stored in Thunder Client variables. In this sequence, step &quot;2H&quot; 
+              uses the refresh_token to obtain a replacement access_token.
             </p>
             <p>
               The collab-frontend demonstration web server supports the use of

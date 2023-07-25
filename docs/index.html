@@ -167,12 +167,12 @@
           collab-iot-device do not use passport.
         </p>
         <p>
-          <a href="https://www.postman.com/downloads/">Postman</a> -
-          Actually, most of the coding on this project was done using Postman rather than a web browser.
+          Postman - Actually, most of the coding on this project was done using Postman rather than a web browser.
           Once I had Oauth2orizeRecipes up and running, I started using postman from the first day.
           Most of early time was spent adding console.log() statements to both
           Oauth2orizeRecipes and oauth2orize as I stepped through the transactions of each Oauth 2.0
-          grant type. I have included exported postman collections with the repository.
+          grant type. In July 2023 after the Postman desktop deprecated use of local files,
+          the API tests were converted to VSCode Thunder Client format.
         </p>
         <p>
           Authorization Server - Once I could reproduce all four grant types using postman, I created a
@@ -191,7 +191,7 @@
           <li>Optional use of PostgreSQL to persist user sessions.</li>
           <li>Incorporate csrf tokens using <a href="https://www.npmjs.com/package/@dr.pogodin/csurf">csurf</a> to reduce risk of cross-site issues</li>
           <li>Input validation using express-validator</li>
-          <li>Development postman  collections included.</li>
+          <li>Thunder Client API test collections included.</li>
         </ul>
         <p>
           The following 3 repositories were created solely to demonstrate the authorization server.
