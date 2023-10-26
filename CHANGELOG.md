@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next
+
+File: server/input-validation.js - Modified input validation for the "/dialog/authorize"
+route to accept an optional URL query parameter "state". Previously, adding the state
+query parameter would return a 422 status. The oauth2orize library supports 
+the recommended "state" query parameter, so no other code changes were required.
+The state parameter is used during the oauth 2.0 handshake to pass a nonce used 
+to reduce the risk of CSRF attacks during web directs. Other grant types were not modified.
+
+Updated the collab-auth API test collection "thunder-collection_collab-auth-demo.json" 
+for authorization code grant to use the "state" query parameter.
+
+The VSCode extension ThunderClient has added a limit of 50 requests per collection, 
+so the test collection "thunder-collection_collab-auth-tests.json" was broken 
+into multiple files of less tha 50 requests.
+
 ## [v0.0.19](https://github.com/cotarr/collab-auth/releases/tag/v0.0.19) 2023-07-25
 
 There are no code changes in this commit.

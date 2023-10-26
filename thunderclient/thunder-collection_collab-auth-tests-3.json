@@ -1,0 +1,2292 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "collab-auth-tests-3",
+    "dateExported": "2023-10-26T00:28:14.225Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "Authorization Code Parsing 1 of 2",
+            "containerId": "",
+            "created": "2023-10-25T19:27:00.910Z",
+            "sortNum": 30000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "550cafb2-5b65-430d-97ce-d958d34d057f",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/logout Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-10-25T19:27:00.910Z",
+            "modified": "2023-10-25T19:27:00.910Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "98aa3bcf-007d-4f05-8b3e-53c43613014e",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize Authorization check 1",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 12500,
+            "created": "2023-10-25T19:27:00.912Z",
+            "modified": "2023-10-25T19:27:00.912Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "03579b0f-f6e1-478f-bc84-9522f2ad0958",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/login Get login form",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-10-25T19:27:00.911Z",
+            "modified": "2023-10-25T19:27:00.911Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "1bdcb4e1-df47-4b49-80af-97c279dede08",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/login Submit username and password",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 25000,
+            "created": "2023-10-25T19:27:00.913Z",
+            "modified": "2023-10-25T19:27:00.913Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "/dialog/authorize"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "response_type=code"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "client_id={{client_id}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "scope="
+                }
+            ]
+        },
+        {
+            "_id": "a78aa928-3f3b-40e3-8927-182e6e7164c6",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  get transaction_id 1",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-10-25T19:27:00.915Z",
+            "modified": "2023-10-25T19:27:00.915Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "0eb4e6f0-89f6-4870-b3de-ea4275998566",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision get auth code 1",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 45000,
+            "created": "2023-10-25T19:27:00.914Z",
+            "modified": "2023-10-25T19:27:00.914Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "16fd4ae4-77ad-4ac8-97d5-989c9c86d60a",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "100 /oauth/token Fail: Extraneous properties in body",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 50000,
+            "created": "2023-10-25T19:27:00.916Z",
+            "modified": "2023-10-25T19:27:00.916Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\",\n  \"extraneious\": \"Invalid value for test\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors[0].msg",
+                    "action": "equal",
+                    "value": "Invalid param"
+                }
+            ]
+        },
+        {
+            "_id": "2dfbf611-9fab-4d16-a463-8455e97b83d8",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "101 /oauth/token Fail: body is text (text/plain)",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 52500,
+            "created": "2023-10-25T19:27:00.917Z",
+            "modified": "2023-10-25T19:27:00.917Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "text/plain"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "text",
+                "raw": "This is some random text",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "03509dbd-c1f8-47c3-a2ad-75a66a9616ef",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "102 /oauth/token Fail: body is text (application/json)",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 53750,
+            "created": "2023-10-25T19:27:00.918Z",
+            "modified": "2023-10-25T19:27:00.918Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "text",
+                "raw": "This is some random text",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "in JSON at position"
+                }
+            ]
+        },
+        {
+            "_id": "a3da756f-56b8-4ff9-871d-86a9c8436631",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "103 /oauth/token Fail: JSON missing end brace",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54375,
+            "created": "2023-10-25T19:27:00.919Z",
+            "modified": "2023-10-25T19:27:00.919Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Content-Type",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Unexpected end of JSON input"
+                }
+            ]
+        },
+        {
+            "_id": "499bd96a-0bed-4e98-8305-0ac05d050e38",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/oauth/token Expect Success 2",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54472.8,
+            "created": "2023-10-25T19:27:00.935Z",
+            "modified": "2023-10-25T19:27:00.935Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.token_type | lower",
+                    "action": "equal",
+                    "value": "bearer"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.access_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.refresh_token | length",
+                    "action": ">",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "77cdc24c-c9d6-4511-88ce-dbc10d44bdd7",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 2",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54502.1,
+            "created": "2023-10-25T19:27:00.936Z",
+            "modified": "2023-10-25T19:27:00.936Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "cca02691-1bdd-4877-9386-49c2649a1f93",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision Get another auth code 2",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54516.7,
+            "created": "2023-10-25T19:27:00.937Z",
+            "modified": "2023-10-25T19:27:00.937Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "2ec35160-7568-47ca-9533-78e43f04e733",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "110 /oauth/token Fail Missing client_id",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54523.8,
+            "created": "2023-10-25T19:27:00.920Z",
+            "modified": "2023-10-25T19:27:00.920Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "94dd203e-73f1-4a0a-adda-b0e38a3bf950",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "112 /oauth/token Fail empty string client_id",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54530.9,
+            "created": "2023-10-25T19:27:00.921Z",
+            "modified": "2023-10-25T19:27:00.921Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "ef28b07f-a0ef-4fc0-b180-7d0a0349cb19",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "111 /oauth/token Fail Missing client_secret",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54530.9,
+            "created": "2023-10-25T19:27:00.922Z",
+            "modified": "2023-10-25T19:27:00.922Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "099aa990-c305-4450-9795-91198db00469",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "113 /oauth/token Fail empty string client_secret",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54530.9,
+            "created": "2023-10-25T19:27:00.923Z",
+            "modified": "2023-10-25T19:27:00.923Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "fbe744d0-84cf-4f43-8de0-aa1816081b61",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/oauth/token Expect Success 3",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.2,
+            "created": "2023-10-25T19:27:00.959Z",
+            "modified": "2023-10-25T19:27:00.959Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.token_type | lower",
+                    "action": "equal",
+                    "value": "bearer"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.access_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.refresh_token | length",
+                    "action": ">",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "17fb3579-0364-4478-97fd-305e71640c15",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "120 /oauth/token Fail Missing auth code",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.925Z",
+            "modified": "2023-10-25T19:27:00.925Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "2b659bd1-d6ef-49fa-97e7-ca33a19a466f",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "121 /oauth/token Fail Missing grant_type",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.926Z",
+            "modified": "2023-10-25T19:27:00.926Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "db1f3d1a-ae3d-489f-803f-2b6b8d13f702",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "122 /oauth/token Fail empty string auth code",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.927Z",
+            "modified": "2023-10-25T19:27:00.927Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "2d677f34-924d-4c35-9601-f4303c6233f3",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "123 /oauth/token Fail empty string grant type",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.929Z",
+            "modified": "2023-10-25T19:27:00.929Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "f79ce5c2-3ffe-43aa-86de-afcacb5dd872",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "124 /oauth/token Fail modified value auth code",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.930Z",
+            "modified": "2023-10-25T19:27:00.930Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}x\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "8824d804-f05e-499c-b42a-4771f610cc13",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "130 /oauth/token Fail modified value client id",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.932Z",
+            "modified": "2023-10-25T19:27:00.932Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}x\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "b9021e89-ac5f-49ff-8b12-5c87075d683b",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "125 /oauth/token Fail modified value grant_type",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.933Z",
+            "modified": "2023-10-25T19:27:00.933Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_codex\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "400"
+                }
+            ]
+        },
+        {
+            "_id": "a1a6eaf2-c55d-4d1a-9c20-6313f1c71fac",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 4",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.938Z",
+            "modified": "2023-10-25T19:27:00.938Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "cf3b4d18-7ade-41b3-88ff-cead049d24c1",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision Get another auth code 4",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.939Z",
+            "modified": "2023-10-25T19:27:00.939Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "e0261ae3-2193-4607-98d9-0e6542e086ab",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "131 /oauth/token Fail modified value client secret",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.940Z",
+            "modified": "2023-10-25T19:27:00.940Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}x\",\n  \"grant_type\": \"\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "a9a519af-2fa7-4bb6-8d3b-03bceabbac69",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/oauth/token Expect Success 5",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.941Z",
+            "modified": "2023-10-25T19:27:00.941Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.token_type | lower",
+                    "action": "equal",
+                    "value": "bearer"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.access_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.refresh_token | length",
+                    "action": ">",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "e39178d2-2e55-4252-9e4d-00071858ad9e",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 5",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.942Z",
+            "modified": "2023-10-25T19:27:00.942Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "39554e65-0b5b-47ca-81b0-26c377aa299a",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision another auth code 5",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.943Z",
+            "modified": "2023-10-25T19:27:00.943Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "f3d07f1c-db14-4a79-9069-d9a5dc11bf4b",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/oauth/token Expect Success 4",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.956Z",
+            "modified": "2023-10-25T19:27:00.956Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.token_type | lower",
+                    "action": "equal",
+                    "value": "bearer"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.access_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.refresh_token | length",
+                    "action": ">",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "6912c6c6-ac1e-4114-8544-a707ed05269b",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 3",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.957Z",
+            "modified": "2023-10-25T19:27:00.957Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "b7060bf3-854c-4cf2-b68a-e86ba2429729",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision Get another auth code 3",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54531.3,
+            "created": "2023-10-25T19:27:00.958Z",
+            "modified": "2023-10-25T19:27:00.958Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "c05e3cec-f726-4dd4-8223-51c64d01a608",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "140 /oauth/token Fail Missing redirect uri",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54539.9,
+            "created": "2023-10-25T19:27:00.924Z",
+            "modified": "2023-10-25T19:27:00.924Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "573cf7e2-ae8d-42a2-972f-f7dfe2087876",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 6",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54599.7,
+            "created": "2023-10-25T19:27:00.944Z",
+            "modified": "2023-10-25T19:27:00.944Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "bdda9e59-9933-47c8-94d5-e0a56206244e",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision another auth code 6",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54633.9,
+            "created": "2023-10-25T19:27:00.945Z",
+            "modified": "2023-10-25T19:27:00.945Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "31b18b69-f266-438d-ae49-18c3d0a1e9df",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "141 /oauth/token Fail empty string  redirect uri",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54646.4,
+            "created": "2023-10-25T19:27:00.928Z",
+            "modified": "2023-10-25T19:27:00.928Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "186e7022-0e7b-4f88-a817-cc2e8de8fef9",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 7",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54658.9,
+            "created": "2023-10-25T19:27:00.946Z",
+            "modified": "2023-10-25T19:27:00.946Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "f701cae0-3aa1-4f62-a4b1-5f31e9b670a2",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision another auth code 7",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54696.4,
+            "created": "2023-10-25T19:27:00.947Z",
+            "modified": "2023-10-25T19:27:00.947Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "f5147ce5-8c5f-4166-ad7c-1b793f711369",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "142 /oauth/token Fail modified value redirect uri",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54734,
+            "created": "2023-10-25T19:27:00.931Z",
+            "modified": "2023-10-25T19:27:00.931Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}/bad\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "02dad2b5-dd46-42f8-91ef-8345953520d2",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 8",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54800.5,
+            "created": "2023-10-25T19:27:00.951Z",
+            "modified": "2023-10-25T19:27:00.951Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "eadeb99e-c8db-4bf4-af6b-8f4278f3af53",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision Use transaction_id twice (1 of 2)",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54833.8,
+            "created": "2023-10-25T19:27:00.952Z",
+            "modified": "2023-10-25T19:27:00.952Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "c71c6dcd-3f38-46fc-9b0a-2551a123e3f3",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision Use transaction_id twice (2 of 2) Copy",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54850.4,
+            "created": "2023-10-25T19:27:00.953Z",
+            "modified": "2023-10-25T19:27:00.953Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "7e4e61a8-1dde-4480-a64d-02f0cfdbf354",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize  refresh transaction_id 9",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54867,
+            "created": "2023-10-25T19:27:00.948Z",
+            "modified": "2023-10-25T19:27:00.948Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "b905b258-c78a-4985-91c5-a278095d2531",
+            "colId": "9ea608e1-85bd-4424-ac42-b0a1718be497",
+            "containerId": "d0f2d6e1-6672-4283-a79c-55f0fb73922b",
+            "name": "/dialog/authorize/decision Fail no CSRF hash",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54871.2,
+            "created": "2023-10-25T19:27:00.955Z",
+            "modified": "2023-10-25T19:27:00.955Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "error=EBADCSRFTOKEN"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "notcontains",
+                    "value": "code="
+                }
+            ]
+        }
+    ]
+}

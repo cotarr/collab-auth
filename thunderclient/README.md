@@ -52,6 +52,8 @@ Import the file: "thunderclient/thunder-environment_collab-auth-env.json".
 This will import an environment named "collab-auth-env".
 This includes the following environment variables for use in testing.
 
+- After importing the environment, right click and select `Set Active` and a star icon will mark the active environment.
+
 ```
 auth_host:       "http://127.0.0.1:3500"
 frontend_host:   "http://localhost:3000"
@@ -67,9 +69,33 @@ scopes:          "api.read api.write"
 
 ## Import collections from repository
 
-To try the demo, import collection: "thunderclient/thunder-collection_collab-auth-demo.json" (Demonstration of OAuth2 handshake workflow)
+To try the demo, import collection: "thunderclient/thunder-collection_collab-auth-demo.json" 
 
-Optional tests, import: "thunderclient/thunder-collection_collab-auth-tests.json" (Optional - Miscellaneous test used for debugging code)
+- Collection: thunder-collection_collab-auth-demo.json
+  - Folder: Client Credentials Grant
+  - Folder: Authorization Code Grant
+  - Implicit Grant
+  - Password Grant
+
+Optional tests:
+
+Thunder Client has added a limit of 50 requests per collection.
+In version 0.0.20 the test collection has been broken into separate collections.
+For various tests and debugging requests load the following collections:
+
+- Collection: thunder-collection_collab-auth-tests-1.json
+  - Folder: Admin Editor User Account
+- Collection: thunder-collection_collab-auth-tests-2.json
+  - Folder: Admin Editor Client Account
+  - Folder: Unprotected Routes
+  - Folder: Response Headers
+  - Folder: Password rate limit
+- Collection: thunder-collection_collab-auth-tests-3.json
+  - Folder: Authorization Code Parsing 1 of 2
+- Collection: thunder-collection_collab-auth-tests-4.json
+  - Folder: Authorization Code Parsing 2 of 2
+- Collection: thunder-collection_collab-auth-tests-5.json
+  - Folder: Protected Routes
 
 
 ## Rate limit issues
@@ -278,58 +304,11 @@ clientSecret credentials base64 encoded in an Authorization header using Basic a
 
 Password grant is disabled in most OAuth2 implementation due to security risks.
 
-## Integrated collab-auth, collab-frontend, collab-backend-api
-
-Collection: collab-auth-demo
-
-Folder: Combined collab-frontend
-
-This sequence includes a full step by step emulation of a web server login using 
-authorization code grant. The access_token is then used to make a database query. 
-For this sequence to run properly, 3 different servers 
-must be running in the test environment. Full instructions are available in the 
-repository /docs folder.
-
-For the cookies to work properly, the authorization server must be a different domain name
-from the web server. The authorization server uses "127.0.0.1" and the web server uses "localhost".
-
-```
-collab-auth        http://127.0.0.1:3500
-collab-frontend    http://localhost:3000
-collab-backend-api http://localhost:4000
-```
-The requests prefaced with "Web" are submitted to the web server.
-
-The requests prefaced with "Auth" are submitted to the authentication server.
-
-- Web-1 The user attempts to visit the website main web page without a valid cookie. The browser is redirected to an /unauthorized landing page with a 'Login' button.
-- Web-2 While on the landing page, the user can select a Login button that is a hyperlink to the /login route on the frontend web server.
-- Web-3 The frontend web server receives the /login route and redirects (302) to the authorization server /dialog/authorize endpoint with several URL query parameters used for the OAuth2 handshake process.
-- Auth-1 The authorization server saves the query parameters for later use. The request does not find a valid cookie. The browser is redirected (302) to the /login route on the authorization server.
-- Auth-2 The authorization server returns the HTML login form for username and password entry (GET /login).
-- Auth-3 The login form submission request submits the username and password to authenticate the user's identity (POST /login). If password is correct, a 302 redirect is sent returning the browser to the /dialog/authorize route.
-- Auth-4 The client account has been configured trustedClient=false for this demonstration. This causes the /dialog/authorize route to return an HTML form asking user permission to access the resource.
-- Auth-5 The decision form submission request submits a 'yes' response to the /dialog/authorize/decision route which returns a redirect (302) back to the original web server with an access code as a URL query parameter of the redirect URL in the location header.
-- Web-4 The web browser receives the redirect and submits the authorization code to the web server and waits for a response. The web server submits the authorization code to the authorization server. If the code matches, a new access_token is created and returned to the web server. The access token is stored in the web server session database. The web server returns a redirect (302) with a valid cookie to the web browser to load the main web page.
-- Web-5 The main web page loads, the page includes javascript that runs on page load.
-- Web-6 As the main page loads, javascript sends a request to the /userinfo route on the web server. The name of the logged in user is returned for display in the banner at the top of the page indicating the login user.
-- Web-6 This is a REST API database request 
-  - Web server verifies the user's cookie.
-  - Web server retrieves user's access token and adds it to the request.
-  - The '/api/' is removed from the route and the request is forwarded by a reverse proxy to the backend database server at http://localhost:4000/v1/data/iot-data.
-  - The backend API extracts the access token.
-  - The access token is sent to the authorization server for validation.
-  - The token's meta-data is returned from the authorization server to the backend database server.
-  - The backend database checks the access_token meta-data scope value to see if the user has permission to access the resource. (api.read or api.write).
-  - The database query is performed.
-  - The backend API returns request to the web server.
-  - The web server returns the request to the web browser.
-
 # API Tests
 
 ## collab-auth-tests (Optional)
 
-The 'collab-auth-tests' collection contains several folders with miscellaneous tests. 
+Several files 'collab-auth-tests-*' contain several collections with miscellaneous tests. 
 It is not necessary to load this collection in order to see a step-by-step demonstration
 of the OAuth workflow.
 

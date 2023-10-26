@@ -1,0 +1,1607 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "collab-auth-tests-2",
+    "dateExported": "2023-10-26T00:21:58.282Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "Admin Editor Client Account",
+            "containerId": "",
+            "created": "2023-10-25T19:09:13.975Z",
+            "sortNum": 20000
+        },
+        {
+            "_id": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "Unprotected Routes",
+            "containerId": "",
+            "created": "2023-10-25T19:09:13.976Z",
+            "sortNum": 50000
+        },
+        {
+            "_id": "b4013a93-ec5d-4d17-8d0d-e4ccd76ca728",
+            "name": "Response Headers",
+            "containerId": "",
+            "created": "2023-10-25T19:09:13.977Z",
+            "sortNum": 60000
+        },
+        {
+            "_id": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "Password Rate Limit",
+            "containerId": "",
+            "created": "2023-10-25T19:09:13.978Z",
+            "sortNum": 80000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "ebc5d602-8746-4476-9f0e-b04fba48164c",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/logout - Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-10-25T19:09:13.975Z",
+            "modified": "2023-10-25T19:09:13.975Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "f5426988-75c2-4f7e-b38d-39d7165c516a",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/menu (remember URL)",
+            "url": "{{auth_host}}/panel/menu",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-10-25T19:09:13.976Z",
+            "modified": "2023-10-25T19:09:13.976Z",
+            "headers": [],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "e4f4f7e1-3aba-496a-a781-4c5c42cef528",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-10-25T19:09:13.977Z",
+            "modified": "2023-10-25T19:09:13.977Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "328b10b1-7a60-4e70-92c2-d2d900b04235",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/login (Role: user.admin)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-10-25T19:09:13.978Z",
+            "modified": "2023-10-25T19:09:13.978Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/panel/menu"
+                }
+            ]
+        },
+        {
+            "_id": "1f26584f-d692-46a8-8c82-64996eaf39b9",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/createclient (Get csrfToken)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2023-10-25T19:09:13.979Z",
+            "modified": "2023-10-25T19:09:13.979Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Create New User"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "59963ccb-9dbf-4676-849f-d023254ebe8b",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "Clear Cookie",
+            "url": "{{auth_host}}/status",
+            "method": "GET",
+            "sortNum": 197500,
+            "created": "2023-10-25T19:09:13.991Z",
+            "modified": "2023-10-25T19:09:13.991Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "4465da6f-4fe2-4baa-8df4-9d95b83d5a71",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/createclient (success)",
+            "url": "{{auth_host}}/panel/createclient",
+            "method": "POST",
+            "sortNum": 207500,
+            "created": "2023-10-25T19:09:13.984Z",
+            "modified": "2023-10-25T19:09:13.984Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "clientId",
+                        "value": "mynewclientid"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Test Client Name"
+                    },
+                    {
+                        "name": "clientSecret",
+                        "value": "mynewsecret"
+                    },
+                    {
+                        "name": "trustedClient",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "allowedScope",
+                        "value": "api.read, api.write"
+                    },
+                    {
+                        "name": "allowedRedirectURI",
+                        "value": "http://localhost:3000/login/callback"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "New client record successfully saved."
+                }
+            ]
+        },
+        {
+            "_id": "1978cb35-d055-47fb-9697-4b126ffaca8e",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/logout - Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 318750,
+            "created": "2023-10-25T19:09:13.996Z",
+            "modified": "2023-10-25T19:09:13.996Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "9e2c514a-5833-4085-ab4d-0b6d74ed2c8e",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/listclients (get client uuid)",
+            "url": "{{auth_host}}/panel/listclients",
+            "method": "GET",
+            "sortNum": 335000,
+            "created": "2023-10-25T19:09:13.980Z",
+            "modified": "2023-10-25T19:09:13.980Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<h2>List Clients</h2>"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"<tr>\") | last | split(\"editclient?id=\") | at(1) | split(\"><\") | first",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "b14d3420-386a-498f-8390-c5bb88270b1d",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/viewclient (verify)",
+            "url": "{{auth_host}}/panel/viewclient?id={{client_uuid}}",
+            "method": "GET",
+            "sortNum": 345000,
+            "created": "2023-10-25T19:09:13.981Z",
+            "modified": "2023-10-25T19:09:13.981Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "{{client_uuid}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<h2>View Client Info</h2>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>name</td><td>Test Client Name</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>clientId</td><td>mynewclientid</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>trustedClient</td><td>No</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>allowedScope</td><td>api.read, api.write</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>allowedRedirectURI</td><td>http://localhost:3000/login/callback</td>"
+                }
+            ]
+        },
+        {
+            "_id": "168de064-1ce5-4e04-8547-3fd491be387e",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 350312.5,
+            "created": "2023-10-25T19:09:13.998Z",
+            "modified": "2023-10-25T19:09:13.998Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "548dad73-394d-4f4e-ab77-90e51e3d0103",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/editclient (success)",
+            "url": "{{auth_host}}/panel/editclient",
+            "method": "POST",
+            "sortNum": 355000,
+            "created": "2023-10-25T19:09:13.982Z",
+            "modified": "2023-10-25T19:09:13.982Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "id",
+                        "value": "{{client_uuid}}"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Test New Name"
+                    },
+                    {
+                        "name": "clientSecret",
+                        "value": "mynewsecret2"
+                    },
+                    {
+                        "name": "trustedClient",
+                        "value": "on"
+                    },
+                    {
+                        "name": "allowedScope",
+                        "value": "api.none"
+                    },
+                    {
+                        "name": "allowedRedirectURI",
+                        "value": "http://localhost:3000/login/callback2"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Modified client record successfully saved."
+                }
+            ]
+        },
+        {
+            "_id": "620b72ee-16c4-4c1e-8d7c-c4783b47a509",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/viewclient (verify)",
+            "url": "{{auth_host}}/panel/viewclient?id={{client_uuid}}",
+            "method": "GET",
+            "sortNum": 360000,
+            "created": "2023-10-25T19:09:13.985Z",
+            "modified": "2023-10-25T19:09:13.985Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "{{client_uuid}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<h2>View Client Info</h2>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>name</td><td>Test New Name</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>clientId</td><td>mynewclientid</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>trustedClient</td><td>Yes</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>allowedScope</td><td>api.none</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>allowedRedirectURI</td><td>http://localhost:3000/login/callback2</td>"
+                }
+            ]
+        },
+        {
+            "_id": "0a1e3459-6faa-415b-8d80-13b3106b5ff7",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/deleteclient",
+            "url": "{{auth_host}}/panel/deleteclient",
+            "method": "POST",
+            "sortNum": 365000,
+            "created": "2023-10-25T19:09:13.983Z",
+            "modified": "2023-10-25T19:09:13.983Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"_csrf\": \"{{csrf_token}}\",\n  \"id\": \"{{client_uuid}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Client successfully deleted."
+                }
+            ]
+        },
+        {
+            "_id": "2bf416bc-0d0c-40b5-bd7b-396f4e0d3c02",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "ead992c0-3970-468d-b746-7f46eb62ff5a",
+            "name": "/panel/listclients (confirm deleted)",
+            "url": "{{auth_host}}/panel/listclients",
+            "method": "GET",
+            "sortNum": 375000,
+            "created": "2023-10-25T19:09:13.986Z",
+            "modified": "2023-10-25T19:09:13.986Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<h2>List Clients</h2>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "notcontains",
+                    "value": "{{client_uuid}}"
+                }
+            ]
+        },
+        {
+            "_id": "3d7f9dcc-16dc-465a-956d-b9f9235165bf",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (1 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 381875,
+            "created": "2023-10-25T19:09:13.997Z",
+            "modified": "2023-10-25T19:09:13.997Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "e1feaa97-d346-4f3a-89b8-1ab928000a8d",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (1 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 381953.2,
+            "created": "2023-10-25T19:09:14.006Z",
+            "modified": "2023-10-25T19:09:14.006Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "d62a529b-887a-4787-8eee-95e0ea3ce09b",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (2 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 382031.3,
+            "created": "2023-10-25T19:09:14.005Z",
+            "modified": "2023-10-25T19:09:14.005Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "34c0582f-4217-4d4c-9881-abe683a1d8ad",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (3 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 382187.5,
+            "created": "2023-10-25T19:09:14.004Z",
+            "modified": "2023-10-25T19:09:14.004Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "19992514-8413-40bb-b389-a501c23f19f6",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (4 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 382500,
+            "created": "2023-10-25T19:09:14.003Z",
+            "modified": "2023-10-25T19:09:14.003Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "174cbec6-4614-458b-9fce-b5189dd908a8",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (5 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 382812.5,
+            "created": "2023-10-25T19:09:14.001Z",
+            "modified": "2023-10-25T19:09:14.001Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "330baa6c-13bc-4002-99de-a602180ff84b",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (6 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 383125,
+            "created": "2023-10-25T19:09:14.002Z",
+            "modified": "2023-10-25T19:09:14.002Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "9cf93811-aa20-4297-a932-9804172fa18f",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (7 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 386875,
+            "created": "2023-10-25T19:09:14.000Z",
+            "modified": "2023-10-25T19:09:14.000Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "5646af76-c3b7-46f7-a000-597a470876bf",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (8 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 391875,
+            "created": "2023-10-25T19:09:13.999Z",
+            "modified": "2023-10-25T19:09:13.999Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "95a7c382-fdf9-4ea3-b05e-da2a5b0337a9",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "/status",
+            "url": "{{auth_host}}/status",
+            "method": "GET",
+            "sortNum": 395000,
+            "created": "2023-10-25T19:09:13.987Z",
+            "modified": "2023-10-25T19:09:13.987Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "fff30217-e48c-4b3f-bf99-3f39b501e1de",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (9 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 396875,
+            "created": "2023-10-25T19:09:14.008Z",
+            "modified": "2023-10-25T19:09:14.008Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "a38db534-a1db-47d7-80ef-950da7e3f31a",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "/login (HTML form)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 397500,
+            "created": "2023-10-25T19:09:13.990Z",
+            "modified": "2023-10-25T19:09:13.990Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "e949a510-f260-4473-b84b-80e8e29c58de",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "/logout",
+            "url": "{{auth_host}}/not-found",
+            "method": "GET",
+            "sortNum": 398750,
+            "created": "2023-10-25T19:09:13.992Z",
+            "modified": "2023-10-25T19:09:13.992Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "404"
+                }
+            ]
+        },
+        {
+            "_id": "4f32bc45-9301-4cdc-b9d3-912c679c8056",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "/robots.txt",
+            "url": "{{auth_host}}/robots.txt",
+            "method": "GET",
+            "sortNum": 400000,
+            "created": "2023-10-25T19:09:13.989Z",
+            "modified": "2023-10-25T19:09:13.989Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "6fd482ec-f02a-4d90-a33c-b25cb2d0cfc3",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login (10 of 10)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 401875,
+            "created": "2023-10-25T19:09:14.007Z",
+            "modified": "2023-10-25T19:09:14.007Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": []
+        },
+        {
+            "_id": "e032cac5-21b1-4a21-8a3a-a35d7f70768c",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "/.well-known/security.txt",
+            "url": "{{auth_host}}/.well-known/security.txt",
+            "method": "GET",
+            "sortNum": 405000,
+            "created": "2023-10-25T19:09:13.988Z",
+            "modified": "2023-10-25T19:09:13.988Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "993a6242-0c81-4bc8-a476-7cb84b0c439e",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "b4013a93-ec5d-4d17-8d0d-e4ccd76ca728",
+            "name": "Helmet Headers",
+            "url": "{{auth_host}}/status",
+            "method": "GET",
+            "sortNum": 405000,
+            "created": "2023-10-25T19:09:13.994Z",
+            "modified": "2023-10-25T19:09:13.994Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "custom-header",
+                    "custom": "cross-origin-opener-policy",
+                    "action": "equal",
+                    "value": "same-origin"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "cross-origin-resource-policy",
+                    "action": "equal",
+                    "value": "same-origin"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "origin-agent-cluster",
+                    "action": "equal",
+                    "value": "?1"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "referrer-policy",
+                    "action": "equal",
+                    "value": "no-referrer"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "strict-transport-security",
+                    "action": "equal",
+                    "value": "max-age=15552000; includeSubDomains"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-content-type-options",
+                    "action": "equal",
+                    "value": "nosniff"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-dns-prefetch-control",
+                    "action": "equal",
+                    "value": "off"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-download-options",
+                    "action": "equal",
+                    "value": "noopen"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-frame-options",
+                    "action": "equal",
+                    "value": "DENY"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-permitted-cross-domain-policies",
+                    "action": "equal",
+                    "value": "none"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "x-xss-protection",
+                    "action": "equal",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "5cd0b388-3076-41a6-9161-88fd9ae0e2ab",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "7da99409-14cb-4118-b59c-cbc44026f5f0",
+            "name": "/login Expect 429 Too Many Requests",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 411875,
+            "created": "2023-10-25T19:09:14.009Z",
+            "modified": "2023-10-25T19:09:14.009Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "429"
+                }
+            ]
+        },
+        {
+            "_id": "0bf0aa6f-b3d3-4922-8aef-8c222b19554c",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "37f26c4d-6b29-4706-b3ab-c6fe2dc3e6d2",
+            "name": "/not-found (intentional 404)",
+            "url": "{{auth_host}}/.well-known/security.txt",
+            "method": "GET",
+            "sortNum": 415000,
+            "created": "2023-10-25T19:09:13.993Z",
+            "modified": "2023-10-25T19:09:13.993Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "0e39ddf1-3f9b-4027-bcd9-4182d2d79a0f",
+            "colId": "61878979-bc5d-44e1-ac2a-606206e89d30",
+            "containerId": "b4013a93-ec5d-4d17-8d0d-e4ccd76ca728",
+            "name": "Content Security Policy",
+            "url": "{{auth_host}}/status",
+            "method": "GET",
+            "sortNum": 415000,
+            "created": "2023-10-25T19:09:13.995Z",
+            "modified": "2023-10-25T19:09:13.995Z",
+            "headers": [],
+            "params": [],
+            "tests": [
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "default-src 'none'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "connect-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "base-uri 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "connect-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "img-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "style-src 'self'"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "content-security-policy",
+                    "action": "contains",
+                    "value": "frame-ancestors 'none'"
+                }
+            ]
+        }
+    ]
+}

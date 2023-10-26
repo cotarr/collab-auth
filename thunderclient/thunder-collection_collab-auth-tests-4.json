@@ -1,0 +1,759 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "collab-auth-tests-4",
+    "dateExported": "2023-10-26T00:28:33.277Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "Authorization Code Parsing 2 of 2",
+            "containerId": "",
+            "created": "2023-10-25T19:32:13.131Z",
+            "sortNum": 30000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "3663dee6-7e2c-444a-8b05-5ecb699af2ba",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/logout Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-10-25T19:32:13.131Z",
+            "modified": "2023-10-25T19:32:13.131Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "f64c4a3a-e641-4582-be81-631d6f70ab63",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/dialog/authorize Authorization check 10",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 12500,
+            "created": "2023-10-25T19:32:13.133Z",
+            "modified": "2023-10-25T19:32:13.133Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "d7d4d161-2f68-4bf8-a99f-1e5df86925d4",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/login Get login form",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-10-25T19:32:13.132Z",
+            "modified": "2023-10-25T19:32:13.132Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "2a4222d7-d739-41ca-96b5-206ed5c5247d",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/login Submit username and password",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 25000,
+            "created": "2023-10-25T19:32:13.134Z",
+            "modified": "2023-10-25T19:32:13.134Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "/dialog/authorize"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "response_type=code"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "client_id={{client_id}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "scope="
+                }
+            ]
+        },
+        {
+            "_id": "11add29e-0650-4eed-9e92-7f843baab401",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/dialog/authorize  get transaction_id 10",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-10-25T19:32:13.135Z",
+            "modified": "2023-10-25T19:32:13.135Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "89a54db5-cd27-44a1-9524-ac75cde6eece",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/dialog/authorize/decision another auth code 10",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54883.7,
+            "created": "2023-10-25T19:32:13.140Z",
+            "modified": "2023-10-25T19:32:13.140Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "40e8a15f-2c22-4681-80a3-5cd59ee197e3",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/oauth/token Use code twice (1 of 2)",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54892,
+            "created": "2023-10-25T19:32:13.141Z",
+            "modified": "2023-10-25T19:32:13.141Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.token_type | lower",
+                    "action": "equal",
+                    "value": "bearer"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.access_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.refresh_token | length",
+                    "action": ">",
+                    "value": "0"
+                }
+            ]
+        },
+        {
+            "_id": "d67da5db-7733-4028-9cfc-9a905daecec2",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/oauth/token Use code twice (2 of 2)",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 54896.2,
+            "created": "2023-10-25T19:32:13.142Z",
+            "modified": "2023-10-25T19:32:13.142Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error",
+                    "action": "equal",
+                    "value": "invalid_grant"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.error_description",
+                    "action": "equal",
+                    "value": "Invalid authorization code"
+                }
+            ]
+        },
+        {
+            "_id": "6e45d762-177c-40f7-b96e-7f1c3a9a2857",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/dialog/authorize  refresh transaction_id 11",
+            "url": "{{auth_host}}/dialog/authorize?redirect_uri={{redirect_uri}}&response_type=code&client_id={{client_id}}&scope={{scopes}}",
+            "method": "GET",
+            "sortNum": 54900.3,
+            "created": "2023-10-25T19:32:13.139Z",
+            "modified": "2023-10-25T19:32:13.139Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "redirect_uri",
+                    "value": "{{redirect_uri}}",
+                    "isPath": false
+                },
+                {
+                    "name": "response_type",
+                    "value": "code",
+                    "isPath": false
+                },
+                {
+                    "name": "client_id",
+                    "value": "{{client_id}}",
+                    "isPath": false
+                },
+                {
+                    "name": "scope",
+                    "value": "{{scopes}}",
+                    "isPath": false
+                }
+            ],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Resource Decision"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=transaction_id\" | at(1) | split(\"value=\") | at(1) | split(\">\") | first",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "4b506e29-9bba-4174-8712-4957e02d9e53",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/dialog/authorize/decision another auth code 11",
+            "url": "{{auth_host}}/dialog/authorize/decision",
+            "method": "POST",
+            "sortNum": 54933.5,
+            "created": "2023-10-25T19:32:13.136Z",
+            "modified": "2023-10-25T19:32:13.136Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "transaction_id",
+                        "value": "{{transaction_id}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "cancel",
+                        "value": "Deny",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location | split(\"?\") | first",
+                    "action": "equal",
+                    "value": "{{redirect_uri}}"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "contains",
+                    "value": "code="
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "header.location | split(\"code=\") | last",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "3b16f64c-5797-4b54-8271-13b0e8ac3f1f",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/oauth2/token Final Test Expectd Success",
+            "url": "{{auth_host}}/oauth/token",
+            "method": "POST",
+            "sortNum": 65000,
+            "created": "2023-10-25T19:32:13.137Z",
+            "modified": "2023-10-25T19:32:13.137Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"code\": \"{{auth_code}}\",\n  \"redirect_uri\": \"{{redirect_uri}}\",\n  \"client_id\": \"{{client_id}}\",\n  \"client_secret\": \"{{client_secret}}\",\n  \"grant_type\": \"authorization_code\"\n}",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.token_type | lower",
+                    "action": "equal",
+                    "value": "bearer"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.scope | first",
+                    "action": "equal",
+                    "value": "api.write"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.access_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.refresh_token | length",
+                    "action": ">",
+                    "value": "0"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "json.access_token",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "json.refresh_token",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "05823c0b-6c7c-4164-8448-68508ab61de7",
+            "colId": "ca257f14-df42-49b4-8bc8-e1f5090d6d3f",
+            "containerId": "ac3f8350-d6d0-41a7-8e87-84ed4a9eaad0",
+            "name": "/oath/introspect Validate token from end test",
+            "url": "{{auth_host}}/oauth/introspect",
+            "method": "POST",
+            "sortNum": 75000,
+            "created": "2023-10-25T19:32:13.138Z",
+            "modified": "2023-10-25T19:32:13.138Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "application/json"
+                },
+                {
+                    "name": "Authorization",
+                    "value": "Basic {{client_base64}}"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"access_token\": \"{{access_token}}\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "isjson",
+                    "value": ""
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.active",
+                    "action": "equal",
+                    "value": "true"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.grant_type",
+                    "action": "equal",
+                    "value": "authorization_code"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.scope | first",
+                    "action": "equal",
+                    "value": "api.write"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.client.clientId",
+                    "action": "equal",
+                    "value": "{{client_id}}"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.user.username",
+                    "action": "equal",
+                    "value": "bob"
+                }
+            ]
+        }
+    ]
+}

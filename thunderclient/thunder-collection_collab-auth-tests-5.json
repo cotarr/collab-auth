@@ -1,0 +1,1342 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "collab-auth-tests-5",
+    "dateExported": "2023-10-26T00:23:15.324Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "Protected Routes",
+            "containerId": "",
+            "created": "2023-10-25T19:24:37.475Z",
+            "sortNum": 40000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "910a505c-d8a5-4335-927f-0600ee3181ef",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/logout - Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-10-25T19:24:37.475Z",
+            "modified": "2023-10-25T19:24:37.475Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "1f6f859a-0ed9-44ec-8430-7517cb792e5e",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "Get CSRF hash",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 15000,
+            "created": "2023-10-25T19:24:37.495Z",
+            "modified": "2023-10-25T19:24:37.495Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "e0122eb6-8e2e-44af-aad9-dfc0d499dd80",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/status (no auth needed)",
+            "url": "{{auth_host}}/status",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-10-25T19:24:37.477Z",
+            "modified": "2023-10-25T19:24:37.477Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "e67095fd-ee9f-4c86-8847-665de1e7be75",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/secure (expect fail)",
+            "url": "{{auth_host}}/secure",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2023-10-25T19:24:37.478Z",
+            "modified": "2023-10-25T19:24:37.478Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "401"
+                }
+            ]
+        },
+        {
+            "_id": "90dbc708-f935-47aa-b6be-59ee100f408f",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/menu (fail)",
+            "url": "{{auth_host}}/panel/menu",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-10-25T19:24:37.479Z",
+            "modified": "2023-10-25T19:24:37.479Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "de9acd2c-a8f7-4223-98b8-b878278f7268",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/listclients (fail)",
+            "url": "{{auth_host}}/panel/listclients",
+            "method": "GET",
+            "sortNum": 55000,
+            "created": "2023-10-25T19:24:37.481Z",
+            "modified": "2023-10-25T19:24:37.481Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "a84951c1-ef0f-483c-8dc0-462897b6fec7",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/listusers (fail)",
+            "url": "{{auth_host}}/panel/listusers",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2023-10-25T19:24:37.480Z",
+            "modified": "2023-10-25T19:24:37.480Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "ba049922-3a1a-4fc5-a50d-cd925bc3737f",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/viewuser (fail)",
+            "url": "{{auth_host}}/panel/viewuser?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "GET",
+            "sortNum": 70000,
+            "created": "2023-10-25T19:24:37.482Z",
+            "modified": "2023-10-25T19:24:37.482Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "f37e06c5-9876-4890-90d4-763fb9a53b90",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/viewclient (fail)",
+            "url": "{{auth_host}}/panel/viewclient?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2023-10-25T19:24:37.483Z",
+            "modified": "2023-10-25T19:24:37.483Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "4794cc3e-1eff-4682-ad29-9a88ac8a8f5a",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/createuser (fail)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2023-10-25T19:24:37.484Z",
+            "modified": "2023-10-25T19:24:37.484Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "f5bd03c1-a588-43cb-9880-efbc647e6788",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/creatclient (fail)",
+            "url": "{{auth_host}}/panel/createclient",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2023-10-25T19:24:37.485Z",
+            "modified": "2023-10-25T19:24:37.485Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "9dbc57b7-5095-4be8-a4d3-d122a28d0bf0",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/createuser (fail)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "POST",
+            "sortNum": 105000,
+            "created": "2023-10-25T19:24:37.496Z",
+            "modified": "2023-10-25T19:24:37.496Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Test User"
+                    },
+                    {
+                        "name": "number",
+                        "value": "987"
+                    },
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "8c9e96d4-06a8-463b-bfd9-5d4ad4e5d92f",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/createclient (fail)",
+            "url": "{{auth_host}}/panel/createclient",
+            "method": "POST",
+            "sortNum": 112500,
+            "created": "2023-10-25T19:24:37.497Z",
+            "modified": "2023-10-25T19:24:37.497Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "clientId",
+                        "value": "mynewclientid"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Test Client Name"
+                    },
+                    {
+                        "name": "clientSecret",
+                        "value": "mynewsecret"
+                    },
+                    {
+                        "name": "trustedClient",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "allowedScope",
+                        "value": "api.read, api.write"
+                    },
+                    {
+                        "name": "allowedRedirectURI",
+                        "value": "http://localhost:3000/login/callback"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "d7e0f5d3-d46c-44f3-adba-f360a010bd09",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/edituser (fail)",
+            "url": "{{auth_host}}/panel/edituser?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2023-10-25T19:24:37.486Z",
+            "modified": "2023-10-25T19:24:37.486Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "fd3ee8a4-86ce-4561-9243-aafa6dd70e0f",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/editclient (fail)",
+            "url": "{{auth_host}}/panel/editclient?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "GET",
+            "sortNum": 140000,
+            "created": "2023-10-25T19:24:37.487Z",
+            "modified": "2023-10-25T19:24:37.487Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "9ad04410-9167-44eb-b29a-5ce41ae94159",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/edituser (fail)",
+            "url": "{{auth_host}}/panel/edituser?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "POST",
+            "sortNum": 145000,
+            "created": "2023-10-25T19:24:37.498Z",
+            "modified": "2023-10-25T19:24:37.498Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "id",
+                        "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Different Test User"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": ""
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": ""
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.password"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "f3570b1d-f159-47f2-b191-18536e7d5211",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/editclient (fail)",
+            "url": "{{auth_host}}/panel/editclient?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "POST",
+            "sortNum": 152500,
+            "created": "2023-10-25T19:24:37.499Z",
+            "modified": "2023-10-25T19:24:37.499Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "id",
+                        "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Test New Name"
+                    },
+                    {
+                        "name": "clientSecret",
+                        "value": "mynewsecret2"
+                    },
+                    {
+                        "name": "trustedClient",
+                        "value": "on"
+                    },
+                    {
+                        "name": "allowedScope",
+                        "value": "api.none"
+                    },
+                    {
+                        "name": "allowedRedirectURI",
+                        "value": "http://localhost:3000/login/callback2"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "d37b5af4-6e02-47e3-a495-0e9a2f9933a2",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/deleteuser (fail)",
+            "url": "{{auth_host}}/panel/deleteuser?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "GET",
+            "sortNum": 170000,
+            "created": "2023-10-25T19:24:37.488Z",
+            "modified": "2023-10-25T19:24:37.488Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "a0d022a4-7f3b-4c0b-85fd-f23bddc95fbf",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/deleteclient (fail)",
+            "url": "{{auth_host}}/panel/deleteclient?id=d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+            "method": "GET",
+            "sortNum": 180000,
+            "created": "2023-10-25T19:24:37.489Z",
+            "modified": "2023-10-25T19:24:37.489Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "d21cfd54-4d23-4fd3-995b-ccc193eff99f",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "50b9c418-2efd-4f07-8d24-238db027ae46",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/deleteuser (fail)",
+            "url": "{{auth_host}}/panel/deleteuser",
+            "method": "POST",
+            "sortNum": 182500,
+            "created": "2023-10-25T19:24:37.501Z",
+            "modified": "2023-10-25T19:24:37.501Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"_csrf\": \"{{csrf_token}}\",\n    \"id\": \"d21cfd54-4d23-4fd3-995b-ccc193eff99f\"\n}\n",
+                "form": []
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "ac547b9c-5ce3-40ac-8bff-8c333bc43383",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/deleteclient (fail)",
+            "url": "{{auth_host}}/panel/deleteclient",
+            "method": "POST",
+            "sortNum": 185000,
+            "created": "2023-10-25T19:24:37.500Z",
+            "modified": "2023-10-25T19:24:37.500Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"_csrf\": \"{{csrf_token}}\",\n  \"id\": \"d21cfd54-4d23-4fd3-995b-ccc193eff99f\"\n}\n",
+                "form": []
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "e078fcda-40bd-4cba-908f-ab420070fb84",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/removealltokens (fail)",
+            "url": "{{auth_host}}/panel/removealltokens",
+            "method": "GET",
+            "sortNum": 190000,
+            "created": "2023-10-25T19:24:37.490Z",
+            "modified": "2023-10-25T19:24:37.490Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "b1c0853b-39c9-4ac4-a507-b03526cbfc62",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/panel/stats (fail)",
+            "url": "{{auth_host}}/panel/stats",
+            "method": "GET",
+            "sortNum": 200000,
+            "created": "2023-10-25T19:24:37.491Z",
+            "modified": "2023-10-25T19:24:37.491Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "3d77e8d6-cb98-4a04-9d5e-b45816ad63b5",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/redirecterror",
+            "url": "{{auth_host}}/redirecterror",
+            "method": "GET",
+            "sortNum": 205000,
+            "created": "2023-10-25T19:24:37.504Z",
+            "modified": "2023-10-25T19:24:37.504Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "9f35dcc6-b166-41d5-8274-bc8955e3a65d",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/secure",
+            "url": "{{auth_host}}/redirecterror",
+            "method": "GET",
+            "sortNum": 207500,
+            "created": "2023-10-25T19:24:37.505Z",
+            "modified": "2023-10-25T19:24:37.505Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "fff57b7a-516c-496c-ac50-f925f0e955f9",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/changepassword (expect fail)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "GET",
+            "sortNum": 210000,
+            "created": "2023-10-25T19:24:37.492Z",
+            "modified": "2023-10-25T19:24:37.492Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "5e276335-6f90-466c-90a5-9f91ca8edb55",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/changepassword (fail)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 215000,
+            "created": "2023-10-25T19:24:37.503Z",
+            "modified": "2023-10-25T19:24:37.503Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "09eecfed-6cfd-4b0e-80ad-06f1e27e56d1",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "Get CSRF hash Copy",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 225000,
+            "created": "2023-10-25T19:24:37.502Z",
+            "modified": "2023-10-25T19:24:37.502Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "a834402e-52cf-4807-9b99-3fba0b992c38",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/login (sesson)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 240000,
+            "created": "2023-10-25T19:24:37.493Z",
+            "modified": "2023-10-25T19:24:37.493Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/changepassword"
+                }
+            ]
+        },
+        {
+            "_id": "32e35eda-caca-4b23-a291-344b07713d79",
+            "colId": "fd20fc6e-f4d6-4615-8869-2aea4f9c449c",
+            "containerId": "0a0ef9a5-8715-4ffe-96f5-7d332150e289",
+            "name": "/secure (expect success)",
+            "url": "{{auth_host}}/secure",
+            "method": "GET",
+            "sortNum": 250000,
+            "created": "2023-10-25T19:24:37.494Z",
+            "modified": "2023-10-25T19:24:37.494Z",
+            "headers": [],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        }
+    ]
+}

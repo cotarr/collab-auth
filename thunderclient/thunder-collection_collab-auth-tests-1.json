@@ -1,0 +1,2219 @@
+{
+    "client": "Thunder Client",
+    "collectionName": "collab-auth-tests-1",
+    "dateExported": "2023-10-26T00:21:03.666Z",
+    "version": "1.1",
+    "folders": [
+        {
+            "_id": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "Admin Editor User Account",
+            "containerId": "",
+            "created": "2023-10-25T19:05:57.487Z",
+            "sortNum": 10000
+        }
+    ],
+    "requests": [
+        {
+            "_id": "c2948099-7b67-4a30-b184-03595cb40172",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/logout - Clear variables",
+            "url": "{{auth_host}}/logout",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2023-10-25T19:05:57.513Z",
+            "modified": "2023-10-25T19:05:57.513Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "You have been logged out of the authorization server."
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{access_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{refresh_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{transaction_id, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{auth_code, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "delete",
+                    "action": "setto",
+                    "value": "{{client_uuid, local}}"
+                }
+            ],
+            "preReq": {
+                "options": {
+                    "clearCookies": true
+                }
+            }
+        },
+        {
+            "_id": "dbaa9394-e7bb-4e46-af4a-9791f7e6df4a",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/menu (remember URL)",
+            "url": "{{auth_host}}/panel/menu",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2023-10-25T19:05:57.487Z",
+            "modified": "2023-10-25T19:05:57.487Z",
+            "headers": [],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/login"
+                }
+            ]
+        },
+        {
+            "_id": "6c0d3664-163e-480c-8c35-4882ee7e7ecd",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 30000,
+            "created": "2023-10-25T19:05:57.514Z",
+            "modified": "2023-10-25T19:05:57.514Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "be0ec31e-0996-4ba9-b34b-4faa0bf757c6",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login Fail no CSRF hash",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 35000,
+            "created": "2023-10-25T19:05:57.525Z",
+            "modified": "2023-10-25T19:05:57.525Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors.msg",
+                    "action": "equal",
+                    "value": "Required value"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors.path",
+                    "action": "equal",
+                    "value": "_csrf"
+                }
+            ]
+        },
+        {
+            "_id": "308c06ee-75d0-49a8-951f-482c10610f8b",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 37500,
+            "created": "2023-10-25T19:05:57.526Z",
+            "modified": "2023-10-25T19:05:57.526Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "1431f59f-63ff-4966-9059-143acf21f216",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (Role: user.admin)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 40000,
+            "created": "2023-10-25T19:05:57.489Z",
+            "modified": "2023-10-25T19:05:57.489Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/panel/menu"
+                }
+            ]
+        },
+        {
+            "_id": "0d532195-033d-4431-9c74-427b979a95ac",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/menu (success)",
+            "url": "{{auth_host}}/panel/menu",
+            "method": "GET",
+            "sortNum": 50000,
+            "created": "2023-10-25T19:05:57.515Z",
+            "modified": "2023-10-25T19:05:57.515Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Web Administration Panel"
+                }
+            ]
+        },
+        {
+            "_id": "6155f6a8-5592-4703-aac3-d7e20d641edf",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser (Get csrfToken)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "GET",
+            "sortNum": 60000,
+            "created": "2023-10-25T19:05:57.490Z",
+            "modified": "2023-10-25T19:05:57.490Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Create New User"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "a88a6ff2-858b-46be-b40e-152a587bc02d",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser fail: no CSRF hash",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "POST",
+            "sortNum": 61250,
+            "created": "2023-10-25T19:05:57.528Z",
+            "modified": "2023-10-25T19:05:57.528Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Test User"
+                    },
+                    {
+                        "name": "number",
+                        "value": "987"
+                    },
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}",
+                        "isDisabled": true
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                }
+            ]
+        },
+        {
+            "_id": "406b38b2-f960-4222-9817-479e12746886",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser (Get csrfToken)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "GET",
+            "sortNum": 62500,
+            "created": "2023-10-25T19:05:57.527Z",
+            "modified": "2023-10-25T19:05:57.527Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Create New User"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "6c8b1602-ec8c-4e1a-a035-19723ce7fd0e",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser (fail: invalid char in username)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "POST",
+            "sortNum": 65000,
+            "created": "2023-10-25T19:05:57.522Z",
+            "modified": "2023-10-25T19:05:57.522Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Test User"
+                    },
+                    {
+                        "name": "number",
+                        "value": "987"
+                    },
+                    {
+                        "name": "username",
+                        "value": "mynewu$ername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors[0].msg",
+                    "action": "equal",
+                    "value": "Invalid characters in string"
+                }
+            ]
+        },
+        {
+            "_id": "488586a3-e4a8-4efa-87cb-8c62be5ad4da",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser (fail: missing username)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "POST",
+            "sortNum": 67500,
+            "created": "2023-10-25T19:05:57.523Z",
+            "modified": "2023-10-25T19:05:57.523Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Test User"
+                    },
+                    {
+                        "name": "number",
+                        "value": "987"
+                    },
+                    {
+                        "name": "username",
+                        "value": "mynewusername",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors[0].msg",
+                    "action": "equal",
+                    "value": "Required value"
+                }
+            ]
+        },
+        {
+            "_id": "60bc8667-83c0-46a0-8089-697308b1bc12",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser (fail: extraneious property)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "POST",
+            "sortNum": 68750,
+            "created": "2023-10-25T19:05:57.524Z",
+            "modified": "2023-10-25T19:05:57.524Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Test User"
+                    },
+                    {
+                        "name": "number",
+                        "value": "987"
+                    },
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    },
+                    {
+                        "name": "extraneous",
+                        "value": "Not expected"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors[0].msg",
+                    "action": "equal",
+                    "value": "Invalid param"
+                }
+            ]
+        },
+        {
+            "_id": "2b76eba9-9377-4dd3-8421-176cb5f8cc5c",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/createuser (user.none)",
+            "url": "{{auth_host}}/panel/createuser",
+            "method": "POST",
+            "sortNum": 70000,
+            "created": "2023-10-25T19:05:57.491Z",
+            "modified": "2023-10-25T19:05:57.491Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "name",
+                        "value": "Test User"
+                    },
+                    {
+                        "name": "number",
+                        "value": "987"
+                    },
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "New user record successfully saved."
+                }
+            ]
+        },
+        {
+            "_id": "a4b1b73c-9de3-4e8d-88fc-5ad6c6dd4b59",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/listusers extract created uuid",
+            "url": "{{auth_host}}/panel/listusers",
+            "method": "GET",
+            "sortNum": 80000,
+            "created": "2023-10-25T19:05:57.492Z",
+            "modified": "2023-10-25T19:05:57.492Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>mynewusername</td>"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"<tr>\") | last | split(\"viewuser?id=\") | last | split(\"><\") | first",
+                    "action": "setto",
+                    "value": "{{user_uuid, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "d2775785-f3d1-49a7-984f-5b573a007b9c",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/viewuser (check some data)",
+            "url": "{{auth_host}}/panel/viewuser?id={{user_uuid}}",
+            "method": "GET",
+            "sortNum": 90000,
+            "created": "2023-10-25T19:05:57.493Z",
+            "modified": "2023-10-25T19:05:57.493Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "{{user_uuid}}",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>{{user_uuid}}</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>Number</td></td><td>987</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>Username</td><td>mynewusername</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>Name</td><td>Test User</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>Role</td><td>user.none</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>987</td>"
+                }
+            ]
+        },
+        {
+            "_id": "6e41767a-5688-46d0-a119-94c70c4092e6",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 100000,
+            "created": "2023-10-25T19:05:57.516Z",
+            "modified": "2023-10-25T19:05:57.516Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "d8859636-99a8-4ddb-b91f-5c22de435dce",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (user.none)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 110000,
+            "created": "2023-10-25T19:05:57.494Z",
+            "modified": "2023-10-25T19:05:57.494Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "password",
+                        "value": "mynewpassword"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/redirecterror"
+                }
+            ]
+        },
+        {
+            "_id": "286dd56a-3ac7-4675-be8c-33c9432e846e",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/menu (403)",
+            "url": "{{auth_host}}/panel/menu",
+            "method": "GET",
+            "sortNum": 120000,
+            "created": "2023-10-25T19:05:57.495Z",
+            "modified": "2023-10-25T19:05:57.495Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "cb63a400-21df-4e9b-a190-c9ba5ab33556",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (403)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "GET",
+            "sortNum": 130000,
+            "created": "2023-10-25T19:05:57.496Z",
+            "modified": "2023-10-25T19:05:57.496Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "449b5205-a655-42fa-890e-9ed49653cd8e",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 140000,
+            "created": "2023-10-25T19:05:57.517Z",
+            "modified": "2023-10-25T19:05:57.517Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "87a295bb-6203-4846-9f1c-bd8bbcc5002e",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (Role: user.admin)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 150000,
+            "created": "2023-10-25T19:05:57.518Z",
+            "modified": "2023-10-25T19:05:57.518Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/redirecterror"
+                }
+            ]
+        },
+        {
+            "_id": "227f142f-c325-4f49-98e3-7683b01eb472",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/edituser (change pw only)",
+            "url": "{{auth_host}}/panel/edituser",
+            "method": "POST",
+            "sortNum": 160000,
+            "created": "2023-10-25T19:05:57.497Z",
+            "modified": "2023-10-25T19:05:57.497Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "id",
+                        "value": "{{user_uuid}}"
+                    },
+                    {
+                        "name": "name",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword1"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword1"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.none"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Modified user record successfully saved."
+                }
+            ]
+        },
+        {
+            "_id": "7d26223c-56e0-4a9d-9552-b0b41cea726d",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/edituser (pw not match)",
+            "url": "{{auth_host}}/panel/edituser",
+            "method": "POST",
+            "sortNum": 170000,
+            "created": "2023-10-25T19:05:57.498Z",
+            "modified": "2023-10-25T19:05:57.498Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "id",
+                        "value": "{{user_uuid}}"
+                    },
+                    {
+                        "name": "name",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword3"
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.password"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Passwords do not match"
+                }
+            ]
+        },
+        {
+            "_id": "cf885f0c-f8f9-45f0-9968-ecb1a02bec3b",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/edituser (name, scope user.password)",
+            "url": "{{auth_host}}/panel/edituser",
+            "method": "POST",
+            "sortNum": 180000,
+            "created": "2023-10-25T19:05:57.499Z",
+            "modified": "2023-10-25T19:05:57.499Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "id",
+                        "value": "{{user_uuid}}"
+                    },
+                    {
+                        "name": "name",
+                        "value": "Different Test User"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": ""
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": ""
+                    },
+                    {
+                        "name": "loginDisabled",
+                        "value": "on",
+                        "isDisabled": true
+                    },
+                    {
+                        "name": "role",
+                        "value": "user.password"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Modified user record successfully saved"
+                }
+            ]
+        },
+        {
+            "_id": "675cd131-74a8-4fc6-884b-34ae93f1830f",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/viewuser (check some data)",
+            "url": "{{auth_host}}/panel/viewuser?id={{user_uuid}}",
+            "method": "GET",
+            "sortNum": 190000,
+            "created": "2023-10-25T19:05:57.500Z",
+            "modified": "2023-10-25T19:05:57.500Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "{{user_uuid}}",
+                    "isPath": false
+                }
+            ],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>{{user_uuid}}</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>Name</td><td>Different Test User</td>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<td>Role</td><td>user.password</td>"
+                }
+            ]
+        },
+        {
+            "_id": "d9d54df2-d772-4546-942f-2756c8d097e8",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 200000,
+            "created": "2023-10-25T19:05:57.519Z",
+            "modified": "2023-10-25T19:05:57.519Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "4da9d79e-03e2-4f72-a5ba-a36358aaf1ba",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (Role: user.password)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 210000,
+            "created": "2023-10-25T19:05:57.501Z",
+            "modified": "2023-10-25T19:05:57.501Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "password",
+                        "value": "mynewpassword1"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/redirecterror"
+                }
+            ]
+        },
+        {
+            "_id": "1434510e-6fcc-46c1-9305-be7ee37db792",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/menu (403)",
+            "url": "{{auth_host}}/panel/menu",
+            "method": "GET",
+            "sortNum": 220000,
+            "created": "2023-10-25T19:05:57.502Z",
+            "modified": "2023-10-25T19:05:57.502Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "403"
+                }
+            ]
+        },
+        {
+            "_id": "d7a8d63f-0cc5-49d5-97ea-420cc1545a07",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (get csrfToken))",
+            "url": "{{auth_host}}/changepassword",
+            "method": "GET",
+            "sortNum": 230000,
+            "created": "2023-10-25T19:05:57.503Z",
+            "modified": "2023-10-25T19:05:57.503Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "<h1>Change Password</h1>"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "e456aee1-3320-4dad-9322-0e7b99df40cc",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (Successful, 200)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 240000,
+            "created": "2023-10-25T19:05:57.504Z",
+            "modified": "2023-10-25T19:05:57.504Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "mynewpassword1"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Your password has been successfully changed."
+                }
+            ]
+        },
+        {
+            "_id": "91ed9ddf-31bf-4b5e-b0ad-d5262fa7a6b9",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (same as old)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 250000,
+            "created": "2023-10-25T19:05:57.505Z",
+            "modified": "2023-10-25T19:05:57.505Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "New password must be different."
+                }
+            ]
+        },
+        {
+            "_id": "ef7f0a8c-5692-483d-a8c4-d7ffc8e907e2",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (old invalid)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 260000,
+            "created": "2023-10-25T19:05:57.506Z",
+            "modified": "2023-10-25T19:05:57.506Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "invalidOldPassword"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Old password was Invalid."
+                }
+            ]
+        },
+        {
+            "_id": "1f569470-b0f9-4086-aa21-4d4f4c613740",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (user invalid)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 270000,
+            "created": "2023-10-25T19:05:57.507Z",
+            "modified": "2023-10-25T19:05:57.507Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "invalidUsername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Username was Invalid"
+                }
+            ]
+        },
+        {
+            "_id": "580a5512-46be-4a71-b5ea-d028f648394c",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (new not match)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 280000,
+            "created": "2023-10-25T19:05:57.508Z",
+            "modified": "2023-10-25T19:05:57.508Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "differentValue"
+                    },
+                    {
+                        "name": "newpassword2",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "Passwords do not match."
+                }
+            ]
+        },
+        {
+            "_id": "97c828da-ca83-4451-91a1-bd725035e447",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/changepassword (missing param)",
+            "url": "{{auth_host}}/changepassword",
+            "method": "POST",
+            "sortNum": 290000,
+            "created": "2023-10-25T19:05:57.509Z",
+            "modified": "2023-10-25T19:05:57.509Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "oldpassword",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "newpassword1",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "422"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors.msg",
+                    "action": "equal",
+                    "value": "Required value"
+                },
+                {
+                    "type": "json-query",
+                    "custom": "json.errors.location",
+                    "action": "equal",
+                    "value": "body"
+                }
+            ]
+        },
+        {
+            "_id": "7ba81ffb-3198-4f73-a9c2-a3bd15d889e3",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (confirm not changed)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 300000,
+            "created": "2023-10-25T19:05:57.510Z",
+            "modified": "2023-10-25T19:05:57.510Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "mynewusername"
+                    },
+                    {
+                        "name": "password",
+                        "value": "mynewpassword2"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/redirecterror"
+                }
+            ]
+        },
+        {
+            "_id": "7f65101e-9117-4722-8b93-b72935ddb4b4",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (form, get csrfToken)",
+            "url": "{{auth_host}}/login",
+            "method": "GET",
+            "sortNum": 310000,
+            "created": "2023-10-25T19:05:57.520Z",
+            "modified": "2023-10-25T19:05:57.520Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "User Login"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "contains",
+                    "value": "_csrf"
+                },
+                {
+                    "type": "set-env-var",
+                    "custom": "text | removeQuotes | split(\"name=_csrf\" | at(1) | split(\"value=\" | at(1) | split(\">\") | first ",
+                    "action": "setto",
+                    "value": "{{csrf_token, local}}"
+                }
+            ]
+        },
+        {
+            "_id": "1f6f1bef-2c6e-45ac-82ff-82577706d159",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/login (Role: user.admin)",
+            "url": "{{auth_host}}/login",
+            "method": "POST",
+            "sortNum": 320000,
+            "created": "2023-10-25T19:05:57.511Z",
+            "modified": "2023-10-25T19:05:57.511Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "formencoded",
+                "raw": "",
+                "form": [
+                    {
+                        "name": "username",
+                        "value": "{{user_username}}"
+                    },
+                    {
+                        "name": "password",
+                        "value": "{{user_password}}"
+                    },
+                    {
+                        "name": "_csrf",
+                        "value": "{{csrf_token}}"
+                    }
+                ]
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "302"
+                },
+                {
+                    "type": "custom-header",
+                    "custom": "location",
+                    "action": "equal",
+                    "value": "/redirecterror"
+                }
+            ]
+        },
+        {
+            "_id": "98dc03d5-cdcc-48b7-b9f8-84c48fdcbb6d",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/deleteuser",
+            "url": "{{auth_host}}/panel/deleteuser",
+            "method": "POST",
+            "sortNum": 322500,
+            "created": "2023-10-25T19:05:57.512Z",
+            "modified": "2023-10-25T19:05:57.512Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n    \"_csrf\": \"{{csrf_token}}\",\n    \"id\": \"{{user_uuid}}\"\n}\n",
+                "form": []
+            },
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                }
+            ]
+        },
+        {
+            "_id": "b69528e8-7936-4b57-a508-620158542023",
+            "colId": "eddd7d23-6a48-4785-af62-cb29ec17823e",
+            "containerId": "d9885d7f-5465-4d4c-9299-dba5956d1523",
+            "name": "/panel/listusers confirm user removed",
+            "url": "{{auth_host}}/panel/listusers",
+            "method": "GET",
+            "sortNum": 325000,
+            "created": "2023-10-25T19:05:57.521Z",
+            "modified": "2023-10-25T19:05:57.521Z",
+            "headers": [
+                {
+                    "name": "Accept",
+                    "value": "text/html"
+                }
+            ],
+            "params": [],
+            "auth": {
+                "type": "none"
+            },
+            "tests": [
+                {
+                    "type": "res-code",
+                    "custom": "",
+                    "action": "equal",
+                    "value": "200"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "notcontains",
+                    "value": "mynewusername"
+                },
+                {
+                    "type": "res-body",
+                    "custom": "",
+                    "action": "notequal",
+                    "value": "{{user_uuid}}"
+                }
+            ]
+        }
+    ]
+}

@@ -601,7 +601,8 @@ exports.dialogAuthorization = [
     'redirect_uri',
     'response_type',
     'client_id',
-    'scope'], 'query'),
+    'scope',
+    'state'], 'query'),
   // Required Query Keys
   query([
     'redirect_uri',
