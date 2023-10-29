@@ -8,6 +8,19 @@ and this project adheres to
 
 ## Next
 
+### Security
+
+Updated npm dependency crypto-js 4.1.1 to 4.2.0 to address GitHub Dependabot 
+security audit notification.
+
+Comments:
+
+In collab-auth the crypto-js npm module is used to perform crypto-js AES encryption of
+the client secret in client account record stored in postgresql database.
+
+The dependabot alert was issued to address a weakness in the crypto-js PBKDF2 functionality.
+PBKDF2 is a password-based key derivation function.
+
 ### Changed
 
 File: server/input-validation.js - Modified input validation for the "/dialog/authorize"
