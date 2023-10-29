@@ -8,6 +8,8 @@ and this project adheres to
 
 ## Next
 
+### Changed
+
 File: server/input-validation.js - Modified input validation for the "/dialog/authorize"
 route to accept an optional URL query parameter "state". Previously, adding the state
 query parameter would return a 422 status. The oauth2orize library supports 
@@ -23,6 +25,13 @@ so the test collection "thunder-collection_collab-auth-tests.json" was broken
 into multiple files of less tha 50 requests.
 
 Update Dependencies:
+
+- express-rate-limit 6.7.0 to 7.1.3
+- jsonwebtoken 9.0.0 to 9.0.2
+- oauth2orize 1.11.1 to 1.12.0
+- pg 8.11.1 to 8.11.3
+- rotating-file-stream 3.1.0 to 3.1.1
+- uuid 9.0.0 to 9.0.1
 
 - Development dependencies: eslint (and dependencies)
 
