@@ -22,6 +22,10 @@ The VSCode extension ThunderClient has added a limit of 50 requests per collecti
 so the test collection "thunder-collection_collab-auth-tests.json" was broken 
 into multiple files of less tha 50 requests.
 
+Update Dependencies:
+
+- Development dependencies: eslint (and dependencies)
+
 ## [v0.0.19](https://github.com/cotarr/collab-auth/releases/tag/v0.0.19) 2023-07-25
 
 There are no code changes in this commit.
