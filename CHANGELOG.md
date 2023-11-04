@@ -48,6 +48,12 @@ Update Dependencies:
 
 - Development dependencies: eslint (and dependencies)
 
+Updated /docs/. The tutorial section of the /docs/installation.html page was 
+updated to address a change in collab-frontend repository.
+The passport configuration object in collab-frontend was modified to 
+add CSRF protection to the authorization code redirects.
+The tutorial example log files were updated show and explain this change.
+
 ## [v0.0.19](https://github.com/cotarr/collab-auth/releases/tag/v0.0.19) 2023-07-25
 
 There are no code changes in this commit.

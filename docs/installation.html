@@ -390,11 +390,17 @@ listening: :::3000 IPv6
         <p>
           When the web server receives the &quot;/login&quot; request, it will
           send a second redirect (302) to the browser. The URL will consist of the hostname
-          of the authorization server, the /dialog/authoirze path followed by a query string
-          with parameters for response_type, redirect_uri, scope, and client_id
+          of the authorization server, the /dialog/authorize path followed by a query string
+          with parameters for response_type, redirect_uri, scope, state, and client_id.
         </p>
         <p>
-          The Authorization server will save the entire request URL in the authorization server
+          In order to address risk of Cross Site Request Forgery (CSRF) during redirects,
+          the passport middleware can be configured to generate a random nonce, store the nonce in the 
+          web server session, and include the nonce in the URL query parameters 
+          as a &quot;state&quot; parameter.
+        </p>
+        <p>
+          After receiving the request, the authorization server will save the entire request URL in the authorization server
           session store. It will check if the user has a valid cookie.
           Since we have previously cleared all session data by restarting the servers,
           no match will be found in the session store.
@@ -405,12 +411,16 @@ listening: :::3000 IPv6
         <p>
           Switch from the web server terminal to the authorization server terminal.
           The authorization server access log will show the Oauth 2.0 authorization workflow
-          beginning with the 302 redirect from the web web server, followed by download
-          of the login form.
+          starting with the request to the &quot;/dialog/authorize&quot; route.
+          In this case, the browser does not have a valid cookie to the authorization server,
+          so the URL query parameters are saved to session storage. A status 302 redirect is 
+          returned to the browser to load the login form, which is shown as 
+          the &quot;/login&quot; in the log.
         </p>
 <pre class="pre-div-out">
 2021-10-27T19:04:31.021Z ::ffff:127.0.0.1 302 GET 1.1 127.0.0.1:3500/dialog/authorize?response_type=code
-    &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&scope=api.read%20api.write&client_id=abc123
+    &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback
+    &scope=api.read%20api.write&state=yqqgmehhSZGTj6iBylA6zfJz&client_id=abc123
 2021-10-27T19:04:31.040Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/login
 2021-10-27T19:04:31.063Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/css/login.css
 </pre>
@@ -438,7 +448,8 @@ listening: :::3000 IPv6
           The second redirect can be seen in the log file as follows:
 <pre class="pre-div-out">
 2021-10-27T19:04:34.897Z ::ffff:127.0.0.1 200 GET 1.1 127.0.0.1:3500/dialog/authorize?response_type=code
-   &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&scope=api.read%20api.write&client_id=abc123
+   &redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Flogin%2Fcallback&
+   scope=api.read%20api.write&state=yqqgmehhSZGTj6iBylA6zfJz&client_id=abc123
 </pre>
         <p>
           This time, when the second request to /dialog/authorize is received, the user's web browser
@@ -493,10 +504,21 @@ listening: :::3000 IPv6
           The web server access log should show the redirect including the code.
         </p>
 <pre class="pre-div-out">
-2021-10-27T19:28:32.506Z ::ffff:127.0.0.1 302 GET 1.1 localhost:3000/login/callback?code=8JUuYggcFkGcDh1BsulCkiLL
+2021-10-27T19:28:32.506Z ::ffff:127.0.0.1 302 GET 1.1 localhost:3000/login/callback?code=8JUuYggcFkGcDh1BsulCkiLL&state=yqqgmehhSZGTj6iBylA6zfJz
 </pre>
         <p>
-          The web server extracts the temporary code from the query parameters of the redirect URI.
+          Before proceeding the passport middleware extracts the &quot;state&quot; parameter containing the
+          random nonce generated earlier. The nonce is compared to the previous value stored in the web 
+          server session storage prior to the redirect.
+        </p>
+<pre class="pre-div">
+{
+  "state": "yqqgmehhSZGTj6iBylA6zfJz"
+}
+</pre>
+        <p>
+          After successfully verifying the state nonce, 
+          the web server extracts the temporary code from the query parameters of the redirect URI.
         </p>
 <pre class="pre-div">
 {
@@ -587,7 +609,7 @@ QkseSgdL9TrTsLg
           The 302 redirect shown in the log here is duplicated for clarity, also shown above.
         </p>
 <pre class="pre-div-out">
-2021-10-27T19:28:32.506Z ::ffff:127.0.0.1 302 GET 1.1 localhost:3000/login/callback?code=8JUuYggcFkGcDh1BsulCkiLL
+2021-10-27T19:28:32.506Z ::ffff:127.0.0.1 302 GET 1.1 localhost:3000/login/callback?code=8JUuYggcFkGcDh1BsulCkiLL&state=yqqgmehhSZGTj6iBylA6zfJz
 
           ( access_token request --&gt; wait --&gt; redirect )
 
