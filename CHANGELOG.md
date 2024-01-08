@@ -203,6 +203,17 @@ when rollingCookie is true. Rolling cookies send new expiration time to the brow
 with each response, while session cookies are valid until the browser is closed, but do not expire.
 However, stale session cookies are pruned from the session store on a timer.
 
+## Added (Security improvement)
+
+Note: all of the above discussion refers to cookies.
+This change refers to JWT access_tokens and refresh tokens.
+
+In the access_token validation module server/validate.js, the JWT token validation 
+function was improved by adding an explicit check of the token expiration time 
+stored in the token database as token meta-data. This means that for a token to be valid, the 
+server's system clock must not exceed either the expiration time within the JWT
+token payload or the expiration time stored in the token's meta-data in the token database.
+
 ### dependencies
 
 - Remove connect-ensure-login

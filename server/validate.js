@@ -195,6 +195,15 @@ validate.token = (token, accessToken) => {
   // Verify will throw an error upon failure
   const decoded = jwtUtils.verifyToken(accessToken);
 
+  // The previous verifyToken() function will throw an error if the signed
+  // payload "exp:" expire time is exceeded.
+  // This is a redundant date expiration check.
+  // Check the database meta-data expirationDate to make sure it is also not exceeded.
+  const timeNow = new Date();
+  if (timeNow > token.expirationDate) {
+    throw new Error('Token meta-data record expired');
+  }
+
   // Build data object to return, additional data added in below before sending
   const tokenMetaData = {
     decoded: decoded,
