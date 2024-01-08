@@ -6,12 +6,12 @@ const CryptoJS = require('crypto-js');
 const bcrypt = require('bcryptjs');
 
 const uid2 = require('uid2');
-const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const db = require('./db');
 const inputValidation = require('./input-validation');
 const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scope');
 const logUtils = require('./log-utils');
 const stats = require('./stats');
+const checkSessionAuth = require('./session-auth');
 
 const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });
@@ -28,7 +28,7 @@ const nodeEnv = process.env.NODE_ENV || 'development';
  * Password authentication is required with user role = user.admin
  */
 router.get('/menu',
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     // Warning message if running Memory Store RAM database
@@ -43,7 +43,7 @@ router.get('/menu',
  * List users endpoint
  */
 router.get('/listusers',
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     db.users.findAll()
@@ -91,7 +91,7 @@ router.get('/listusers',
  * User record ID is passed as a GET query parameter
  */
 router.get('/viewuser',
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
   (req, res, next) => {
@@ -136,7 +136,7 @@ router.get('/viewuser',
  * Create new user record endpoint
  */
 router.get('/createuser',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   csrfProtection,
   (req, res, next) => {
@@ -160,7 +160,7 @@ router.get('/createuser',
  * Create new user POST request handler
  */
 router.post('/createuser',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.createUser,
   csrfProtection,
@@ -218,7 +218,7 @@ router.post('/createuser',
  * User ID is passed as a GET request URL query parameter
  */
 router.get('/edituser',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
   csrfProtection,
@@ -279,7 +279,7 @@ router.get('/edituser',
  * Edit user POST request handler
  */
 router.post('/edituser',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.editUser,
   csrfProtection,
@@ -344,7 +344,7 @@ router.post('/edituser',
  * The ID is passed in as a GET request URL query parameter
  */
 router.get('/deleteuser',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
   csrfProtection,
@@ -379,7 +379,7 @@ router.get('/deleteuser',
  * The ID is passed in as a POST request URL body parameter
  */
 router.post('/deleteuser',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.deleteByUUID,
   csrfProtection,
@@ -413,7 +413,7 @@ router.post('/deleteuser',
  * List clients endpoint
  */
 router.get('/listclients',
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     db.clients.findAll()
@@ -444,7 +444,7 @@ router.get('/listclients',
  * Client record ID is passed as a GET query parameter
  */
 router.get('/viewclient',
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
   (req, res, next) => {
@@ -500,7 +500,7 @@ router.get('/viewclient',
  * Create new client record endpoint
  */
 router.get('/createclient',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   csrfProtection,
   (req, res, next) => {
@@ -523,7 +523,7 @@ router.get('/createclient',
  * Create new client POST request handler
  */
 router.post('/createclient',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.createClient,
   csrfProtection,
@@ -575,7 +575,7 @@ router.post('/createclient',
  * THe ID value is passed as a GET request query parameter
  */
 router.get('/editclient',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
   csrfProtection,
@@ -638,7 +638,7 @@ router.get('/editclient',
  * Edit client POST request handler
  */
 router.post('/editclient',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.editClient,
   csrfProtection,
@@ -695,7 +695,7 @@ router.post('/editclient',
  * The ID is passed in as a GET request URL query parameter
  */
 router.get('/deleteclient',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.viewByUUID,
   csrfProtection,
@@ -730,7 +730,7 @@ router.get('/deleteclient',
  *
  */
 router.post('/deleteclient',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   inputValidation.deleteByUUID,
   csrfProtection,
@@ -766,7 +766,7 @@ router.post('/deleteclient',
  * invalidate all authorization server sessions
  */
 router.get('/removealltokens',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   csrfProtection,
   (req, res, next) => {
@@ -788,7 +788,7 @@ router.get('/removealltokens',
  * This is a series of deleteAll database calls
  */
 router.post('/removealltokens',
-  ensureLoggedIn(),
+  checkSessionAuth({ failRedirectTo: '/panel/unauthorized' }),
   requireScopeForWebPanel('user.admin'),
   csrfProtection,
   (req, res, next) => {
@@ -826,7 +826,7 @@ router.post('/removealltokens',
  * Password authentication is required with user role = user.admin
  */
 router.get('/stats',
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel('user.admin'),
   (req, res, next) => {
     Promise.all([
@@ -866,6 +866,27 @@ router.get('/stats',
         console.log(err);
         next(err);
       });
+  }
+);
+
+/**
+ * Unauthorized Message Page
+ *
+ * This page does not require authorization
+ *
+ * Most of the /panel/* routes will redirect to the /login route
+ * with a valid return URL stored in the users session.
+ * However, pages that involve edit forms will not attempt
+ * a return to the form. In this case, an alternate information
+ * page is provided with a link back to the main admin panel menu
+ */
+router.get('/unauthorized',
+  (req, res, next) => {
+    res.render('menu-unauthorized',
+      {
+        name: ''
+      }
+    );
   }
 );
 

@@ -166,12 +166,12 @@ exports.clientScopePrecheckForTokenHTTP = (requiredUserScope, requiredClientScop
  * Usage:
  *
  *    app.get('/path',
- *      ensureLoggedIn(),
+ *      checkSessionAuth,
  *      requireScopeForWebPanel('api.scope'),
  *      renderPage);
  *
  *    app.get('/path',
- *      ensureLoggedIn(),
+ *      checkSessionAuth,
  *      requireScopeForWebPanel(['api.scope1', 'api.scope2']),
  *      renderPage);
  *
@@ -205,7 +205,8 @@ exports.requireScopeForWebPanel = (requiredScope) => {
           if (scopeFound) {
             return next();
           } else {
-            return res.status(403).send('Status 403, Forbidden, User role insufficient scope.');
+            // return res.status(403).send('Status 403, Forbidden, User role insufficient scope.');
+            return res.redirect('/noscope');
           }
         })
         .catch((err) => {

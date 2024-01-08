@@ -9,6 +9,7 @@ const express = require('express');
 const session = require('express-session');
 const oauth2 = require('./oauth2');
 const passport = require('passport');
+const rateLimit = require('express-rate-limit');
 const logger = require('morgan');
 const helmet = require('helmet');
 
@@ -137,11 +138,60 @@ if (nodeEnv === 'production') {
   app.use(checkVhost.rejectNotVhost);
 }
 
-// Edge case: IOS iPhone brwoser request to favicon.ico makes request without cookie.
+// Edge case: IOS iPhone browser request to favicon.ico makes request without cookie.
 // This unprotected route prevents an authorization redirect on favicon.ico requests.
 app.get('/favicon.ico', function (req, res, next) {
   res.status(204).send(null);
 });
+
+/**
+ * Limit per IP address for GET request to /login
+ * Successful request add to count.
+ */
+const loginFormRateLimit = rateLimit({
+  windowMs: config.limits.passwordRateLimitTimeMs,
+  max: config.limits.passwordRateLimitCount,
+  statusCode: 429,
+  message: 'Too many requests',
+  standardHeaders: false,
+  legacyHeaders: false
+});
+
+/**
+ * Middleware to add timer to delay request before processing.
+ * @param {Object} req - NodeJs request object
+ * @param {Object} res - NodeJs request object
+ * @param {function} next - NodeJs return next handler
+ */
+const loginFormDelay = (req, res, next) => {
+  if (config.session.enablePgSessionStore) {
+    setTimeout(() => {
+      return next();
+    }, 100);
+  } else {
+    return next();
+  }
+};
+
+// ----------------------------------------------------------
+// This is a work around.
+//
+// Calls to /dialog/authorize or /panel/menu modify the
+// session by adding a "returnTo" property to the session object.
+// Calls to load the login form at route GET /login modify the
+// session object by adding a CSRF token to the session object.
+// When using PostgreSQL as a session store with connect-pg-simple,
+// occasionally, the second call to /login retrieves the
+// session record from the session store database before the
+// previous request has finished updating the record.
+// This can rewrite the session store without a returnTo value,
+// resulting in a 302 redirect to the page /redirecterror.
+// The timer is not used when configured with memorystore.
+//
+// Since this adds a fixed timer to the request, a IP rate
+// limit was added before the timer.
+//
+app.get('/login', loginFormRateLimit, loginFormDelay);
 
 // -----------------------------------------------------------------
 // express-session
@@ -173,6 +223,9 @@ if (config.session.enablePgSessionStore) {
   // List:       SELECT sid, expire FROM session;
   // Clear all:  DELETE FROM session;
   console.log('Using PostgresSQL connect-pg-simple for session storage');
+  // disable touch for fixed expiration cookie configuration
+  const disableTouch = ((config.session.notSessionCookie === true) &&
+    (config.session.rollingCookie === false));
 
   const pgPool = require('./db/pg-pool');
   const PgSessionStore = require('connect-pg-simple')(session);
@@ -181,6 +234,8 @@ if (config.session.enablePgSessionStore) {
     // connect-pg-simple ttl is in seconds
     ttl: config.session.ttl,
     tableName: 'session',
+    // disable touch for fixed expiration cookie configuration
+    disableTouch: disableTouch,
     // Connect-pg-simple takes prune time in seconds
     pruneSessionInterval: config.session.pruneInterval
   });
@@ -190,7 +245,7 @@ if (config.session.enablePgSessionStore) {
   sessionOptions.store = new MemoryStore({
     // Memorystore ttl is in milliseconds
     ttl: config.session.maxAge,
-    stale: true,
+    stale: false,
     // Memorystore takes prune time in milliseconds
     checkPeriod: config.session.pruneInterval * 1000
   });
@@ -216,6 +271,7 @@ app.get('/redirecterror', site.redirectError);
 app.get('/logout', site.logout);
 app.get('/changepassword', site.changePassword);
 app.post('/changepassword', site.changePasswordHandler);
+app.get('/noscope', site.noScopePage);
 app.get('/dialog/authorize', oauth2.authorization);
 app.post('/dialog/authorize/decision', oauth2.decision);
 app.post('/oauth/token', oauth2.token);

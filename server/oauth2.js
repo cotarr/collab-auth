@@ -10,7 +10,6 @@
  */
 
 // NPM packages
-const login = require('connect-ensure-login');
 const passport = require('passport');
 const oauth2orize = require('oauth2orize');
 const uid2 = require('uid2');
@@ -21,6 +20,8 @@ const csrfProtection = csrf({ cookie: false });
 const config = require('./config');
 const db = require('./db');
 const jwtUtils = require('./jwt-utils');
+const checkSessionAuth = require('./session-auth');
+
 const {
   toScopeString,
   intersectReqCliUsrScopes,
@@ -373,7 +374,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
  * This middleware simply initializes a new authorization transaction.  It is
  * the application's responsibility to authenticate the user and render a dialog
  * to obtain their approval (displaying details about the client requesting
- * authorization).  We accomplish that here by routing through `ensureLoggedIn()`
+ * authorization).  We accomplish that here by routing through `checkSessionAuth()`
  * first, and rendering the `dialog` view.
  *
  * At this step, the scope of the requsted token is formed.
@@ -386,7 +387,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
  * and subsequently used during exchange of code for token.
  */
 exports.authorization = [
-  login.ensureLoggedIn(),
+  checkSessionAuth(),
   inputValidation.dialogAuthorization,
   csrfProtection,
   server.authorization({ idLength: config.oauth2.decisionTransactionIdLength },
@@ -482,7 +483,7 @@ exports.authorization = [
  * authorizationErrorHandler removes transaction from session
  */
 exports.decision = [
-  login.ensureLoggedIn(),
+  checkSessionAuth(),
   inputValidation.dialogAuthDecision,
   csrfProtection,
   server.decision(),

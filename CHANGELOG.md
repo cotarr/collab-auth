@@ -6,6 +6,209 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## next v0.0.21-dev DRAFT
+
+## Fixed
+
+Issue: 
+
+Calls to /dialog/authorize or /panel/menu modify the user's session
+session by adding a "returnTo" property to the session object.
+The purpose is to remember the original URL and return
+the browser to the original URL after password entry.
+The subsequent redirect loads the login form at route GET /login.
+The login form modifies the session object by adding a CSRF token 
+to the session object.
+
+When using PostgreSQL as a session store with connect-pg-simple,
+occasionally, the second call to /login retrieves the
+session record from the session store database before the
+previous request has finished writing the returnTo property
+to the session store. Saving the CSRF token
+the session's record in the session store may 
+therefore overwrite the previous returnTo value,
+resulting in a 302 redirect to the page /redirecterror.
+This has been an intermittent problem over the life of this program.
+
+Fix:
+
+Added a fixed timer as a middleware function to the GET /login route
+to introduce a small time delay before express-session and passport
+middleware will process the request. The new timer allows the previous 
+request to complete updating the record in the session store PostgreSQL 
+database before it is modified a second time. The timer only 
+impacts the GET /login route. The timer is disabled when using 
+memorystore as session store as this problem was not observed 
+when using memorystore.
+
+An IP address rate limiter was added in front of the time 
+delay middleware function.
+
+## Fixed
+
+Issue:
+
+When configured for session cookies,
+SESSION_NOT_SESSION_COOKIE=false (the default), there is no expiration time
+associated with session cookies. Session cookies are valid until the browser is closed.
+The authorization server will accept session cookies until the session's record 
+in the session store database becomes inactive (no more requests) and the stale record
+is pruned from the session database at fixed time intervals. This was working correctly.
+
+When configured to use rolling cookies, 
+SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=true,
+A revised expiration time is sent to the browser in a set-cookie
+header for each request. Rolling cookies will be accepted by the server
+until the elapsed time since the last request has exceeded
+the cookie's expiration time. In other words the expiration time 
+of the session's database record is 'touched' with each request 
+while concurrently updated cookies are sent to the browser to match.
+This was also working correctly.
+
+On the other hand, when cookies are configured to use a fixed expiration time, 
+SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=false,
+The cookies intended to remain valid until the elapsed time since 
+the cookie was created exceeds the lifetime defined in the configuration.
+However it appears that with certain configurations, the session store will 
+touch (reset) the session expiration timestamp. Thus, cookies in the
+fixed expiration configuration will act like rolling cookies.
+
+Cause:
+
+There are multiple inter-related configurations.
+The express-session middleware defines cookie creation. 
+The session store modules memorystore or connect-pg-simple 
+define time to live for records in the session store database.
+There is configuration for the passport authorization middleware
+determines if a session is authorized or not. The requests may be
+handed off to the oauth2orize server to issue OAuth 2.0 token 
+related responses.
+
+It appears that when configured for cookie of fixed expiration, 
+SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=false,
+in certain configurations the last modified time of the 
+session's record is 'touched' with each request, extending 
+the session time to live (TTL).
+
+Additionally, calls to the /dialog/authorize route may forward the request
+to the oauth2orize middleware authorization server. It seems oauth2orize
+independently updates the request processing to re-send
+the set-cookie to the browser each time /dialog/authorize route is called.
+
+This could potentially allow an expired session to
+accept requests past it's fixed expiration time as long as repeated requests
+are made with frequency less than the expiration time interval.
+
+This only applies to the case of fixed expiration cookies.
+
+Fix:
+
+Created a new module server/session-auth.js. This is a custom module to replace
+connect-ensure-login npm module. After the user enters the password during login,
+the next request will store the original expiration time of the
+cookie into the session's record in the session store database.
+An explicit expiration check function checkSessionAuth() was added.
+
+The new function `checkSessionAuth()` replaced `ensureLoggedIn()` for all 
+protected routes in the server/admin-panel.js, the /dialog/authorize and 
+/dialog/authorize/decision routes in server/oauth2.js, and the 
+/redirecterror, GET /changepassword, POST /changepassword routes in site.js.
+The connect-ensure-module was removed from package.json.
+
+For cookie and session handling in express-session options object, 
+when configured to use memorystore as the memorystore configuration property "stale"
+was changed from true to `stale: false`. This is to prevent expired cookies from being 
+retrieved by memorystore on the first request after expiration.
+
+For cookie and session handling in express-session options object, 
+when configured to use connect-pg-simple as the session store, 
+the connect-pg-simple configuration property "disableTouch" was 
+added and set to true when
+SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=false,
+else it is set to false. When configured for fixed expiration cookies,
+the session's record does not require modification since the expiration
+time is not intended to change.
+
+Continued issue: When configured for fixed expiration cookies, 
+in certain configurations, the browser may receive a set-cookie header with 
+revised expiration time, like a rolling cookie. However, unless the 
+authorization server is explicitly configured for rolling cookies, 
+the server will no longer accept requests past the original expiration time 
+that was defined when the user entered their password at the login form.
+
+## Added (feature)
+
+As a feature, the new session-auth.js module includes an array `loginRedirectRoutes`
+containing a list of path names, such as "/panel/menu" that will be allowed 
+to remember the original URL by saving it as a returnTo value in the session's record.
+The main benefit of this array is to exclude administration panel 
+account data entry forms from being auto-resumed by a post login redirect.
+
+As a feature, the session-auth.js module authorization function will
+accept an optional options object. An optional property "failRedirectTo" 
+is used to define a redirection URL for use after an authorization failure.
+An array `allowedAlternateRedirectRoutes` listing allowed redirect 
+routes is configurable in the session-auth.js source file. 
+In the case no failRedirectTo value is defined, the failed login will 
+redirect to "/login" if the original route is listed in the 
+loginRedirectRoutes, else return 401 Unauthorized.
+
+Example:
+
+```js
+const checkSessionAuth = require('./session-auth');
+app.get('/somewhere',
+  checkSessionAuth({ failRedirectTo: '/error.html' }),
+  renderPage); 
+```
+
+The failRedirectTo property should not be set to '/login'
+as this defeats the returnTo value that would be stored in the session.
+The intended way is to call checkSessionAuth() without an argument
+so it will redirect to the /login route by default for configured routes.
+
+## Added
+
+Added a web page to the admin panel "/panel/unauthorized" which will
+inform the user when the session is expired and provide a link back
+to /panel/menu.
+
+Updated the server/admin-panel.js module to use the /panel/unauthorized
+URL for the case of editing panels that do not automatically redirect 
+to the /login route.
+
+In summary, the admin panel pages that do not involve
+form input (editing) may be bookmarked, and will redirect to /login as needed.
+Unauthorized requests to pages involving edit forms will redirect to the 
+/panel/unauthorized information page.
+
+## Added 
+
+Added a web page to inform users when making requests where the 
+user's account configuration does not have sufficient scope
+to access the resource.
+
+Updated the server/scope.js file to render the insufficient scope page.
+
+## Changed
+
+Removed the "Change password" button from the footer bar of the /logout response page.
+
+## Fixed
+
+Invalid configuration where SESSION_NOT_SESSION_COOKIE=false and SESSION_SET_ROLLING_COOKIE=true 
+in now corrected in server/config/index.js. A console.log configuration warning is shown 
+at program start. The configuration variable notSessionCookie is forced to to true 
+when rollingCookie is true. Rolling cookies send new expiration time to the browser
+with each response, while session cookies are valid until the browser is closed, but do not expire.
+However, stale session cookies are pruned from the session store on a timer.
+
+### dependencies
+
+- Remove connect-ensure-login
+- Update connect-pg-simple@9.0.1, passport@0.7.0, express-rate-limit@7.1.5, helmet@7.1.0
+
+
 ## [v0.0.20](https://github.com/cotarr/collab-auth/releases/tag/v0.0.20) 2023-11-05
 
 ### Security

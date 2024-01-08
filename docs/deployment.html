@@ -700,7 +700,7 @@ listening: :::3500 IPv6
       </p>
 <pre class="pre-div">
 exports.decision = [
-  login.ensureLoggedIn(),
+  checkSessionAuth(),
   inputValidation.dialogAuthDecision,
   csrfProtection,
   server.decision(),

@@ -199,7 +199,7 @@ environment, non-encrypted (http) protocol will be used with Chrome
 web browser. If your web browser requires a temporary self signed TLS 
 certificate for testing, you may generate one. See: data/tls-certs/README.md
 
-For full instuctions to setup TLS certificates for deployment, see the /docs at:  https://cotarr.github.io/collab-auth/deployment.html
+For full instructions to setup TLS certificates for deployment, see the /docs at:  https://cotarr.github.io/collab-auth/deployment.html
 
 ```
 SERVER_TLS_KEY=...some_path.../privkey.pem

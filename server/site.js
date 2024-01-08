@@ -5,7 +5,6 @@ const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
 // NPM modules
-const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn;
 const passport = require('passport');
 const rateLimit = require('express-rate-limit');
 const csrf = require('@dr.pogodin/csurf');
@@ -17,6 +16,7 @@ const { requireScopeForWebPanel } = require('./scope');
 const validate = require('./validate');
 const inputValidation = require('./input-validation');
 const logUtils = require('./log-utils');
+const checkSessionAuth = require('./session-auth');
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -51,7 +51,7 @@ exports.loginForm = [
  * user a `/login` was initiated without a valid redirectURL.
  */
 exports.redirectError = [
-  ensureLoggedIn(),
+  checkSessionAuth(),
   (req, res) => {
     res.set('Cache-Control', 'no-store').render('redirecterror', { name: req.user.name });
   }
@@ -158,7 +158,7 @@ const validateAndHashPassword = (req, res, user) => {
  * Change Password <form> GET /password
  */
 exports.changePassword = [
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
   csrfProtection,
   (req, res, next) => {
@@ -194,7 +194,7 @@ exports.changePassword = [
  *  Array of middleware
  */
 exports.changePasswordHandler = [
-  ensureLoggedIn(),
+  checkSessionAuth(),
   requireScopeForWebPanel(['user.password', 'user.admin']),
   csrfProtection,
   inputValidation.changePassword,
@@ -235,5 +235,15 @@ exports.changePasswordHandler = [
         };
         res.set('Cache-Control', 'no-store').render('change-password-error', options);
       });
+  }
+];
+
+/**
+ * Display page showing user insufficient scope error
+ */
+exports.noScopePage = [
+  checkSessionAuth(),
+  (req, res, next) => {
+    return res.render('no-scope', { name: '' });
   }
 ];

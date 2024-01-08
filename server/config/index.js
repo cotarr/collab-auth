@@ -38,9 +38,20 @@ exports.server = {
   logFilter: process.env.SERVER_LOG_FILTER || ''
 };
 
+const rollingCookie = (process.env.SESSION_SET_ROLLING_COOKIE === 'true') || false;
+let notSessionCookie = (process.env.SESSION_NOT_SESSION_COOKIE === 'true') || false;
+if ((rollingCookie === true) && (notSessionCookie === false)) {
+  notSessionCookie = true;
+  console.log('--------------------------------------------------------------------------');
+  console.log('Config Warning: Session cookies do not have an expiration.');
+  console.log('Due to configuration setting SESSION_SET_ROLLING_COOKIE=true, the setting');
+  console.log('SESSION_NOT_SESSION_COOKIE has been changed to true.');
+  console.log('--------------------------------------------------------------------------');
+}
+
 exports.session = {
-  rollingCookie: (process.env.SESSION_SET_ROLLING_COOKIE === 'true') || false,
-  notSessionCookie: (process.env.SESSION_NOT_SESSION_COOKIE === 'true') || false,
+  rollingCookie: rollingCookie,
+  notSessionCookie: notSessionCookie,
   maxAge: parseInt(process.env.SESSION_EXPIRE_SEC || '3600') * 1000,
   ttl: parseInt(process.env.SESSION_EXPIRE_SEC || '3600'),
   pruneInterval: parseInt(process.env.SESSION_PRUNE_INTERVAL_SEC || '3600'),
