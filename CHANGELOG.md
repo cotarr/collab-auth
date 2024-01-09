@@ -8,7 +8,7 @@ and this project adheres to
 
 ## next v0.0.21-dev DRAFT
 
-## Fixed
+### Fixed
 
 Issue: 
 
@@ -44,7 +44,7 @@ when using memorystore.
 An IP address rate limiter was added in front of the time 
 delay middleware function.
 
-## Fixed
+### Fixed
 
 Issue:
 
@@ -136,7 +136,7 @@ authorization server is explicitly configured for rolling cookies,
 the server will no longer accept requests past the original expiration time 
 that was defined when the user entered their password at the login form.
 
-## Added (feature)
+### Added (feature)
 
 As a feature, the new session-auth.js module includes an array `loginRedirectRoutes`
 containing a list of path names, such as "/panel/menu" that will be allowed 
@@ -167,7 +167,7 @@ as this defeats the returnTo value that would be stored in the session.
 The intended way is to call checkSessionAuth() without an argument
 so it will redirect to the /login route by default for configured routes.
 
-## Added
+### Added
 
 Added a web page to the admin panel "/panel/unauthorized" which will
 inform the user when the session is expired and provide a link back
@@ -182,7 +182,7 @@ form input (editing) may be bookmarked, and will redirect to /login as needed.
 Unauthorized requests to pages involving edit forms will redirect to the 
 /panel/unauthorized information page.
 
-## Added 
+### Added 
 
 Added a web page to inform users when making requests where the 
 user's account configuration does not have sufficient scope
@@ -190,11 +190,11 @@ to access the resource.
 
 Updated the server/scope.js file to render the insufficient scope page.
 
-## Changed
+### Changed
 
 Removed the "Change password" button from the footer bar of the /logout response page.
 
-## Fixed
+### Fixed
 
 Invalid configuration where SESSION_NOT_SESSION_COOKIE=false and SESSION_SET_ROLLING_COOKIE=true 
 in now corrected in server/config/index.js. A console.log configuration warning is shown 
@@ -203,7 +203,7 @@ when rollingCookie is true. Rolling cookies send new expiration time to the brow
 with each response, while session cookies are valid until the browser is closed, but do not expire.
 However, stale session cookies are pruned from the session store on a timer.
 
-## Added (Security improvement)
+### Added (Security improvement)
 
 Note: all of the above discussion refers to cookies.
 This change refers to JWT access_tokens and refresh tokens.
@@ -213,6 +213,10 @@ function was improved by adding an explicit check of the token expiration time
 stored in the token database as token meta-data. This means that for a token to be valid, the 
 server's system clock must not exceed either the expiration time within the JWT
 token payload or the expiration time stored in the token's meta-data in the token database.
+
+### Debug tests
+
+- Update ThunderClient collections to incorporate /panel/unauthorized and /noscope routes.
 
 ### dependencies
 
