@@ -1158,6 +1158,7 @@ setup(chainObj)
         if (testEnv.trustedClient) {
           console.log('\tExpect: status === 302');
           assert.strictEqual(chain.responseStatus, 302);
+          console.log('\tExpect: redirect location match redirectURI');
           assert.strictEqual(
             testEnv.redirectURI,
             chain.parsedLocationHeader.split('?')[0]);
@@ -1173,6 +1174,7 @@ setup(chainObj)
           if (testEnv.trustedClient) {
             console.log('\tExpect: status === 302');
             assert.strictEqual(chain.responseStatus, 302);
+            console.log('\tExpect: redirect location match redirectURI');
             assert.strictEqual(
               testEnv.redirectURI,
               chain.parsedLocationHeader.split('?')[0]);
@@ -1195,6 +1197,7 @@ setup(chainObj)
           if (testEnv.trustedClient) {
             console.log('\tExpect: status === 302');
             assert.strictEqual(chain.responseStatus, 302);
+            console.log('\tExpect: redirect location match redirectURI');
             assert.strictEqual(
               testEnv.redirectURI,
               chain.parsedLocationHeader.split('?')[0]);
@@ -1249,6 +1252,7 @@ setup(chainObj)
         if (testEnv.trustedClient) {
           console.log('\tExpect: status === 302');
           assert.strictEqual(chain.responseStatus, 302);
+          console.log('\tExpect: redirect location match redirectURI');
           assert.strictEqual(
             testEnv.redirectURI,
             chain.parsedLocationHeader.split('?')[0]);
@@ -1264,6 +1268,7 @@ setup(chainObj)
           if (testEnv.trustedClient) {
             console.log('\tExpect: status === 302');
             assert.strictEqual(chain.responseStatus, 302);
+            console.log('\tExpect: redirect location match redirectURI');
             assert.strictEqual(
               testEnv.redirectURI,
               chain.parsedLocationHeader.split('?')[0]);
@@ -1286,6 +1291,7 @@ setup(chainObj)
           if (testEnv.trustedClient) {
             console.log('\tExpect: status === 302');
             assert.strictEqual(chain.responseStatus, 302);
+            console.log('\tExpect: redirect location match redirectURI');
             assert.strictEqual(
               testEnv.redirectURI,
               chain.parsedLocationHeader.split('?')[0]);
@@ -1340,6 +1346,7 @@ setup(chainObj)
         if (testEnv.trustedClient) {
           console.log('\tExpect: status === 302');
           assert.strictEqual(chain.responseStatus, 302);
+          console.log('\tExpect: redirect location match redirectURI');
           assert.strictEqual(
             testEnv.redirectURI,
             chain.parsedLocationHeader.split('?')[0]);
@@ -1355,6 +1362,7 @@ setup(chainObj)
           if (testEnv.trustedClient) {
             console.log('\tExpect: status === 302');
             assert.strictEqual(chain.responseStatus, 302);
+            console.log('\tExpect: redirect location match redirectURI');
             assert.strictEqual(
               testEnv.redirectURI,
               chain.parsedLocationHeader.split('?')[0]);
