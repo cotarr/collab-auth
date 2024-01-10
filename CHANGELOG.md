@@ -41,8 +41,8 @@ impacts the GET /login route. The timer is disabled when using
 memorystore as session store as this problem was not observed 
 when using memorystore.
 
-An IP address rate limiter was added in front of the time 
-delay middleware function.
+An IP address rate limiter previously used for POST /login requests was 
+also added in front of the time delay middleware function for the GET /login route.
 
 ### Fixed
 
@@ -129,6 +129,13 @@ else it is set to false. When configured for fixed expiration cookies,
 the session's record does not require modification since the expiration
 time is not intended to change.
 
+Example:
+
+```js
+const checkSessionAuth = require('./session-auth');
+app.get('/somewhere', checkSessionAuth(), renderPage); 
+```
+
 Continued issue: When configured for fixed expiration cookies, 
 in certain configurations, the browser may receive a set-cookie header with 
 revised expiration time, like a rolling cookie. However, unless the 
@@ -205,7 +212,7 @@ However, stale session cookies are pruned from the session store on a timer.
 
 ### Added (Security improvement)
 
-Note: all of the above discussion refers to cookies.
+Note: all of the above discussion in v0.0.21 refers to cookies.
 This change refers to JWT access_tokens and refresh tokens.
 
 In the access_token validation module server/validate.js, the JWT token validation 
@@ -217,6 +224,8 @@ token payload or the expiration time stored in the token's meta-data in the toke
 ### Debug tests
 
 - Update ThunderClient collections to incorporate /panel/unauthorized and /noscope routes.
+
+- Added new folder /debug/ which contains several javascript files used to debug requests (see /debug/README.md)
 
 ### dependencies
 
