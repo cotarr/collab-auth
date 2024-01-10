@@ -699,6 +699,16 @@ setup(chainObj)
 
   // -------------------------------
   // 102 GET /changepassword - Elapsed time 3 seconds, check if expired
+  //
+  // Assuming the configuration in .env SESSION_EXPIRE_SEC=8, these tests will run
+  //
+  // Session will be set to expire in 8 seconds
+  //
+  // At 3 seconds:
+  //     Session cookie:   accept (non expiring, skip test)
+  //     Fixed expiration: accept (will expire in 7 seconds)
+  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -761,6 +771,13 @@ setup(chainObj)
 
   // -------------------------------
   // 103 GET /changepassword - Elapsed time 3 + 3 = 6 seconds, check if expired
+  // Session will be set to expire in 8 seconds
+  //
+  // At 3 + 3 = 6 seconds:
+  //     Session cookie:   accept (non expiring, skip test)
+  //     Fixed expiration: accept (will expire in 4 seconds)
+  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -815,6 +832,14 @@ setup(chainObj)
 
   // -------------------------------
   // 104 GET /changepassword - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired
+  //
+  // At this time, there will be a difference in acceptance for different cookies
+  //
+  // At 3 + 3 + 4 = 10 seconds:
+  //     Session cookie:   accept (non expiring, skip test)
+  //     Fixed expiration: reject (Expired 2 seconds ago)
+  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -874,6 +899,14 @@ setup(chainObj)
 
   // -------------------------------
   // 105 GET /changepassword - Elapsed time 3 + 3 + 4 + 10 = 20 seconds, check if expired
+  //
+  // In this case, an interval of 10 seconds without any request will expire all cookies
+  //
+  // At 3 + 3 + 4 + 10 = 20 seconds:
+  //     Session cookie:   reject (In session store longer than TTL)
+  //     Fixed expiration: reject (Expired 12 seconds ago)
+  //     Rolling cookie:   reject (Expired 2 seconds ago)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -911,6 +944,12 @@ setup(chainObj)
 
   // -------------------------------
   // 106 GET /changepassword - Elapsed time 3 + 3 + 4 + 10 + 4 = 24 seconds, Done
+  //
+  // In the previous test #105, all sessions were expired, they should continue to reject
+  // At 3 + 3 + 4 +10 + 4 = 24 seconds:
+  //     Session cookie:   reject
+  //     Fixed expiration: reject
+  //     Rolling cookie:   reject
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -1075,6 +1114,14 @@ setup(chainObj)
 
   // -------------------------------
   // 203 GET /dialog/authorize - Elapsed time 3 seconds, check if expired
+  //
+  // Session will be set to expire in 8 seconds
+  //
+  // At 3 seconds:
+  //     Session cookie:   accept (non expiring, skip test)
+  //     Fixed expiration: accept (will expire in 7 seconds)
+  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -1168,6 +1215,12 @@ setup(chainObj)
 
   // -------------------------------
   // 204 GET /dialog/authorize - Elapsed time 3 + 3 = 6 seconds, check if expired
+  //
+  // At 3 + 3 = 6 seconds:
+  //     Session cookie:   accept (non expiring, skip test)
+  //     Fixed expiration: accept (will expire in 4 seconds)
+  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -1253,6 +1306,12 @@ setup(chainObj)
 
   // -------------------------------
   // 205 GET /dialog/authorize - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired
+  //
+  // At 3 + 3 + 4 = 10 seconds:
+  //     Session cookie:   accept (non expiring, skip test)
+  //     Fixed expiration: reject (Expired 2 seconds ago)
+  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -1333,6 +1392,8 @@ setup(chainObj)
 
   // -------------------------------
   // 206 GET /dialog/authorize - Elapsed time 3 + 3 + 4 + 10 = 20 seconds, check if expired
+  //
+  // All type of cookies rejected
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -1371,6 +1432,8 @@ setup(chainObj)
 
   // -------------------------------
   // 207 GET /dialog/authorize - Elapsed time 3 + 3 + 4 + 10 + 4 = 24 seconds, Done
+  //
+  // All type of cookies rejected
   // -------------------------------
   .then((chain) => {
     chain.testDescription =

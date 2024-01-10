@@ -87,11 +87,11 @@ module.exports = function (options) {
     if ((req.session.cookie) && (req.session.passport)) {
       //
       // for case of rolling cookies or session cookies, skip this block and
-      // let the session store expire and prune as needed.
+      // let the session store, expire and prune as needed.
       // For the case of cookies that expire, independent of the session store,
       // deny requests that exceed expiration of original cookie
       //
-      if (!config.session.rollingCookie) {
+      if ((config.session.notSessionCookie) && (!config.session.rollingCookie)) {
         if (!req.session.cookieFirstExpire) {
           req.session.cookieFirstExpire = req.session.cookie._expires;
         } else {
