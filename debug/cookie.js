@@ -64,23 +64,6 @@ const sleep = (chain, timeSeconds) => {
 };
 
 /**
- * Console log type of cookie in config
- */
-const showSessionOptions = () => {
-  let postgres = ' (No database, using memorystore)';
-  if (config.session.enablePgSessionStore) postgres = ' SESSION_ENABLE_POSTGRES=true';
-  if (config.session.notSessionCookie === true) {
-    if (config.session.rollingCookie === true) {
-      console.log('\tConfig: SESSION_SET_ROLLING_COOKIE=true' + postgres);
-    } else {
-      console.log('\tConfig: SESSION_SET_ROLLING_COOKIE=false' + postgres);
-    }
-  } else {
-    console.log('\tConfig: SESSION_NOT_SESSION_COOKIE=false' + postgres);
-  }
-};
-
-/**
  * Initialize shared variables used in chain of promises
  * @param {Object} chain - Data variables passed from promise to promise.
  * @returns {Promise} resolving to chain object
@@ -698,23 +681,23 @@ setup(chainObj)
   })
 
   // -------------------------------
-  // 102 GET /changepassword - Elapsed time 3 seconds, check if expired
+  // 102 GET /secure - Elapsed time 3 seconds, check if expired
   //
   // Assuming the configuration in .env SESSION_EXPIRE_SEC=8, these tests will run
   //
   // Session will be set to expire in 8 seconds
   //
   // At 3 seconds:
-  //     Session cookie:   accept (non expiring, skip test)
-  //     Fixed expiration: accept (will expire in 7 seconds)
-  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //     Session cookie:   accept (session will expire in 7 seconds)
+  //     Fixed expiration: accept (session will expire in 7 seconds)
+  //     Rolling cookie:   accept (session will expire in 10 seconds)
   //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
-      '102 GET /changepassword - Elapsed time 3 seconds, check if expired';
+      '102 GET /secure - Elapsed time 3 seconds, check if expired';
     chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/changepassword');
+    chain.requestFetchURL = encodeURI(testEnv.authURL + '/secure');
 
     if ((config.session.ttl === 8)) {
       // Save the expiration time of the previous cookie (UNIX seconds)
@@ -740,11 +723,9 @@ setup(chainObj)
     } else {
       logRequest(chain);
       // console.log(JSON.stringify(chain.responseRawData, null, 2));
-      showSessionOptions();
       if (config.session.notSessionCookie === false) {
         console.log('\tExpect: status === 200');
         assert.strictEqual(chain.responseStatus, 200);
-        console.log('\tNote: Session cookies do not expire, no cookie expiration test performed');
       } else {
         const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
         if (config.session.rollingCookie === true) {
@@ -760,9 +741,6 @@ setup(chainObj)
         } else {
           console.log('\tExpect: status === 200');
           assert.strictEqual(chain.responseStatus, 200);
-          if ((chain.parsedSetCookieHeader != null) && (chain.parsedSetCookieHeader.length > 0)) {
-            console.log('\tWarning: unexpected set-cookie header in response');
-          }
         }
       }
       return Promise.resolve(chain);
@@ -770,20 +748,20 @@ setup(chainObj)
   })
 
   // -------------------------------
-  // 103 GET /changepassword - Elapsed time 3 + 3 = 6 seconds, check if expired
+  // 103 GET /secure - Elapsed time 3 + 3 = 6 seconds, check if expired
   // Session will be set to expire in 8 seconds
   //
   // At 3 + 3 = 6 seconds:
-  //     Session cookie:   accept (non expiring, skip test)
-  //     Fixed expiration: accept (will expire in 4 seconds)
-  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //     Session cookie:   accept (session will expire in 4 seconds)
+  //     Fixed expiration: accept (session will expire in 4 seconds)
+  //     Rolling cookie:   accept (session will expire in 10 seconds)
   //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
-      '103 GET /changepassword - Elapsed time 3 + 3 = 6 seconds, check if expired';
+      '103 GET /secure - Elapsed time 3 + 3 = 6 seconds, check if expired';
     chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/changepassword');
+    chain.requestFetchURL = encodeURI(testEnv.authURL + '/secure');
     if (config.session.ttl === 8) {
       return Promise.resolve(chain);
     } else {
@@ -801,11 +779,9 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      showSessionOptions();
       if (config.session.notSessionCookie === false) {
         console.log('\tExpect: status === 200');
         assert.strictEqual(chain.responseStatus, 200);
-        console.log('\tNote: Session cookies do not expire, no cookie expiration test performed');
       } else {
         const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
         if (config.session.rollingCookie === true) {
@@ -821,9 +797,6 @@ setup(chainObj)
         } else {
           console.log('\tExpect: status === 200');
           assert.strictEqual(chain.responseStatus, 200);
-          if ((chain.parsedSetCookieHeader != null) && (chain.parsedSetCookieHeader.length > 0)) {
-            console.log('\tWarning: unexpected set-cookie header in response');
-          }
         }
       }
       return Promise.resolve(chain);
@@ -831,21 +804,21 @@ setup(chainObj)
   })
 
   // -------------------------------
-  // 104 GET /changepassword - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired
+  // 104 GET /secure - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired
   //
   // At this time, there will be a difference in acceptance for different cookies
   //
   // At 3 + 3 + 4 = 10 seconds:
-  //     Session cookie:   accept (non expiring, skip test)
-  //     Fixed expiration: reject (Expired 2 seconds ago)
-  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //     Session cookie:   reject (session expired 2 seconds ago)
+  //     Fixed expiration: reject (session expired 2 seconds ago)
+  //     Rolling cookie:   accept (session will expire in 10 seconds)
   //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
-      '104 GET /changepassword - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired';
+      '104 GET /secure - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired';
     chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/changepassword');
+    chain.requestFetchURL = encodeURI(testEnv.authURL + '/secure');
     if (config.session.ttl === 8) {
       return Promise.resolve(chain);
     } else {
@@ -862,12 +835,10 @@ setup(chainObj)
       delete chain.skipInlineTests;
       return Promise.resolve(chain);
     } else {
-      logRequest(chain);
-      showSessionOptions();
+      logRequest(chain, { ignoreErrorStatus: 401 });
       if (config.session.notSessionCookie === false) {
-        console.log('\tExpect: status === 200');
-        assert.strictEqual(chain.responseStatus, 200);
-        console.log('\tNote: Session cookies do not expire, no cookie expiration test performed');
+        console.log('\tExpect: status === 401');
+        assert.strictEqual(chain.responseStatus, 401);
       } else {
         const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
         if (config.session.rollingCookie === true) {
@@ -881,16 +852,8 @@ setup(chainObj)
           console.log('\tExpect: Cookie expires value incremented by 10 seconds after time delay');
           assert.ok((expiresDelta >= 9) && (expiresDelta <= 11));
         } else {
-          // If expired cookie may change, remember new cookie for future tests
-          chain.tempLastSessionCookie = chain.currentSessionCookie;
-          chain.tempLastSessionCookieExpires = chain.currentSessionCookieExpires;
-          console.log('\tExpect: set-cookie header (previous session expired)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-            (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: status === 302');
-          assert.strictEqual(chain.responseStatus, 302);
-          console.log('\tExpect: Location header redirects to GET /login');
-          assert.strictEqual(chain.parsedLocationHeader, '/login');
+          console.log('\tExpect: status === 401');
+          assert.strictEqual(chain.responseStatus, 401);
         }
       }
       return Promise.resolve(chain);
@@ -898,21 +861,21 @@ setup(chainObj)
   })
 
   // -------------------------------
-  // 105 GET /changepassword - Elapsed time 3 + 3 + 4 + 10 = 20 seconds, check if expired
+  // 105 GET /secure - Elapsed time 3 + 3 + 4 + 10 = 20 seconds, check if expired
   //
   // In this case, an interval of 10 seconds without any request will expire all cookies
   //
   // At 3 + 3 + 4 + 10 = 20 seconds:
-  //     Session cookie:   reject (In session store longer than TTL)
-  //     Fixed expiration: reject (Expired 12 seconds ago)
-  //     Rolling cookie:   reject (Expired 2 seconds ago)
+  //     Session cookie:   reject (session expired 12 seconds ago)
+  //     Fixed expiration: reject (session expired 12 seconds ago)
+  //     Rolling cookie:   reject (session expired 2 seconds ago)
   //
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
-      '105 GET /changepassword - Elapsed time 3 + 3 + 4 + 10 = 20 seconds, check if expired';
+      '105 GET /secure - Elapsed time 3 + 3 + 4 + 10 = 20 seconds, check if expired';
     chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/changepassword');
+    chain.requestFetchURL = encodeURI(testEnv.authURL + '/secure');
     if (config.session.ttl === 8) {
       return Promise.resolve(chain);
     } else {
@@ -929,21 +892,15 @@ setup(chainObj)
       delete chain.skipInlineTests;
       return Promise.resolve(chain);
     } else {
-      logRequest(chain);
-      showSessionOptions();
-      // In all cases, this expeced to always be expired cookie
-      console.log('\tExpect: New (different) cookie issued');
-      assert.notEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-      console.log('\tExpect: status === 302');
-      assert.strictEqual(chain.responseStatus, 302);
-      console.log('\tExpect: Location header redirects to GET /login');
-      assert.strictEqual(chain.parsedLocationHeader, '/login');
+      logRequest(chain, { ignoreErrorStatus: 401 });
+      console.log('\tExpect: status === 401');
+      assert.strictEqual(chain.responseStatus, 401);
       return Promise.resolve(chain);
     }
   })
 
   // -------------------------------
-  // 106 GET /changepassword - Elapsed time 3 + 3 + 4 + 10 + 4 = 24 seconds, Done
+  // 106 GET /secure - Elapsed time 3 + 3 + 4 + 10 + 4 = 24 seconds, Done
   //
   // In the previous test #105, all sessions were expired, they should continue to reject
   // At 3 + 3 + 4 +10 + 4 = 24 seconds:
@@ -953,9 +910,9 @@ setup(chainObj)
   // -------------------------------
   .then((chain) => {
     chain.testDescription =
-      '106 GET /changepassword - Elapsed time 3 + 3 + 4 + 10 + 4 = 24 seconds, Done';
+      '106 GET /secure - Elapsed time 3 + 3 + 4 + 10 + 4 = 24 seconds, Done';
     chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/changepassword');
+    chain.requestFetchURL = encodeURI(testEnv.authURL + '/secure');
     if (config.session.ttl === 8) {
       return Promise.resolve(chain);
     } else {
@@ -975,12 +932,9 @@ setup(chainObj)
       delete chain.skipInlineTests;
       return Promise.resolve(chain);
     } else {
-      logRequest(chain);
-      showSessionOptions();
-      console.log('\tExpect: status === 302');
-      assert.strictEqual(chain.responseStatus, 302);
-      console.log('\tExpect: Location header redirects to GET /login');
-      assert.strictEqual(chain.parsedLocationHeader, '/login');
+      logRequest(chain, { ignoreErrorStatus: 401 });
+      console.log('\tExpect: status === 401');
+      assert.strictEqual(chain.responseStatus, 401);
       return Promise.resolve(chain);
     }
   })
@@ -1023,7 +977,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      console.log(chain.responseRawData);
+      // console.log(chain.responseRawData);
       console.log('\tExpect: status === 302');
       assert.strictEqual(chain.responseStatus, 302);
       console.log('\tExpect: parsedLocationHeader === "/login"');
@@ -1118,9 +1072,9 @@ setup(chainObj)
   // Session will be set to expire in 8 seconds
   //
   // At 3 seconds:
-  //     Session cookie:   accept (non expiring, skip test)
-  //     Fixed expiration: accept (will expire in 7 seconds)
-  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //     Session cookie:   accept (session will expire in 7 seconds)
+  //     Fixed expiration: accept (session will expire in 7 seconds)
+  //     Rolling cookie:   accept (session will expire in 10 seconds)
   //
   // -------------------------------
   .then((chain) => {
@@ -1153,64 +1107,29 @@ setup(chainObj)
     } else {
       logRequest(chain);
       // console.log(chain.responseRawData);
-      showSessionOptions();
-      if (config.session.notSessionCookie === false) {
-        if (testEnv.trustedClient) {
-          console.log('\tExpect: status === 302');
-          assert.strictEqual(chain.responseStatus, 302);
-          console.log('\tExpect: redirect location match redirectURI');
-          assert.strictEqual(
-            testEnv.redirectURI,
-            chain.parsedLocationHeader.split('?')[0]);
-        } else {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-          console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-          assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-        }
-        console.log('\tNote: Session cookies do not expire, no cookie expiration test performed');
+      if (testEnv.trustedClient) {
+        console.log('\tExpect: status === 302');
+        assert.strictEqual(chain.responseStatus, 302);
+        console.log('\tExpect: redirect location match redirectURI');
+        assert.strictEqual(
+          testEnv.redirectURI,
+          chain.parsedLocationHeader.split('?')[0]);
       } else {
-        if (config.session.rollingCookie === true) {
-          if (testEnv.trustedClient) {
-            console.log('\tExpect: status === 302');
-            assert.strictEqual(chain.responseStatus, 302);
-            console.log('\tExpect: redirect location match redirectURI');
-            assert.strictEqual(
-              testEnv.redirectURI,
-              chain.parsedLocationHeader.split('?')[0]);
-          } else {
-            console.log('\tExpect: status === 200');
-            assert.strictEqual(chain.responseStatus, 200);
-            console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-            assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-          }
-          console.log('\tExpect: set-cookie header (because rollingCookie=true)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-          (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: Cookie not changed');
-          assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-          const expiresDelta =
-            chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
-          console.log('\tExpect: Cookie expires value incremented by 3 seconds after time delay');
-          assert.ok((expiresDelta >= 2) && (expiresDelta <= 4));
-        } else {
-          if (testEnv.trustedClient) {
-            console.log('\tExpect: status === 302');
-            assert.strictEqual(chain.responseStatus, 302);
-            console.log('\tExpect: redirect location match redirectURI');
-            assert.strictEqual(
-              testEnv.redirectURI,
-              chain.parsedLocationHeader.split('?')[0]);
-          } else {
-            console.log('\tExpect: status === 200');
-            assert.strictEqual(chain.responseStatus, 200);
-            console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-            assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-          }
-          if ((chain.parsedSetCookieHeader != null) && (chain.parsedSetCookieHeader.length > 0)) {
-            console.log('\tWarning: unexpected set-cookie header in response');
-          }
-        }
+        console.log('\tExpect: status === 200');
+        assert.strictEqual(chain.responseStatus, 200);
+        console.log('\tExpect: body contains "<title>Resource Decision</title>"');
+        assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
+      }
+      if (config.session.rollingCookie === true) {
+        console.log('\tExpect: set-cookie header (because rollingCookie=true)');
+        assert.ok((chain.parsedSetCookieHeader != null) &&
+        (chain.parsedSetCookieHeader.length > 0));
+        console.log('\tExpect: Cookie not changed');
+        assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
+        const expiresDelta =
+          chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
+        console.log('\tExpect: Cookie expires value incremented by 3 seconds after time delay');
+        assert.ok((expiresDelta >= 2) && (expiresDelta <= 4));
       }
       return Promise.resolve(chain);
     }
@@ -1220,9 +1139,9 @@ setup(chainObj)
   // 204 GET /dialog/authorize - Elapsed time 3 + 3 = 6 seconds, check if expired
   //
   // At 3 + 3 = 6 seconds:
-  //     Session cookie:   accept (non expiring, skip test)
-  //     Fixed expiration: accept (will expire in 4 seconds)
-  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //     Session cookie:   accept (session will expire in 4 seconds)
+  //     Fixed expiration: accept (session will expire in 4 seconds)
+  //     Rolling cookie:   accept (session will expire in 10 seconds)
   //
   // -------------------------------
   .then((chain) => {
@@ -1247,64 +1166,29 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      showSessionOptions();
-      if (config.session.notSessionCookie === false) {
-        if (testEnv.trustedClient) {
-          console.log('\tExpect: status === 302');
-          assert.strictEqual(chain.responseStatus, 302);
-          console.log('\tExpect: redirect location match redirectURI');
-          assert.strictEqual(
-            testEnv.redirectURI,
-            chain.parsedLocationHeader.split('?')[0]);
-        } else {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-          console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-          assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-        }
-        console.log('\tNote: Session cookies do not expire, no cookie expiration test performed');
+      if (testEnv.trustedClient) {
+        console.log('\tExpect: status === 302');
+        assert.strictEqual(chain.responseStatus, 302);
+        console.log('\tExpect: redirect location match redirectURI');
+        assert.strictEqual(
+          testEnv.redirectURI,
+          chain.parsedLocationHeader.split('?')[0]);
       } else {
-        if (config.session.rollingCookie === true) {
-          if (testEnv.trustedClient) {
-            console.log('\tExpect: status === 302');
-            assert.strictEqual(chain.responseStatus, 302);
-            console.log('\tExpect: redirect location match redirectURI');
-            assert.strictEqual(
-              testEnv.redirectURI,
-              chain.parsedLocationHeader.split('?')[0]);
-          } else {
-            console.log('\tExpect: status === 200');
-            assert.strictEqual(chain.responseStatus, 200);
-            console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-            assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-          }
-          console.log('\tExpect: set-cookie header (because rollingCookie=true)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-          (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: Cookie not changed');
-          assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-          const expiresDelta =
-            chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
-          console.log('\tExpect: Cookie expires value incremented by 6 seconds after time delay');
-          assert.ok((expiresDelta >= 5) && (expiresDelta <= 7));
-        } else {
-          if (testEnv.trustedClient) {
-            console.log('\tExpect: status === 302');
-            assert.strictEqual(chain.responseStatus, 302);
-            console.log('\tExpect: redirect location match redirectURI');
-            assert.strictEqual(
-              testEnv.redirectURI,
-              chain.parsedLocationHeader.split('?')[0]);
-          } else {
-            console.log('\tExpect: status === 200');
-            assert.strictEqual(chain.responseStatus, 200);
-            console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-            assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-          }
-          if ((chain.parsedSetCookieHeader != null) && (chain.parsedSetCookieHeader.length > 0)) {
-            console.log('\tWarning: unexpected set-cookie header in response');
-          }
-        }
+        console.log('\tExpect: status === 200');
+        assert.strictEqual(chain.responseStatus, 200);
+        console.log('\tExpect: body contains "<title>Resource Decision</title>"');
+        assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
+      }
+      if (config.session.rollingCookie === true) {
+        console.log('\tExpect: set-cookie header (because rollingCookie=true)');
+        assert.ok((chain.parsedSetCookieHeader != null) &&
+        (chain.parsedSetCookieHeader.length > 0));
+        console.log('\tExpect: Cookie not changed');
+        assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
+        const expiresDelta =
+          chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
+        console.log('\tExpect: Cookie expires value incremented by 6 seconds after time delay');
+        assert.ok((expiresDelta >= 5) && (expiresDelta <= 7));
       }
       return Promise.resolve(chain);
     }
@@ -1314,9 +1198,9 @@ setup(chainObj)
   // 205 GET /dialog/authorize - Elapsed time 3 + 3 + 4 = 10 seconds, check if expired
   //
   // At 3 + 3 + 4 = 10 seconds:
-  //     Session cookie:   accept (non expiring, skip test)
-  //     Fixed expiration: reject (Expired 2 seconds ago)
-  //     Rolling cookie:   accept (will expire in 10 seconds)
+  //     Session cookie:   reject (session xpired 2 seconds ago)
+  //     Fixed expiration: reject (session xpired 2 seconds ago)
+  //     Rolling cookie:   accept (session will expire in 10 seconds)
   //
   // -------------------------------
   .then((chain) => {
@@ -1341,22 +1225,11 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      showSessionOptions();
       if (config.session.notSessionCookie === false) {
-        if (testEnv.trustedClient) {
-          console.log('\tExpect: status === 302');
-          assert.strictEqual(chain.responseStatus, 302);
-          console.log('\tExpect: redirect location match redirectURI');
-          assert.strictEqual(
-            testEnv.redirectURI,
-            chain.parsedLocationHeader.split('?')[0]);
-        } else {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-          console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-          assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-        }
-        console.log('\tNote: Session cookies do not expire, no cookie expiration test performed');
+        console.log('\tExpect: status === 302');
+        assert.strictEqual(chain.responseStatus, 302);
+        console.log('\tExpect: Location header redirects to GET /login');
+        assert.strictEqual(chain.parsedLocationHeader, '/login');
       } else {
         if (config.session.rollingCookie === true) {
           if (testEnv.trustedClient) {
@@ -1382,12 +1255,6 @@ setup(chainObj)
           console.log('\tExpect: Cookie expires value incremented by 10 seconds after time delay');
           assert.ok((expiresDelta >= 9) && (expiresDelta <= 11));
         } else {
-          // If expired cookie may change, remember new cookie for future tests
-          chain.tempLastSessionCookie = chain.currentSessionCookie;
-          chain.tempLastSessionCookieExpires = chain.currentSessionCookieExpires;
-          console.log('\tExpect: set-cookie header (previous session expired)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-            (chain.parsedSetCookieHeader.length > 0));
           console.log('\tExpect: status === 302');
           assert.strictEqual(chain.responseStatus, 302);
           console.log('\tExpect: Location header redirects to GET /login');
@@ -1425,15 +1292,10 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      showSessionOptions();
-      console.log('\tExpect: New (different) cookie issued');
-      assert.notEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
       console.log('\tExpect: status === 302');
       assert.strictEqual(chain.responseStatus, 302);
       console.log('\tExpect: Location header redirects to GET /login');
       assert.strictEqual(chain.parsedLocationHeader, '/login');
-      chain.tempLastSessionCookie = chain.currentSessionCookie;
-      chain.tempLastSessionCookieExpires = chain.currentSessionCookieExpires;
       return Promise.resolve(chain);
     }
   })

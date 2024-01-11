@@ -21,7 +21,7 @@ const checkVhost = require('./check-vhost');
 const logConfig = require('./log-config');
 const securityContact = require('./security-contact');
 const robotPolicy = require('./robot-policy');
-
+const { checkSessionAuth } = require('./session-auth');
 const config = require('./config');
 const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -143,6 +143,14 @@ if (nodeEnv === 'production') {
 app.get('/favicon.ico', function (req, res, next) {
   res.status(204).send(null);
 });
+
+//
+// Routes that authenticate by Basic Auth for use of access_tokens
+// are handled before the session middleware.
+//
+app.post('/oauth/token', oauth2.token);
+app.post('/oauth/introspect', oauth2.introspect);
+app.post('/oauth/token/revoke', oauth2.revoke);
 
 /**
  * Limit per IP address for GET request to /login
@@ -274,9 +282,6 @@ app.post('/changepassword', site.changePasswordHandler);
 app.get('/noscope', site.noScopePage);
 app.get('/dialog/authorize', oauth2.authorization);
 app.post('/dialog/authorize/decision', oauth2.decision);
-app.post('/oauth/token', oauth2.token);
-app.post('/oauth/introspect', oauth2.introspect);
-app.post('/oauth/token/revoke', oauth2.revoke);
 
 // --------------------------------------------------
 //   Admin Web site
@@ -293,12 +298,8 @@ if (!config.database.disableWebAdminPanel) {
 // ---------------------------------
 // Secure link to challenge cookie
 // ---------------------------------
-app.get('/secure', (req, res, next) => {
-  if (req.isAuthenticated && req.isAuthenticated()) {
-    res.json({ authenticated: true });
-  } else {
-    res.set('Content-Type', 'text/plain').status(401).send('Unauthorized');
-  }
+app.get('/secure', checkSessionAuth(), (req, res) => {
+  res.json({ authenticated: true });
 });
 
 // --------------------------------------

@@ -11,7 +11,7 @@ const inputValidation = require('./input-validation');
 const { toScopeString, toScopeArray, requireScopeForWebPanel } = require('./scope');
 const logUtils = require('./log-utils');
 const stats = require('./stats');
-const checkSessionAuth = require('./session-auth');
+const { checkSessionAuth } = require('./session-auth');
 
 const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });

@@ -20,7 +20,7 @@ const csrfProtection = csrf({ cookie: false });
 const config = require('./config');
 const db = require('./db');
 const jwtUtils = require('./jwt-utils');
-const checkSessionAuth = require('./session-auth');
+const { checkSessionAuth } = require('./session-auth');
 
 const {
   toScopeString,

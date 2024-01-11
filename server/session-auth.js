@@ -9,7 +9,7 @@
 //
 // app.get('/hello', checkSessionAuth(), renderPage)
 //
-// In the case where the path '/hello' is added to the list of allowed paths
+// In the case where the path (like '/hello') is added to the list of allowed paths
 // in loginRedirectRoutes array, the URL will be saved into the user's session.
 // A 302 redirect will send the user's browser to the GET /login,
 // the password entry form. The passport middleware will use this
@@ -18,11 +18,9 @@
 // If the URL path is not in the loginRedirectRoutes array,
 // a 401 Unauthorized response will be returned.
 //
-// The unique feature in this module is to store the original expiration
-// time of the cookie in the user's session, so that expired requests will
-// be denied independent of the session record ttl (See CHANGELOG v0.0.21).
-// This expiration time feature is only applicable to fixed expiration cookies
-// where SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=false
+// This module has a middleware function to store a session expiration timestamp
+// to the user's session. Expired requests will be denied except when
+// configured for SESSION_SET_ROLLING_COOKIE=true.
 //
 'use strict';
 
@@ -48,7 +46,7 @@ const config = require('./config');
 // browser bookmark, the original page would redirect after /login.
 //
 // -------------------------------------------------
-// These routes redirect back to the original router
+// These routes redirect back to the original route
 // after successful login with username and password.
 // ---------------------------------------------------
 const loginRedirectRoutes = [
@@ -77,31 +75,40 @@ const allowedAlternateRedirectRoutes = [
 ];
 
 /**
- * Authorization middleware using passport to validate sessions
- * @param {String} failRedirectTo - String containing the redirect route
- * @returns Express next() handler, or returns res object
+ * Middleware function to add session expiration time
+ * in milliseconds to session record.
+ * This is called from POST /login (password entry)
+ * @param {Object} req - ExpressJs request object
+ * @param {Object} res - ExpressJs response object
+ * @param {Function} next - ExpressJs function to call next handler
  */
-module.exports = function (options) {
+exports.updateSessionExpireTime = function (req, res, next) {
+  if (req.session) {
+    if (!req.session.sessionExpiresMs) {
+      req.session.sessionExpiresMs = Date.now() + config.session.maxAge;
+    }
+  };
+  next();
+};
+
+/**
+ * Authorization middleware using passport to validate sessions
+ * @param {Object} options - Function options argument
+ * @param {String} options.failRedirectTo - Alternate 302 redirect
+ */
+exports.checkSessionAuth = function (options) {
   return function (req, res, next) {
     let expired = false;
-    if ((req.session.cookie) && (req.session.passport)) {
-      //
-      // for case of rolling cookies or session cookies, skip this block and
-      // let the session store, expire and prune as needed.
-      // For the case of cookies that expire, independent of the session store,
-      // deny requests that exceed expiration of original cookie
-      //
-      if ((config.session.notSessionCookie) && (!config.session.rollingCookie)) {
-        if (!req.session.cookieFirstExpire) {
-          req.session.cookieFirstExpire = req.session.cookie._expires;
-        } else {
-          const timeNow = new Date();
-          const timeExpire = new Date(req.session.cookieFirstExpire);
-          if (timeNow > timeExpire) {
+
+    if (req.session.cookie) {
+      // For case of rolling cookies skip this block
+      if (!config.session.rollingCookie) {
+        // For case of session cookie, or fixed expiration cookie
+        // deny requests that exceed maxAge of session
+        if (req.session.sessionExpiresMs) {
+          const timeNowMs = Date.now();
+          if (timeNowMs > req.session.sessionExpiresMs) {
             expired = true;
-            delete req.session.passport;
-            // holds /dialog/authorize/decision transaction code
-            delete req.session.authorize;
           }
         }
       }
@@ -110,12 +117,15 @@ module.exports = function (options) {
     // Case of not authorized, for valid routes redirect /login, else return status 401
     //
     if ((expired) || (!req.isAuthenticated || (!req.isAuthenticated()))) {
+      // Case of original URL is found is list of allowed redirect /login URLs
       if ((req.method) && (req.method.toUpperCase() === 'GET') &&
-        (req._parsedOriginalUrl) && (req._parsedOriginalUrl.pathname) &&
-        (loginRedirectRoutes.indexOf(req._parsedOriginalUrl.pathname) >= 0)) {
+      (req._parsedOriginalUrl) && (req._parsedOriginalUrl.pathname) &&
+      (loginRedirectRoutes.indexOf(req._parsedOriginalUrl.pathname) >= 0)) {
         if (req.session) {
+          // Remember original URL in session, used by passport redirect after successful login
           req.session.returnTo = req.originalUrl || req.url;
         }
+        // Redirect browser to load the login form
         if (req._parsedOriginalUrl.pathname !== '/login') {
           return res.redirect('/login');
         } else {
@@ -124,10 +134,15 @@ module.exports = function (options) {
           return next(error);
         }
       } else {
+        // Case of not on list for redirect to /login.
+        // Check if custom redirect URL was provided
         if ((options) && (options.failRedirectTo) && (options.failRedirectTo.length > 0) &&
           (allowedAlternateRedirectRoutes.indexOf(options.failRedirectTo) >= 0)) {
+          // Case of URL supplied to function when called, and URL is in allowed list.
           return res.redirect(options.failRedirectTo);
         } else {
+          // Not redirect to /login, not redirect to custom URL,
+          // therefore reject response as 401 Unauthorized.
           return res.status(401).send('Unauthorized');
         }
       }

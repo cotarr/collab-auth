@@ -48,72 +48,84 @@ also added in front of the time delay middleware function for the GET /login rou
 
 Issue:
 
-When configured for session cookies,
-SESSION_NOT_SESSION_COOKIE=false (the default), there is no expiration time
-associated with session cookies. Session cookies are valid until the browser is closed.
-The authorization server will accept session cookies until the session's record 
-in the session store database becomes inactive (no more requests) and the stale record
-is pruned from the session database at fixed time intervals. This was working correctly.
+There is an issue where fixed expiration cookies or sessions cookies 
+may be treated as rolling cookies, where the expiration time of the 
+session is extended with each request.
 
-When configured to use rolling cookies, 
-SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=true,
-A revised expiration time is sent to the browser in a set-cookie
-header for each request. Rolling cookies will be accepted by the server
-until the elapsed time since the last request has exceeded
-the cookie's expiration time. In other words the expiration time 
-of the session's database record is 'touched' with each request 
-while concurrently updated cookies are sent to the browser to match.
-This was also working correctly.
+There are 3 cookie/session configurations defined in the .env file.
 
-On the other hand, when cookies are configured to use a fixed expiration time, 
-SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=false,
-The cookies intended to remain valid until the elapsed time since 
-the cookie was created exceeds the lifetime defined in the configuration.
-However it appears that with certain configurations, the session store will 
-touch (reset) the session expiration timestamp. Thus, cookies in the
-fixed expiration configuration will act like rolling cookies.
+| Configuration              | 1-session | 2-fixed  | 3-rolling |
+| -------------------------- | --------- | -------- | --------- | 
+| SESSION_NOT_SESSION_COOKIE | false     | true     | true      |
+| SESSION_SET_ROLLING_COOKIE | false     | false    | true      |
 
-Cause:
+1 - When configured as session cookie, a new cookie is 
+created and sent to the browser where the Expires= value omitted
+from the set-cookie header in the response.
+As long a subsequent requests include the same cookie,
+the set-cookie header is not added to the response.
+When the browser is closed, session cookies are discarded.
+
+2 - When configured as fixed expiration cookie, a new cookie 
+is created and a set-cookie header is returned to the 
+browser with an Expires= value indicating the life of the cookie.
+As long a subsequent requests include the same cookie,
+the no set-cookie header will added to the response.
+This maintains the original Expires= value in the browser
+cookie jar.
+
+3 - When configured as rolling cookie, a new cookie 
+is created and a set-cookie header is returned to the 
+browser with an Expires= value indicating the life of the cookie.
+Each subsequent request will include a set-cookie header on
+every response, and each response will change the value
+of the Expires= value, extending the life of the cookie with each request.
+
+On the server end, each session is a database record stored
+in the session store, either memorystore or connect-pg-simple.
+The session store configuration accepts a TTL (Time to Live)
+value and a time interval where stale sessions are purged.
 
 There are multiple inter-related configurations.
-The express-session middleware defines cookie creation. 
-The session store modules memorystore or connect-pg-simple 
+The `express-session` middleware defines cookie creation. 
+The session store modules `memorystore` or `connect-pg-simple` 
 define time to live for records in the session store database.
-There is configuration for the passport authorization middleware
-determines if a session is authorized or not. The requests may be
-handed off to the oauth2orize server to issue OAuth 2.0 token 
-related responses.
+There is strategy configuration for the `passport` authorization
+middleware determines if a session is authorized or not. 
+Some requests are handed off to the `oauth2orize` server related 
+to OAuth 2.0 functionality.
 
-It appears that when configured for cookie of fixed expiration, 
-SESSION_NOT_SESSION_COOKIE=true and SESSION_SET_ROLLING_COOKIE=false,
-in certain configurations the last modified time of the 
-session's record is 'touched' with each request, extending 
-the session time to live (TTL).
+In certain configurations of the above modules, the last modified 
+time of the session's record may be 'touched' with each request, 
+extending the expiration of the session record in the session store.
+Additionally, certain routes may modify the session record,
+such as adding a CSRF token, which may trigger a new 
+cookie Expires= value as well as touch the session record timestamp.
 
-Additionally, calls to the /dialog/authorize route may forward the request
-to the oauth2orize middleware authorization server. It seems oauth2orize
-independently updates the request processing to re-send
-the set-cookie to the browser each time /dialog/authorize route is called.
-
-This could potentially allow an expired session to
-accept requests past it's fixed expiration time as long as repeated requests
-are made with frequency less than the expiration time interval.
-
-This only applies to the case of fixed expiration cookies.
+This could potentially allow a session cookie or fixed expiration cookie
+to act as a rolling cookie, with extended expiration. However, 
+it would not allow access to protected routes without a valid cookie.
 
 Fix:
 
 Created a new module server/session-auth.js. This is a custom module to replace
-connect-ensure-login npm module. After the user enters the password during login,
-the next request will store the original expiration time of the
-cookie into the session's record in the session store database.
-An explicit expiration check function checkSessionAuth() was added.
+connect-ensure-login npm module. The route handler for the POST /login route
+where the user submits username and password, a new middleware 
+function `updateSessionExpireTime()` will add the intended expiration 
+time to the session. 
 
 The new function `checkSessionAuth()` replaced `ensureLoggedIn()` for all 
 protected routes in the server/admin-panel.js, the /dialog/authorize and 
 /dialog/authorize/decision routes in server/oauth2.js, and the 
 /redirecterror, GET /changepassword, POST /changepassword routes in site.js.
 The connect-ensure-module was removed from package.json.
+
+Example:
+
+```js
+const checkSessionAuth = require('./session-auth');
+app.get('/somewhere', checkSessionAuth(), renderPage); 
+```
 
 For cookie and session handling in express-session options object, 
 when configured to use memorystore as the memorystore configuration property "stale"
@@ -129,19 +141,13 @@ else it is set to false. When configured for fixed expiration cookies,
 the session's record does not require modification since the expiration
 time is not intended to change.
 
-Example:
-
-```js
-const checkSessionAuth = require('./session-auth');
-app.get('/somewhere', checkSessionAuth(), renderPage); 
-```
-
-Continued issue: When configured for fixed expiration cookies, 
-in certain configurations, the browser may receive a set-cookie header with 
-revised expiration time, like a rolling cookie. However, unless the 
-authorization server is explicitly configured for rolling cookies, 
-the server will no longer accept requests past the original expiration time 
-that was defined when the user entered their password at the login form.
+Unresolved issue: In certain configurations and certain routes, the 
+browser may receive a set-cookie header with revised expiration 
+time, like a rolling cookie. However, unless the authorization 
+server is explicitly configured for rolling cookies, the server 
+will no longer accept requests past the original expiration time 
+that was defined during the POST /login handler for the 
+username/password login.
 
 ### Added (feature)
 
@@ -149,7 +155,7 @@ As a feature, the new session-auth.js module includes an array `loginRedirectRou
 containing a list of path names, such as "/panel/menu" that will be allowed 
 to remember the original URL by saving it as a returnTo value in the session's record.
 The main benefit of this array is to exclude administration panel 
-account data entry forms from being auto-resumed by a post login redirect.
+account data entry forms from being auto-resumed after a user login redirect.
 
 As a feature, the session-auth.js module authorization function will
 accept an optional options object. An optional property "failRedirectTo" 
@@ -220,6 +226,14 @@ function was improved by adding an explicit check of the token expiration time
 stored in the token database as token meta-data. This means that for a token to be valid, the 
 server's system clock must not exceed either the expiration time within the JWT
 token payload or the expiration time stored in the token's meta-data in the token database.
+
+### Changed
+
+In server/app.js, moved the route handlers for paths '/oauth/token', 
+'/oauth/introspect', and '/oauth/token/revoke' earlier in the file before the 
+express-session and passport middleware. These routes authenticate with Basic Auth using client 
+credentials to perform access_token functions. These calls do not require cookies, nor 
+should they return a cookie.
 
 ### Debug tests
 
