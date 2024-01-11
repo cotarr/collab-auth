@@ -6,7 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## next v0.0.21-dev DRAFT
+## [v0.0.21](https://github.com/cotarr/collab-auth/releases/tag/v0.0.21) 2024-01-11
+
+This update is a generally an improvement to cookie/session handling with some
+unrelated items included.
 
 ### Fixed
 
