@@ -152,54 +152,11 @@ app.post('/oauth/token', oauth2.token);
 app.post('/oauth/introspect', oauth2.introspect);
 app.post('/oauth/token/revoke', oauth2.revoke);
 
-/**
- * Limit per IP address for GET request to /login
- * Successful request add to count.
- */
-const loginFormRateLimit = rateLimit({
-  windowMs: config.limits.passwordRateLimitTimeMs,
-  max: config.limits.passwordRateLimitCount,
-  statusCode: 429,
-  message: 'Too many requests',
-  standardHeaders: false,
-  legacyHeaders: false
-});
-
-/**
- * Middleware to add timer to delay request before processing.
- * @param {Object} req - NodeJs request object
- * @param {Object} res - NodeJs request object
- * @param {function} next - NodeJs return next handler
- */
-const loginFormDelay = (req, res, next) => {
-  if (config.session.enablePgSessionStore) {
-    setTimeout(() => {
-      return next();
-    }, 100);
-  } else {
-    return next();
-  }
-};
-
 // ----------------------------------------------------------
-// This is a work around.
-//
-// Calls to /dialog/authorize or /panel/menu modify the
-// session by adding a "returnTo" property to the session object.
-// Calls to load the login form at route GET /login modify the
-// session object by adding a CSRF token to the session object.
-// When using PostgreSQL as a session store with connect-pg-simple,
-// occasionally, the second call to /login retrieves the
-// session record from the session store database before the
-// previous request has finished updating the record.
-// This can rewrite the session store without a returnTo value,
-// resulting in a 302 redirect to the page /redirecterror.
-// The timer is not used when configured with memorystore.
-//
-// Since this adds a fixed timer to the request, a IP rate
-// limit was added before the timer.
-//
-app.get('/login', loginFormRateLimit, loginFormDelay);
+// Add fixed delay timer to the GET /login route.
+// Workaround for PostgreSQL race condition, See comments in site.js
+// ----------------------------------------------------------
+app.get('/login', site.loginFormPreSessionDelay);
 
 // -----------------------------------------------------------------
 // express-session
