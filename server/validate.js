@@ -16,7 +16,7 @@ const validate = Object.create(null);
 
 /**
  * Timing safe compare, from express-basic-auth
- * @param   {Stromg} userInput - Express request object
+ * @param   {String} userInput - Express request object
  * @param   {String} secret - username from passport change form
  * @returns {Boolean} Return true if successful match, else false
  */
@@ -35,7 +35,7 @@ const safeCompare = function (userInput, secret) {
  * Given a user and a password this will return the user if it exists and the password matches,
  * otherwise this will throw an error.
  *
- * Addionally, check that user.loginDisabled is not true
+ * Additionally, check that user.loginDisabled is not true
  *
  * @param   {Object} user     - The user profile
  * @param   {String} password - The user's password
@@ -306,7 +306,7 @@ validate.isRefreshToken = ({ scope }) => {
  * @throws  {Object}  clientID - the client profile
  * @throws  {Object}  scope    - the scope
  * @parms   {grantType} grantType - Oauth2 grant type
- * @parms   {authTime}  authTime  - Time of user authoriztion
+ * @parms   {authTime}  authTime  - Time of user authorization
  * @returns {Promise} The resolved refresh token after saved
  */
 validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime }) => {
@@ -325,7 +325,7 @@ validate.generateRefreshToken = ({ userID, clientID, scope, grantType, authTime 
  * @param   {clientID}  clientID  - The client profile
  * @param   {scope}     scope     - The scope
  * @parms   {grantType} grantType - Oauth2 grant type
- * @parms   {authTime}  authTime  - Time of user authoriztion
+ * @parms   {authTime}  authTime  - Time of user authorization
  * @returns {Promise}  The resolved refresh token after saved
  */
 validate.generateToken = ({ userID, clientID, scope, grantType, authTime }) => {

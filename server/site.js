@@ -196,7 +196,7 @@ const validateAndHashPassword = (req, res, user) => {
     throw new Error('Passwords do not match');
   } else if ((req.body.newpassword1.length < config.data.userPasswordMinLength) ||
     (req.body.newpassword1.length > config.data.userPasswordMaxLength)) {
-    throw new Error('Password invlid length');
+    throw new Error('Password invalid length');
   } else if (req.body.oldpassword === req.body.newpassword1) {
     throw new Error('New password same');
   } else {
@@ -282,8 +282,8 @@ exports.changePasswordHandler = [
         if (e.message === 'Passwords do not match') {
           message = 'Passwords do not match.';
         }
-        if (e.message === 'Password invlid length') {
-          message = 'Password invlid length.';
+        if (e.message === 'Password invalid length') {
+          message = 'Password invalid length.';
         }
         if (e.message === 'New password same') {
           message = 'New password must be different.';

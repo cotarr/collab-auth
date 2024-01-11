@@ -47,7 +47,7 @@ const server = oauth2orize.createServer();
  *
  * The scope to be included with the requested token is saved here with the
  * authorization code. The scope was created in the authorization endpoint.
- * The scope was previously saved to `req.oauth2.req.tokenscope` when the
+ * The scope was previously saved to `req.oauth2.req.tokenScope` when the
  * authorization transaction was initiated and appears here as `areq.tokenScope`.
  * The scope is the intersection of -
  *    - requesting client's `allowedScope`,
@@ -85,7 +85,7 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, loca
  * which is bound to these values.
  *
  * The scope was included with the requested token was created in the authorization endpoint.
- * The scope was previously saved to `req.oauth2.req.tokenscope` when the
+ * The scope was previously saved to `req.oauth2.req.tokenScope` when the
  * authorization transaction was initiated and appears here as `areq.tokenScope`.
  * The scope is the intersection of -
  *    - requesting client's `allowedScope`,
@@ -259,7 +259,7 @@ server.exchange(oauth2orize.exchange.password(
  * password/secret from the token request for verification. If these values are validated, the
  * application issues an access token on behalf of the client who authorized the code.
  *
- * For client credentials, there is no user authenticaiton involved with this transation.
+ * For client credentials, there is no user authentication involved with this transaction.
  * Therefore the scope is based solely on the request and client definition.
  * The scope is the intersection of -
  *    - requesting client's `allowedScope`,
@@ -309,7 +309,7 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
  * request for verification.  If this value is validated, the application issues an access
  * token on behalf of the client who authorized the code
  *
- * The scope used to create the replacement access_token is retrived from the
+ * The scope used to create the replacement access_token is retrieved from the
  * refresh_token record in the database.
  */
 server.exchange(oauth2orize.exchange.refreshToken(
@@ -361,12 +361,12 @@ server.exchange(oauth2orize.exchange.refreshToken(
 /*
  * User authorization endpoint
  *
- * /dialog/authorization
+ * /dialog/authorize
  *
  * `authorization` middleware accepts a `validate` callback which is
  * responsible for validating the client making the authorization request.  In
  * doing so, the `redirectURI` be checked against a registered value included
- * in the client record, although security requirements may vary accross
+ * in the client record, although security requirements may vary across
  * implementations.  Once validated, the `done` callback must be invoked with
  * a `client` instance, as well as the `redirectURI` to which the user will be
  * redirected after an authorization decision is obtained.
@@ -377,7 +377,7 @@ server.exchange(oauth2orize.exchange.refreshToken(
  * authorization).  We accomplish that here by routing through `checkSessionAuth()`
  * first, and rendering the `dialog` view.
  *
- * At this step, the scope of the requsted token is formed.
+ * At this step, the scope of the requested token is formed.
  * The scope is the intersection of -
  *    - requesting client's `allowedScope`,
  *    - requesting user's `role`
@@ -426,10 +426,10 @@ exports.authorization = [
         // The /dialog/authorization can not be pre-checked for scope restrictions in
         // the inputValidation because the client has not been looked up in the database
         // at that point, it the scope is being checked here as middleware.
-        // This is a pre-check. The oauth2oize callback will enforce it during processing.
+        // This is a pre-check. The oauth2orize callback will enforce it during processing.
         if ((client.allowedScope == null) ||
           (client.allowedScope.indexOf('auth.token') < 0)) {
-          const err = new Error('Oauth2 authorizaton requires scope: auth.token');
+          const err = new Error('Oauth2 authorization requires scope: auth.token');
           err.status = 400;
           throw err;
         } else {
@@ -465,7 +465,7 @@ exports.authorization = [
 /**
  * User decision endpoint
  *
- * /dialog/authorization/decision
+ * /dialog/authorize/decision
  *
  * `decision` middleware processes a user's decision to allow or deny access
  * requested by a client application.  Based on the grant type requested by the
@@ -501,10 +501,10 @@ exports.decision = [
  * exchange middleware will be invoked to handle the request.  Clients must
  * authenticate when making requests to this endpoint.
  *
- * Client credentials may be either Basic with base64 encoded Basic Authorizatin header,
+ * Client credentials may be either Basic with base64 encoded Basic Authorization header,
  * or client_id and client_secret in body of request. Either will work.
  *
- * Scope restriction for API access, not issue token. Additional scope checks fillow.
+ * Scope restriction for API access, not issue token. Additional scope checks follow.
  */
 exports.token = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
@@ -524,7 +524,7 @@ exports.token = [
  *    POST request
  *
  *    Authorization: client credentials
- *    Accepts Authorizaton header with base64 encoded client credentials,
+ *    Accepts Authorization header with base64 encoded client credentials,
  *    or alternately, it accepts client_id and client_secret in body of POST
  *
  *    req.body {
@@ -585,7 +585,7 @@ exports.revoke = [
           .then((token) => validate.tokenNotNull(token, 'refresh_token not found'))
           .then((token) => validate.token(token, refreshToken))
           .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
-            'refresh_token failed valiation'))
+            'refresh_token failed validation'))
           .then(() => db.refreshTokens.delete(refreshToken))
           .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
             'error deleting refresh_token'))
@@ -618,7 +618,7 @@ exports.revoke = [
  *        user:
  * 5) Return JSON object containing token information, or else return error
  *
- *  Scope restriction for API access, not issue token. Additional scope checks fillow.
+ *  Scope restriction for API access, not issue token. Additional scope checks follow.
  */
 exports.introspect = [
   passport.authenticate(['basic', 'oauth2-client-password'], { session: false }),
@@ -633,7 +633,7 @@ exports.introspect = [
         .then((token) => validate.tokenNotNull(token, 'access_token not found'))
         .then((token) => validate.token(token, accessToken))
         .then((tokenMetaData) => validate.tokenNotNull(tokenMetaData,
-          'access_token validaiton failed'))
+          'access_token validation failed'))
         .then((tokenMetaData) => {
           stats.incrementCounterFn('introspect');
           const resJson = {
@@ -666,7 +666,7 @@ exports.introspect = [
 ];
 
 /**
- * Register serialialization and deserialization functions.
+ * Register serialization and deserialization functions.
  *
  * When a client redirects a user to user authorization endpoint, an
  * authorization transaction is initiated.  To complete the transaction, the
