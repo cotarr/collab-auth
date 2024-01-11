@@ -235,6 +235,20 @@ express-session and passport middleware. These routes authenticate with Basic Au
 credentials to perform access_token functions. These calls do not require cookies, nor 
 should they return a cookie.
 
+### Added
+
+In response to GitHub CodeQL security scan, a network request IP address rate limit
+was added using express-rate-limit middleware. API routes related to access token functions
+may be configured with a different limit from browser web requests. The following new
+configuration values are applicable in the .env file.
+
+```
+LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+LIMITS_TOKEN_RATE_LIMIT_MS=3600000
+LIMITS_WEB_RATE_LIMIT_COUNT=1000
+LIMITS_WEB_RATE_LIMIT_MS=3600000
+```
+
 ### Debug tests
 
 - Update ThunderClient collections to incorporate /panel/unauthorized and /noscope routes.

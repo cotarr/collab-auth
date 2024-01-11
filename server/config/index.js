@@ -86,7 +86,11 @@ exports.database = {
 exports.limits = {
   // Rate limit per IP address for POST requests to /login (10 per hour per IP address)
   passwordRateLimitCount: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_COUNT || '10'),
-  passwordRateLimitTimeMs: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_MS || '3600000')
+  passwordRateLimitTimeMs: parseInt(process.env.LIMITS_PASSWORD_RATE_LIMIT_MS || '3600000'),
+  tokenRateLimitCount: parseInt(process.env.LIMITS_TOKEN_RATE_LIMIT_COUNT || '1000'),
+  tokenRateLimitTimeMs: parseInt(process.env.LIMITS_TOKEN_RATE_LIMIT_MS || '3600000'),
+  webRateLimitCount: parseInt(process.env.LIMITS_WEB_RATE_LIMIT_COUNT || '1000'),
+  webRateLimitTimeMs: parseInt(process.env.LIMITS_WEB_RATE_LIMIT_MS || '3600000')
 };
 
 exports.oauth2 = {
