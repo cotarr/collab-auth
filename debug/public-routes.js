@@ -24,9 +24,10 @@ const managedFetch = require('./modules/managed-fetch').managedFetch;
 const {
   logRequest,
   // showChain,
-  showHardError
+  showHardError,
   // showJwtToken,
   // showJwtMetaData
+  check404PossibleVhostError
 } = require('./modules/test-utils');
 
 const chainObj = Object.create(null);
@@ -177,6 +178,7 @@ setup(chainObj)
     } else {
       logRequest(chain);
       // console.log(chain.responseRawData);
+      check404PossibleVhostError(chain);
       console.log('\tExpect: status === 200');
       assert.strictEqual(chain.responseStatus, 200);
       // console.log('\tExpect: response include "Disallow: /"');

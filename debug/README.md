@@ -63,6 +63,18 @@ Confirm that public routes are accessible
 
 Confirm that protected routes are blocked
 
+- debug/rate-limit.js
+
+Confirm that express-rate-limit is working.
+
+rate-limit.js requires:
+
+```
+LIMITS_PASSWORD_RATE_LIMIT_COUNT=4
+LIMITS_TOKEN_RATE_LIMIT_COUNT=6
+LIMITS_WEB_RATE_LIMIT_COUNT=16
+```
+
 ## Command Line Test Execution
 
 Tests must be executed from the base folder of 
@@ -166,6 +178,11 @@ TESTENV_PASSWORD=bobssecret
 | testEnv.username         | TESTENV_USERNAME         | users[testEnv.userIndex].username                                         |
 | testEnv.password         | TESTENV_PASSWORD         | users[testEnv.userIndex].password                                         |
 
+Example command line override:
+
+```bash
+TESTENV_CLIENTSECRET="wrong_secret" node debug/code-grant.js
+```
 
 ## Command line arguments
 
@@ -191,6 +208,12 @@ information during test execution.
 | SHOWCHAIN=1  | Print chain object at end of tests (debug) |
 | SHOWCHAIN=2  | Print chain object after each test (debug) |
 | SHOWSTACK=1  | Error handler print stack                  |
+
+Command line example:
+
+```bash
+SHOWRES=3 SHOWTOKEN=3 SHOWCOOKIE=1 SHOWSTACK=1 node debug/access-token.js
+```
 
 ## Structure of JavaScript test files
 

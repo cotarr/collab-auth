@@ -31,7 +31,8 @@ const {
   showChain,
   showHardError,
   showJwtToken,
-  showJwtMetaData
+  showJwtMetaData,
+  check404PossibleVhostError
 } = require('./modules/test-utils');
 
 const chainObj = Object.create(null);
@@ -119,6 +120,7 @@ setup(chainObj)
   .then((chain) => {
     logRequest(chain);
     // console.log(JSON.stringify(chain.responseRawData, null, 2));
+    check404PossibleVhostError(chain);
     console.log('\tExpect: status === 302');
     assert.strictEqual(chain.responseStatus, 302);
     console.log('\tExpect: parsedLocationHeader === "/login"');
@@ -663,6 +665,7 @@ setup(chainObj)
       console.log('\tExpect: Server error message: Unauthorized');
       assert.ok(chain.responseErrorMessage.indexOf(', Unauthorized') >= 0);
 
+      showJwtMetaData();
       return Promise.resolve(chain);
     }
   })
@@ -711,9 +714,7 @@ setup(chainObj)
       console.log('\tExpect: Server error message: Invalid refresh token');
       assert.ok(chain.responseErrorMessage.indexOf('Invalid refresh token') >= 0);
 
-      //
-      // Parse Data
-      //
+      showJwtToken();
       return Promise.resolve(chain);
     }
   })

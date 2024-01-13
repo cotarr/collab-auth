@@ -33,7 +33,8 @@ const {
   showChain,
   showHardError,
   showJwtToken,
-  showJwtMetaData
+  showJwtMetaData,
+  check404PossibleVhostError
 } = require('./modules/test-utils');
 
 const chainObj = Object.create(null);
@@ -118,6 +119,7 @@ setup(chainObj)
     logRequest(chain);
     // console.log(JSON.stringify(chain.responseRawData, null, 2));
 
+    check404PossibleVhostError(chain);
     console.log('\tExpect: status === 200');
     assert.strictEqual(chain.responseStatus, 200);
     console.log('\tExpect: Content-type === "application/json"');

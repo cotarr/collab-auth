@@ -43,16 +43,28 @@
 /**
  * Perform fetch request using native NodeJs fetch() API
  * @param {Object} chain - Chain object used to pass data from promise to promise
- * @param {String} chain.requestMethod
+ * @param {String} chain.requestMethod - GET and POST supported
  * @param {String} chain.requestFetchURL - Full URI encoded URL
- * @param {String} chain.requestAcceptType
+ * @param {String} chain.requestAcceptType - Header: Accept
  * @param {String} chain.requestAuthorization - Values: 'basic', 'cookie
  * @param {String} chain.requestBasicAuthCredentials - Base64 encoded
- * @param {String} chain.currentSessionCookie
- * @param {String} chain.requestContentType
- * @param {String} chain.requestBody
-  @returns {Promise} resolves to chain object, or reject error
- */
+ * @param {String} chain.currentSessionCookie - Used for requestAuthorization: cookie
+ * @param {String} chain.requestContentType - Header: Content-type
+ * @param {String} chain.requestBody - Used for POST requests
+ * @param {String} chain.forceOverrideContentType - Used to mis-match header verses content
+ * @returns {Promise} resolves to chain object, or reject error
+ * @returns {Number} chain.responseStatus
+ * @returns {String} chain.responseStatusText
+ * @returns {Object} chain.responseHeaders
+ * @returns {String|Object} chain.responseRawData
+ * @returns {String} chain.parsedContentType
+ * @returns {String} chain.parsedLocationHeader
+ * @returns {String} chain.parseSetCookieHeader
+ * @returns {Number} chain.parseSetCookieHeaderExpires
+ * @returns {String} chain.currentSessionCookie
+ * @returns {Number} chain.currentSessionCookieExpires
+ * @returns {String} chain.responseErrorMessage
+*/
 exports.managedFetch = (chain) => {
   if ((Object.hasOwn(chain, 'testDescription')) &&
     (chain.testDescription.length > 0)) {
@@ -65,14 +77,15 @@ exports.managedFetch = (chain) => {
   } else {
     return new Promise((resolve, reject) => {
       // Initialize response variables
-      chain.responseErrorMessage = null;
       chain.responseStatus = null;
       chain.responseStatusText = '';
       chain.responseHeaders = {};
+      chain.responseRawData = null;
+      chain.parsedContentType = null;
       chain.parsedLocationHeader = null;
       chain.parsedSetCookieHeader = null;
       chain.parseSetCookieHeaderExpires = null;
-      chain.responseRawData = null;
+      chain.responseErrorMessage = null;
 
       const fetchController = new AbortController();
 
@@ -99,8 +112,9 @@ exports.managedFetch = (chain) => {
           fetchOptions.headers.cookie = chain.currentSessionCookie;
           if ((Object.hasOwn(process.env, 'SHOWCOOKIE') &&
             (parseInt(process.env.SHOWCOOKIE) === 1))) {
-            console.log('---------- Request Cookie ----------');
+            console.log('---------- REQUEST Cookie Header ----------');
             console.log(chain.currentSessionCookie);
+            console.log('-----------END Cookie Header --------------');
           }
         }
       }
@@ -122,12 +136,17 @@ exports.managedFetch = (chain) => {
           fetchOptions.body = body;
         } else if (chain.requestContentType === 'text/html') {
           fetchOptions.headers['Content-type'] = 'text/html';
+          // Note: this is not encoded
           fetchOptions.body = chain.requestBody;
         } else {
           const error = new Error('Unsupported or missing Content-type in POST request');
           reject(error);
         }
       }
+      //
+      // Used for testing, after processing the request of one type,
+      // change the request header before sending, to create a type mismatch.
+      //
       if (chain.forceOverrideContentType) {
         fetchOptions.headers['Content-type'] = chain.forceOverrideContentType;
         delete chain.forceOverrideContentType;
@@ -166,6 +185,9 @@ exports.managedFetch = (chain) => {
               console.log('"' + header[0] + '": "' + header[1] + '"');
             }
           };
+          if (showHeadersFlag) {
+            console.log('-------------- END HEADERS -----------------');
+          }
           // Assume only 1 cookie is returned from auth server
           if (responseCookieArray.length === 1) {
             // This variable will persist in future fetch calls
@@ -185,15 +207,12 @@ exports.managedFetch = (chain) => {
             });
             if ((Object.hasOwn(process.env, 'SHOWCOOKIE') &&
             (parseInt(process.env.SHOWCOOKIE) === 1))) {
-              console.log('------ Response Set-Cookie ---------');
+              console.log('------ RESPONSE Set-Cookie Header ---------');
               console.log(responseCookieArray[0]);
-              console.log('------------------------------------');
+              console.log('--------- END Set-cookie Header------------');
             }
           } else if (responseCookieArray.length > 1) {
             throw new Error('Fatal test error: Response contained more than 1 set-cookie header');
-          }
-          if (showHeadersFlag) {
-            console.log('-------------- END HEADERS ----------------');
           }
 
           if ((response.ok) || (response.status === 302)) {

@@ -36,9 +36,10 @@ const managedFetch = require('./modules/managed-fetch').managedFetch;
 const {
   logRequest,
   showChain,
-  showHardError
+  showHardError,
   // showJwtToken,
   // showJwtMetaData
+  check404PossibleVhostError
 } = require('./modules/test-utils');
 
 const chainObj = Object.create(null);
@@ -128,6 +129,7 @@ setup(chainObj)
   .then((chain) => {
     logRequest(chain);
     // console.log(chain.responseRawData);
+    check404PossibleVhostError(chain);
     console.log('\tExpect: status === 302 (Redirect)');
     assert.strictEqual(chain.responseStatus, 302);
     console.log('\tExpect: Location header redirects to GET /login');

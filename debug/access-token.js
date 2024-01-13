@@ -43,7 +43,8 @@ const {
   showChain,
   showHardError,
   showJwtToken,
-  showJwtMetaData
+  showJwtMetaData,
+  check404PossibleVhostError
 } = require('./modules/test-utils');
 
 const chainObj = Object.create(null);
@@ -176,6 +177,13 @@ setup(chainObj)
 
   // -----------------------------------------
   // 2 GET /oauth/token - Request access_token using client credentials
+  //
+  // This will submit a set of client credentials
+  // to the authentication server.
+  // In the case where the credentials are valid
+  // and the client account has sufficient scope
+  // to issue access_tokens, a new access_token
+  // will be generated and returned in the response.
   // -----------------------------------------
   .then((chain) => {
     chain.testDescription = '2 GET /oauth/token - Request access_token using client credentials';
@@ -196,7 +204,7 @@ setup(chainObj)
   .then((chain) => {
     logRequest(chain);
     // console.log(JSON.stringify(chain.responseRawData, null, 2));
-
+    check404PossibleVhostError(chain);
     console.log('\tExpect: status === 200');
     assert.strictEqual(chain.responseStatus, 200);
     console.log('\tExpect: Content-type === "application/json"');
@@ -243,6 +251,13 @@ setup(chainObj)
 
   // ----------------------------------------------------------
   // 3 POST /oauth/introspect - Submit token, verify active and meta-data before further tests
+  //
+  // This request will submit the access_token obtained in step #2
+  // to the authentication server. A set of valid client credentials are
+  // required to submit the request. The authentication server
+  // will check the signature of the access token, if valid and
+  // not expired, the meta-data associated with the access_token
+  // will be looked up in the token database and returned in the response
   // ----------------------------------------------------------
   .then((chain) => {
     chain.testDescription =
@@ -361,6 +376,7 @@ setup(chainObj)
     assert.ok((timeUntilExpire < -3597));
     console.log('\tExpect: status === 401');
     assert.strictEqual(chain.responseStatus, 401);
+    showJwtMetaData(chain);
     return Promise.resolve(chain);
   })
 
@@ -391,6 +407,7 @@ setup(chainObj)
     logRequest(chain, { ignoreErrorStatus: 401 });
     console.log('\tExpect: status === 401');
     assert.strictEqual(chain.responseStatus, 401);
+    showJwtMetaData(chain);
     return Promise.resolve(chain);
   })
 
@@ -420,6 +437,7 @@ setup(chainObj)
     logRequest(chain, { ignoreErrorStatus: 401 });
     console.log('\tExpect: status === 401');
     assert.strictEqual(chain.responseStatus, 401);
+    showJwtMetaData(chain);
     return Promise.resolve(chain);
   })
 
@@ -452,6 +470,7 @@ setup(chainObj)
     logRequest(chain, { ignoreErrorStatus: 401 });
     console.log('\tExpect: status === 401');
     assert.strictEqual(chain.responseStatus, 401);
+    showJwtMetaData(chain);
     return Promise.resolve(chain);
   })
 
@@ -510,7 +529,6 @@ setup(chainObj)
       chain.abortSleepTimer = true;
       chain.abortManagedFetch = true;
       chain.skipInlineTests = true;
-      showJwtMetaData(chain);
       return Promise.resolve(chain);
     }
   })
@@ -612,6 +630,7 @@ setup(chainObj)
       logRequest(chain, { ignoreErrorStatus: 401 });
       console.log('\tExpect: status === 401 (access token expired)');
       assert.strictEqual(chain.responseStatus, 401);
+      showJwtMetaData(chain);
       return Promise.resolve(chain);
     }
   })
@@ -658,6 +677,7 @@ setup(chainObj)
       logRequest(chain, { ignoreErrorStatus: 401 });
       console.log('\tExpect: status === 401 (New access_token valid, but database record expired)');
       assert.strictEqual(chain.responseStatus, 401);
+      showJwtMetaData(chain);
       return Promise.resolve(chain);
     }
   })

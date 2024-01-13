@@ -28,9 +28,10 @@ const managedFetch = require('./modules/managed-fetch').managedFetch;
 const {
   logRequest,
   showChain,
-  showHardError
+  showHardError,
   // showJwtToken,
   // showJwtMetaData
+  check404PossibleVhostError
 } = require('./modules/test-utils');
 
 if (config.database.disableWebAdminPanel) {
@@ -105,7 +106,7 @@ setup(chainObj)
   .then((chain) => {
     logRequest(chain);
     // console.log(JSON.stringify(chain.responseRawData, null, 2));
-
+    check404PossibleVhostError(chain);
     console.log('\tExpect: status === 200');
     assert.strictEqual(chain.responseStatus, 200);
     console.log('\tExpect: body contains "<title>collab-auth</title>"');
