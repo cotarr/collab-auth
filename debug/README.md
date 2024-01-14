@@ -63,13 +63,25 @@ Confirm that public routes are accessible
 
 Confirm that protected routes are blocked
 
+- debug/load-test-introspect.js
+
+Evaluate how many requests per second the
+GET /oauth/introspect API can handle.
+
+```bash
+# Number of requests to send during testing (default 10)
+TESTENV_LT_COUNT=10
+# If 0, send requests at maximum rate
+# if > 0, limit rate, value of milliseconds/request (default 0)
+TESTENV_LT_PERIODMS=0
+```
 - debug/rate-limit.js
 
 Confirm that express-rate-limit is working.
 
 rate-limit.js requires:
 
-```
+```bash
 LIMITS_PASSWORD_RATE_LIMIT_COUNT=4
 LIMITS_TOKEN_RATE_LIMIT_COUNT=6
 LIMITS_WEB_RATE_LIMIT_COUNT=16
