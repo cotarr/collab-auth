@@ -15,7 +15,7 @@
         <tr><td>Number</td></td><td><%= user.number %></td></tr>
         <tr><td>Username</td><td><%= user.username %></td></tr>
         <tr><td>Name</td><td><%= user.name %></td></tr>
-        <tr><td>Login Disabled</td><td><%= user.loginDisabled %></td></tr>
+        <tr<%- user.trClassTag %>><td>Login Disabled</td><td><%= user.loginDisabled %></td></tr>
         <tr><td>Role</td><td><%= user.role %></td></tr>
         <tr><td>Last Login</td><td><%= user.lastLogin %></td></tr>
         <tr><td>Updated At</td><td><%= user.updatedAt %></td></tr>

@@ -61,6 +61,14 @@ server.grant(oauth2orize.grant.code((client, redirectURI, user, ares, areq, loca
     const err = new Error('grant_type code (code grant) is disabled');
     return done(err);
   }
+
+  // Check if client account is disabled
+  if (client.clientDisabled) {
+    const err = new Error('Client account disabled');
+    err.status = 401;
+    return done(err);
+  }
+
   // Check if scope is sufficient (2 places, also in exchange code)
   // This is pre-checked in in authorization endpoint middleware to inhibit a hard error here
   if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.token') < 0)) {
@@ -97,6 +105,13 @@ server.grant(oauth2orize.grant.token((client, user, ares, areq, locals, done) =>
   // This is pre-checked in input validation to inhibit a hard error here
   if (config.oauth2.disableTokenGrant) {
     const err = new Error('response_type token (implicit grant) is disabled');
+    return done(err);
+  }
+
+  // Check if client account is disabled
+  if (client.clientDisabled) {
+    const err = new Error('Client account disabled');
+    err.status = 401;
     return done(err);
   }
 
@@ -144,6 +159,13 @@ server.exchange(oauth2orize.exchange.code((client, code, redirectURI, body, auth
   // This is pre-checked in input validation to inhibit a hard error here
   if (config.oauth2.disableCodeGrant) {
     const err = new Error('grant_type code (code grant) is disabled');
+    return done(err);
+  }
+
+  // Check if client account is disabled
+  if (client.clientDisabled) {
+    const err = new Error('Client account disabled');
+    err.status = 401;
     return done(err);
   }
 
@@ -204,6 +226,13 @@ server.exchange(oauth2orize.exchange.password(
     // This is pre-checked in input validation to inhibit a hard error here
     if (config.oauth2.disablePasswordGrant) {
       const err = new Error('grant_type password (password grant) is disabled');
+      return done(err);
+    }
+
+    // Check if client account is disabled
+    if (client.clientDisabled) {
+      const err = new Error('Client account disabled');
+      err.status = 401;
       return done(err);
     }
 
@@ -273,6 +302,13 @@ server.exchange(oauth2orize.exchange.clientCredentials((client, scope, body, aut
     return done(err);
   }
 
+  // Check if client account is disabled
+  if (client.clientDisabled) {
+    const err = new Error('Client account disabled');
+    err.status = 401;
+    return done(err);
+  }
+
   // Check if scope is sufficient
   // This is pre-checked in token endpoint middleware to inhibit hard error here
   if ((client.allowedScope == null) || (client.allowedScope.indexOf('auth.client') < 0)) {
@@ -318,6 +354,13 @@ server.exchange(oauth2orize.exchange.refreshToken(
     // This is pre-checked in input validation to inhibit a hard error here
     if (config.oauth2.disableRefreshTokenGrant) {
       const err = new Error('grant_type refresh_token (Refresh token grant) is disabled');
+      return done(err);
+    }
+
+    // Check if client account is disabled
+    if (client.clientDisabled) {
+      const err = new Error('Client account disabled');
+      err.status = 401;
       return done(err);
     }
 
@@ -422,6 +465,13 @@ exports.authorization = [
     // the clients then they will have to re-consent.
     db.clients.findByClientId(req.query.client_id)
       .then((client) => {
+        // Check if client account is disabled
+        if (client.clientDisabled) {
+          const err = new Error('Client account disabled');
+          err.status = 401;
+          throw err;
+        }
+
         // check if client has sufficient scope to request tokens
         // The /dialog/authorization can not be pre-checked for scope restrictions in
         // the inputValidation because the client has not been looked up in the database

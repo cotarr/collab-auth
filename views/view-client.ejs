@@ -18,6 +18,7 @@
         <tr><td>trustedClient</td><td><%= aclient.trustedClient %></td></tr>
         <tr><td>allowedScope</td><td><%= aclient.allowedScope %></td></tr>
         <tr><td>allowedRedirectURI</td><td><%= aclient.allowedRedirectURI %></td></tr>
+        <tr<%- aclient.trClassTag %>><td>Client disabled</td><td><%= aclient.clientDisabled %></td></tr>
         <tr><td>Updated At</td><td><%= aclient.updatedAt %></td></tr>
         <tr><td>Created At</td><td><%= aclient.createdAt %></td></tr>
       </table>

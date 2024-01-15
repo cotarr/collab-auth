@@ -29,6 +29,7 @@
       "auth.info"
     ],
     "allowedRedirectURI": [],
+    "clientDisabled": false,
     "createdAt": "2021-08-22T18:38:29.250Z",
     "updatedAt": "2021-08-22T18:38:29.250Z"
   },
@@ -43,6 +44,7 @@
       "api.write"
     ],
     "allowedRedirectURI": [],
+    "clientDisabled": false,
     "createdAt": "2021-08-22T18:38:29.250Z",
     "updatedAt": "2021-08-22T18:38:29.250Z"
   }

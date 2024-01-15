@@ -47,6 +47,7 @@ CREATE TABLE authclients (
   "trustedClient" boolean NOT NULL,
   "allowedScope" varchar(64)[] NOT NULL,
   "allowedRedirectURI" varchar(255)[],
+  "clientDisabled" boolean NOT NULL DEFAULT FALSE;
   "deleted" boolean NOT NULL DEFAULT FALSE,
   "createdAt" timestamp without time zone NOT NULL,
   "updatedAt" timestamp without time zone NOT NULL

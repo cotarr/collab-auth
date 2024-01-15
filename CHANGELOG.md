@@ -6,6 +6,80 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Next v0.0.23-dev DRAFT
+
+This update added the capability to disable client accounts in the client database.
+
+A new client.clientDisabled property allows creation of temporary client 
+accounts for testing or development purposes that may be disabled 
+or enabled from the admin panel while preserving the client credentials. 
+This also makes the client accounts symmetrical with the user accounts 
+that already ad a "loginDisabled" property.
+
+### Changes
+
+The schema for a client account was updated to add a new 
+property "clientDisabled" of type boolean as described below:
+
+server/admin-panel.js - The admin account editor was updated to provide a 
+checkbox on the client account edit forms to enable and disable the client
+account. Several HTML ejs view template files were updated as part of this change.
+Color highlighting was added to better show disabled accounts.
+
+server/db/mem-client.js - For the RAM memory database option, updated the 
+client account object to handle the new clientDisabled property. 
+For backward compatibility, during loading of the "client-db.json" file, 
+if the clientDisabled property is not present, it is added and set 
+to false (account enabled). The RAM memory option uses RAM variables 
+to emulate database for demonstration mode where changes are discarded 
+when the server is shut down.
+
+server/db/pg-client.js - For the PostgreSQL database option, the SQL queries 
+were updated to add the new "clientDisabled" column to the "authclients" table 
+in the "collabauth" database. For backward compatibility where an existing 
+client table does not have a clientDisabled column, upon starting the server, the 
+client table is retrieved, and if the old schema is found, the following SQL query
+is run to add the new column with clientDisabled set to false (account enabled).
+
+The server automatically runs this SQL query at start (Only if schema update needed):
+
+```sql
+ALTER TABLE authclients ADD COLUMN "clientDisabled" boolean NOT NULL DEFAULT FALSE;
+```
+server/validate.js - The `validate.client()` function was updated to fail validation 
+when clientDisabled property is set to true. This will deny access to API routes
+that use Basic Auth with base64 encoded client credentials. These are:
+POST /oauth/token, POST /oauth/token/introspect, POST /oauth/token/revoke.
+
+server/oauth2.js - Those oauth2orize callback functions have been updated 
+to return a status 401 error to outh2orize when the client.clientDisabled 
+property is set to true.
+
+server/oauth2.js - The express route handler for GET /dialog/authorize was updated to
+to throw an error when lookup of the "client_id" query parameter has the
+client.clientDisabled property set to true. This is a public OAuth 2.0 route that
+does not require authentication. Oauth2orize handles this case with a 302 redirect back
+to the calling web server's redirect URI with the error message:
+"Status: 502, Bad Gateway, Client account disabled". 
+
+server/oauth2.js - For the case of OAuth 2.0 authorization code grant 
+where client.trustedClient is false, the route handler for route 
+GET /dialog/authorize/decision is authorized by the users session 
+cookie and by a random nonce "transaction" parameter that is included in 
+the 302 redirect from GET /dialog/authorize. In this request, no client account 
+lookup is performed. The request is authorized by matching the cookie, CSRF token, and 
+the transaction code before redirecting with a new OAuth 2.0 code grant authorization code. 
+THerefore, no explicit clientDisabled check was added to /dialog/authorize/decision
+
+server/input-validation - Updated input validation for new schema.
+
+SQL-tools/create-oauth-tables.sql - The SQL queries to create PostgreSQL tables
+were updated to include the clientDisabled column.
+
+example-clients-db.json - Added `clientDisabled: false` to client accounts.
+
+docs/admin.html - Update documentation for use of admin panel.
+
 ## [v0.0.22](https://github.com/cotarr/collab-auth/releases/tag/v0.0.22) 2024-01-14
 
 ### Changed

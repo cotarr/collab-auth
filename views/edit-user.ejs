@@ -37,7 +37,7 @@
                 minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>"
                 value="" autocomplete="new-password" /></td>
             </tr>
-            <tr>
+            <tr<%- user.trClassTag %>>
               <td><label for "loginDisabled">Login Disabled</label></td>
               <td><input type="checkbox" name="loginDisabled" <%= user.disabled %> ></td>
             </tr>

@@ -64,6 +64,12 @@ router.get('/listusers',
           } else {
             filteredUser.lastLogin = '';
           }
+          // Change background color to gray when login disabled
+          if (user.loginDisabled) {
+            filteredUser.trClassTag = ' class="tr-list-disabled"';
+          } else {
+            filteredUser.trClassTag = '';
+          }
           filteredArray.push(filteredUser);
         });
         //
@@ -108,7 +114,6 @@ router.get('/viewuser',
             number: user.number,
             username: user.username,
             name: user.name,
-            loginDisabled: user.loginDisabled,
             role: toScopeString(user.role),
             updatedAt: user.updatedAt.toUTCString(),
             createdAt: user.createdAt.toUTCString()
@@ -117,6 +122,14 @@ router.get('/viewuser',
             filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {
             filteredUser.lastLogin = '';
+          }
+          if (user.loginDisabled) {
+            // Change color to red when login disabled
+            filteredUser.loginDisabled = 'Yes';
+            filteredUser.trClassTag = ' class="tr-form-disabled"';
+          } else {
+            filteredUser.loginDisabled = 'No';
+            filteredUser.trClassTag = '';
           }
           return res.set('Cache-Control', 'no-store').render('view-user',
             { name: req.user.name, user: filteredUser });
@@ -248,8 +261,11 @@ router.get('/edituser',
           }
           if (user.loginDisabled) {
             filteredUser.disabled = 'checked';
+            // Change background color to gray when login disabled
+            filteredUser.trClassTag = ' class="tr-form-disabled"';
           } else {
             filteredUser.disabled = '';
+            filteredUser.trClassTag = '';
           }
           return res.set('Cache-Control', 'no-store').render('edit-user',
             {
@@ -419,9 +435,28 @@ router.get('/listclients',
     db.clients.findAll()
       .then((clientArray) => {
         //
+        // Process array of clients for display
+        //
+        const filteredArray = [];
+        clientArray.forEach((client, i) => {
+          const filteredClient = {
+            id: client.id,
+            name: client.name,
+            clientId: client.clientId,
+            clientSecret: 'ssh-secret'
+          };
+          // Change background color to gray for disabled clients
+          if (client.clientDisabled) {
+            filteredClient.trClassTag = ' class="tr-list-disabled"';
+          } else {
+            filteredClient.trClassTag = '';
+          }
+          filteredArray.push(filteredClient);
+        });
+        //
         // Sort the array
         //
-        clientArray.sort((a, b) => {
+        filteredArray.sort((a, b) => {
           if (a.clientId.toUpperCase() > b.clientId.toUpperCase()) return 1;
           if (a.clientId.toUpperCase() < b.clientId.toUpperCase()) return -1;
           return 0;
@@ -430,7 +465,7 @@ router.get('/listclients',
         // Render the page
         //
         return res.set('Cache-Control', 'no-store').render('list-clients',
-          { name: req.user.name, clients: clientArray });
+          { name: req.user.name, clients: filteredArray });
       })
       .catch((err) => {
         return next(err);
@@ -486,6 +521,15 @@ router.get('/viewclient',
           filteredClient.trustedClient = 'Yes';
         } else {
           filteredClient.trustedClient = 'No';
+        }
+
+        if (client.clientDisabled) {
+          filteredClient.clientDisabled = 'Yes';
+          // Change background color to gray when client disabled
+          filteredClient.trClassTag = ' class="tr-form-disabled"';
+        } else {
+          filteredClient.clientDisabled = 'No';
+          filteredClient.trClassTag = '';
         }
         return res.set('Cache-Control', 'no-store').render('view-client',
           { name: req.user.name, aclient: filteredClient });
@@ -549,7 +593,8 @@ router.post('/createclient',
       clientSecret: savedClientSecret,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: toScopeArray(req.body.allowedScope),
-      allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
+      allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI),
+      clientDisabled: (req.body.clientDisabled === 'on') || false
     };
     db.clients.save(client)
       .then((createdClient) => {
@@ -616,6 +661,15 @@ router.get('/editclient',
           } else {
             filteredClient.trustedClient = '';
           }
+          if (client.clientDisabled) {
+            filteredClient.disabled = 'checked';
+            // Change background color to gray when login disabled
+            filteredClient.trClassTag = ' class="tr-form-disabled"';
+          } else {
+            filteredClient.disabled = '';
+            filteredClient.trClassTag = '';
+          }
+
           return res.set('Cache-Control', 'no-store').render('edit-client',
             {
               csrfToken: req.csrfToken(),
@@ -648,7 +702,8 @@ router.post('/editclient',
       name: req.body.name,
       trustedClient: (req.body.trustedClient === 'on') || false,
       allowedScope: toScopeArray(req.body.allowedScope),
-      allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI)
+      allowedRedirectURI: toScopeArray(req.body.allowedRedirectURI),
+      clientDisabled: (req.body.clientDisabled === 'on') || false
     };
     // If client secret is zero length or missing, the previous client secret will not be updated
     if ((req.body.clientSecret) &&
@@ -659,7 +714,7 @@ router.post('/editclient',
         return res.set('Cache-Control', 'no-store').render('generic-message', {
           name: req.user.name,
           title: 'Create New Client',
-          message: 'Error: Client secret invlid length, aborted'
+          message: 'Error: Client secret invalid length, aborted'
         });
       }
       // Case of PostgreSQL database, use AES encryption on client secret

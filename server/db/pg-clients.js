@@ -91,16 +91,18 @@ exports.save = (client) => {
           '"trustedClient",' +
           '"allowedScope",' +
           '"allowedRedirectURI",' +
+          '"clientDisabled",' +
           '"updatedAt", ' +
           '"createdAt") ' +
-          'VALUES ($1, $2, $3, $4, $5, $6, now(), now()) RETURNING *',
+          'VALUES ($1, $2, $3, $4, $5, $6, $7, now(), now()) RETURNING *',
           values: [
             client.name,
             client.clientId,
             client.clientSecret,
             client.trustedClient,
             client.allowedScope,
-            client.allowedRedirectURI
+            client.allowedRedirectURI,
+            client.clientDisabled
           ]
         };
         return pgPool.query(saveQuery);
@@ -134,6 +136,7 @@ exports.update = (client) => {
         '"trustedClient" = $4, ' +
         '"allowedScope" = $5, ' +
         '"allowedRedirectURI" = $6, ' +
+        '"clientDisabled" = $7, ' +
         '"updatedAt" = now() ' +
         'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
       values: [
@@ -142,7 +145,8 @@ exports.update = (client) => {
         client.clientSecret,
         client.trustedClient,
         client.allowedScope,
-        client.allowedRedirectURI
+        client.allowedRedirectURI,
+        client.clientDisabled
       ]
     };
   } else {
@@ -152,6 +156,7 @@ exports.update = (client) => {
         '"trustedClient" = $3, ' +
         '"allowedScope" = $4, ' +
         '"allowedRedirectURI" = $5, ' +
+        '"clientDisabled" = $6, ' +
         '"updatedAt" = now() ' +
         'WHERE "id" = $1 AND "deleted" = FALSE RETURNING *',
       values: [
@@ -159,7 +164,8 @@ exports.update = (client) => {
         client.name,
         client.trustedClient,
         client.allowedScope,
-        client.allowedRedirectURI
+        client.allowedRedirectURI,
+        client.clientDisabled
       ]
     };
   }
@@ -193,3 +199,58 @@ exports.delete = (id) => {
       }
     });
 };
+
+//
+// Version v0.0.23 added the feature to disable client accounts.
+// This required modification of the database schema to
+// add the new column "clientDisabled" defaulting to false.
+//
+// For debugging, the column can be removed using the SQL query:
+//   ALTER TABLE authclients DROP COLUMN "clientDisabled";
+//
+
+/**
+ * Perform a SQL query on the authclients table to determine
+ * if the table has the new "clientDisabled" column exists.
+ * If no, perform SQL query to add "clientDisabled" column
+ */
+const _updateSchema1 = () => {
+  const queryAll = {
+    text: 'SELECT * FROM authclients WHERE "deleted" = FALSE'
+  };
+  const queryFixSchema = {
+    text: 'ALTER TABLE authclients ADD COLUMN "clientDisabled" boolean NOT NULL DEFAULT FALSE;'
+  };
+  pgPool.query(queryAll)
+    .then((queryResponse) => {
+      if (Object.hasOwn(queryResponse.rows[0], 'clientDisabled')) {
+        return Promise.resolve(false);
+      } else {
+        console.log('----------------------------------------------------------');
+        console.log('PostgreSQL schema conflict:');
+        console.log('Database: "collabauth" Table: "authclients"');
+        console.log('Error: Column "clientDisabled" not found in table.');
+        console.log('Attempting to ALTER the table by adding missing column...');
+        return pgPool.query(queryFixSchema);
+      }
+    })
+    .then((queryResponse) => {
+      if (queryResponse) {
+        if ((Object.hasOwn(queryResponse, 'command')) &&
+          (queryResponse.command === 'ALTER')) {
+          console.log('Success, table altered successfully');
+          console.log('----------------------------------------------------------');
+        } else {
+          throw new Error('Unexpected response updating schema for table authclients');
+        }
+      }
+    })
+    .catch((error) => {
+      console.log('An error occurred trying to upgrade the "collabauth" database schema ' +
+        'to add a new column "clientDisabled" to the "authClients" table.');
+      console.log('error: ', error.message || error.toString() || 'Unknown Error');
+      process.exit(1);
+    });
+};
+// On program start, call the function
+_updateSchema1();

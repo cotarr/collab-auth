@@ -40,6 +40,10 @@
               <td><label for "allowedRedirectURI">Allowed Redirect URI</label></td>
               <td><textarea type="text" name="allowedRedirectURI" cols="80" rows="3"><%= aclient.allowedRedirectURI %></textarea></td>
             </tr>
+            <tr<%- aclient.trClassTag %>>
+              <td><label for "clientDisabled">Client disabled</label></td>
+              <td><input type="checkbox" name="clientDisabled" <%= aclient.disabled %> ></td>
+            </tr>
             <tr><td>Updated At</td><td><%= aclient.updatedAt %></td></tr>
             <tr><td>Created At</td><td><%= aclient.createdAt %></td></tr>
           </table>

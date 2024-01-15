@@ -245,6 +245,20 @@
                 <br>Allowed Characters:
                 <br>abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:,"\'/%._-?&
               </td>
+              <tr>
+                <td>clientDisabled</td>
+                <td>Boolean</td>
+                <td>
+                  This setting will disable a client account when set to client.clientDisabled=true.
+                  <br>This will deny access to server-to-server API routes requiring 
+                    authentication Basic Auth with base64 encoded client credentials in the 
+                    authorization header including:
+                    POST /oauth/token /oauth/token/revoke /oauth/token/introspect.
+                  <br>This will deny access to oauth2rise callback functions for browser accessible
+                    routes like /dialog/authorize
+                  <br>Note: Not shown in above screen capture (TBD needs update)
+                </td>
+              </tr>
             </tr>
           </tbody>
         </table>

@@ -59,7 +59,6 @@ body {
 
 .head-left {
   display: inline;
-  fon
 }
 
 .head-center {
@@ -88,7 +87,6 @@ body {
 
 .foot-left {
   display: inline;
-  fon
 }
 
 .foot-center {
@@ -150,6 +148,13 @@ textarea {
 .account-table {
   background-color: white;
   border-spacing: 0;
+}
+.tr-list-disabled {
+  background-color: #b8b8b8;
+}
+.tr-form-disabled {
+  color: #ff0000;
+  font-weight: bold;
 }
 /* td {
   font-size: 80%;

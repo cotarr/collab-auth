@@ -32,8 +32,13 @@ try {
   console.log(e.message);
   process.exit(1);
 }
-// convert dates from ISO string to JS Date.
 clients.forEach((client) => {
+  // Client account setting clientDisabled added in v0.0.23
+  // If clientDisabled not in client-db.json file, add it, set to false
+  if (!Object.hasOwn(client, 'clientDisabled')) {
+    client.clientDisabled = false;
+  }
+  // convert dates from ISO string to JS Date.
   client.createdAt = new Date(Date(client.createdAt));
   client.updatedAt = new Date(Date(client.updatedAt));
 });
@@ -154,6 +159,7 @@ exports.update = (client) => {
       }
       foundClient.allowedScope = client.allowedScope;
       foundClient.allowedRedirectURI = client.allowedRedirectURI;
+      foundClient.clientDisabled = client.clientDisabled;
       foundClient.updatedAt = new Date();
 
       // Stringify a deep copy to maintain RAM database as immutable

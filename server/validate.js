@@ -125,36 +125,43 @@ validate.usernameMatchesSession = (req, username) => {
  * @returns {Object} The client if valid
  */
 validate.client = (client, clientSecret) => {
-  validate.clientExists(client);
-  if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
-    //
-    // Client secret is PLAIN TEXT
-    //                  ==========
-    // This is case of in-memory database loaded from static files
-    //
-    if (safeCompare(clientSecret, client.clientSecret)) {
-      // Success, client secret matches
-      return client;
-    } else {
-      console.log('Client secret does not match');
-      throw new Error('Client secret does not match');
-    }
+  if ((client != null) && (client.clientDisabled)) {
+    console.log('Client account disabled');
+    const err = new Error('Client account disabled');
+    err.status = 401;
+    throw err;
   } else {
-    //
-    // Client secret is AES encrypted.
-    //
-    // This is case of PostsgreSQL database
-    //
-    const plainTextBytes =
-      CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
-    const plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
-    // Timing safe compare
-    if (safeCompare(clientSecret, plainTextClientSecret)) {
-      // Success, client secret matches
-      return client;
+    validate.clientExists(client);
+    if ((nodeEnv === 'development') && (!config.database.enablePgUserDatabase)) {
+      //
+      // Client secret is PLAIN TEXT
+      //                  ==========
+      // This is case of in-memory database loaded from static files
+      //
+      if (safeCompare(clientSecret, client.clientSecret)) {
+        // Success, client secret matches
+        return client;
+      } else {
+        console.log('Client secret does not match');
+        throw new Error('Client secret does not match');
+      }
     } else {
-      console.log('Client secret does not match');
-      throw new Error('Client secret does not match');
+      //
+      // Client secret is AES encrypted.
+      //
+      // This is case of PostsgreSQL database
+      //
+      const plainTextBytes =
+        CryptoJS.AES.decrypt(client.clientSecret, config.oauth2.clientSecretAesKey);
+      const plainTextClientSecret = plainTextBytes.toString(CryptoJS.enc.Utf8);
+      // Timing safe compare
+      if (safeCompare(clientSecret, plainTextClientSecret)) {
+        // Success, client secret matches
+        return client;
+      } else {
+        console.log('Client secret does not match');
+        throw new Error('Client secret does not match');
+      }
     }
   }
 };

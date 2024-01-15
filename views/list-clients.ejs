@@ -21,7 +21,7 @@
         <th></th>
       </tr>
       <% for(var i=0; i < clients.length; i++) { %>
-         <tr>
+         <tr<%- clients[i].trClassTag %>>
            <td><a href="/panel/viewclient?id=<%= clients[i].id %>"><button class="button">View</button></a></td>
            <td><a href="/panel/editclient?id=<%= clients[i].id %>"><button class="button">Edit</button></a></td>
            <td><%= clients[i].id %></td>

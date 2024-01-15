@@ -458,7 +458,8 @@ exports.createClient = [
     'clientSecret',
     'trustedClient',
     'allowedScope',
-    'allowedRedirectURI'], 'body'),
+    'allowedRedirectURI',
+    'clientDisabled'], 'body'),
   // Forbidden body keys
   body([
     'id',
@@ -515,6 +516,14 @@ exports.createClient = [
   body('allowedRedirectURI')
     .isWhitelisted(uriAllowedChars)
     .withMessage('Invalid characters in string'),
+  body('clientDisabled')
+    .optional()
+    .custom(function (value, { req }) {
+      if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
+        throw new Error('Checkbox requires on/off');
+      }
+      return true;
+    }),
   handleErrorHTTP
 ]; // createClient
 
@@ -531,7 +540,8 @@ exports.editClient = [
     'clientSecret',
     'trustedClient',
     'allowedScope',
-    'allowedRedirectURI'], 'body'),
+    'allowedRedirectURI',
+    'clientDisabled'], 'body'),
   // Forbidden body keys
   body([
     'clientId'])
@@ -588,6 +598,13 @@ exports.editClient = [
   body('allowedRedirectURI')
     .isWhitelisted(uriAllowedChars)
     .withMessage('Invalid characters in string'),
+  body('clientDisabled').optional()
+    .custom(function (value, { req }) {
+      if ((value.toLowerCase() !== 'on') && (value.toLowerCase !== 'off')) {
+        throw new Error('Checkbox requires on/off');
+      }
+      return true;
+    }),
   handleErrorHTTP
 ]; // editClient
 
