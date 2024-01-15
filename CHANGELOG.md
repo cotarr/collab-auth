@@ -51,6 +51,11 @@ when clientDisabled property is set to true. This will deny access to API routes
 that use Basic Auth with base64 encoded client credentials. These are:
 POST /oauth/token, POST /oauth/token/introspect, POST /oauth/token/revoke.
 
+server/validate.js - The `validate.token()` function was updated to fail validation 
+when clientDisabled property is set to true for the client account that created
+the access token. This will return an error for API route 
+POST /oauth/token/introspect, used to validate submitted tokens.
+
 server/oauth2.js - Those oauth2orize callback functions have been updated 
 to return a status 401 error to outh2orize when the client.clientDisabled 
 property is set to true.

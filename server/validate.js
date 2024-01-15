@@ -222,6 +222,12 @@ validate.token = (token, accessToken) => {
     .then((client) => validate.clientExists(client))
     // 3) Add client data to object
     .then((client) => {
+      // Check if client account is disabled for the client
+      // that was used to create the access token.
+      if (client.clientDisabled) {
+        console.log('Client disabled');
+        throw new Error('Client disabled');
+      }
       tokenMetaData.client = {
         id: client.id,
         clientId: client.clientId,
