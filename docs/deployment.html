@@ -576,20 +576,19 @@ OAUTH2_EDITOR_SHOW_CLIENT_SECRET=true
         <div class="section-title">Cookie/Session Configuration</div>
         <p>
           By default, browser cookies for the collab-auth authorization server
-          are created as session cookies. The cookie will not be issued an 
-          expiration date, but remain valid until the browser is closed.
+          are set to expire at a fixed time after user login. The permitted age
+          of the session is defined by providing a configuration value 
+          for SESSION_EXPIRE_SEC.
         </p>
         <p>
-          Setting SESSION_NOT_SESSION_COOKIE=true will instruct the server to 
-          add a cookie expiration time as specified in SESSION_EXPIRE_SEC.
-          Optionally, this can become a rolling cookie by setting 
-          SESSION_SET_ROLLING_COOKIE=true so a new cookie expiration date 
-          is issued with each browser interaction.
+          Setting SESSION_SET_ROLLING_COOKIE=true will instruct the server to 
+          reset the cookie expiration with each browser request.
+          In this case, the session will expire after a time period where no
+          requests are received in the time period specified by SESSION_EXPIRE_SEC.
         </p>
 
 <pre class="pre-div">
 SESSION_SET_ROLLING_COOKIE=false
-SESSION_NOT_SESSION_COOKIE=false
 SESSION_EXPIRE_SEC=3600
 SESSION_PRUNE_INTERVAL_SEC=3600
 SESSION_SECRET="A Secret That Should Be Changed"

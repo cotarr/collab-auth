@@ -19,6 +19,17 @@ More descriptive variables names were also used.
 - In server/auth.js - Added code to the passport localStrategy 'local' callback function to add login timestamp to the session.
 - In server/session-auth.js - In the auth.check() function, refactored check for session expiration to match other changes.
 
+Deprecated and removed configuration variable SESSION_NOT_SESSION_COOKIE. 
+This was not compatible with some of the middleware libraries.
+After removal, the server will act as if SESSION_NOT_SESSION_COOKIE=true.
+
+Cookies and sessions now have 2 options:
+
+- SESSION_SET_ROLLING_COOKIE=false - The session will expire at a fixed time after user login.
+- SESSION_SET_ROLLING_COOKIE=true - The session expiration time will be updated with each request.
+
+The session expiration time is configured using SESSION_EXPIRE_SEC in the .env file.
+
 ## [v0.0.23](https://github.com/cotarr/collab-auth/releases/tag/v0.0.23) 2024-01-17
 
 This update added the capability to disable client accounts in the client database.

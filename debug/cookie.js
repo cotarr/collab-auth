@@ -146,13 +146,6 @@ setup(chainObj)
   //
   // This is the second request of the series. the user's session
   // cookie from test #1 is submitted with the request.
-  // Depending on the authorization server configuration,
-  // a set-cookie header may or may not be returned.
-  //
-  // SESSION_NOT_SESSION_COOKIE   false   true   true   false
-  // SESSION_SET_ROLLING_COOKIE   false   false  true   true
-  //                              -----   -----  -----  -----
-  // Expect set-cookie header:    no      yes    yes    ERROR
   //
   // This HTML form is unique because the GET /login route
   // will create a new record in the authentication server
@@ -179,19 +172,15 @@ setup(chainObj)
 
     console.log('\tExpect: status === 200');
     assert.strictEqual(chain.responseStatus, 200);
-    if (config.session.notSessionCookie) {
-      console.log('\tExpect: set-cookie header present (SESSION_NOT_SESSION_COOKIE=true)');
-      assert.ok(((chain.parsedSetCookieHeader != null) &&
-        (chain.parsedSetCookieHeader.length > 0)));
-      console.log('\tExpect: cookie matches previous cookie from previous test');
-      assert.strictEqual(
-        chain.tempLastSessionCookie,
-        chain.parsedSetCookieHeader);
-    } else {
-      // case of session cookies do not expire
-      console.log('\tExpect: set-cookie header not present (SESSION_NOT_SESSION_COOKIE=false)');
-      assert.ok(chain.parsedSetCookieHeader === null);
-    }
+
+    console.log('\tExpect: set-cookie header present');
+    assert.ok(((chain.parsedSetCookieHeader != null) &&
+      (chain.parsedSetCookieHeader.length > 0)));
+    console.log('\tExpect: cookie matches previous cookie from previous test');
+    assert.strictEqual(
+      chain.tempLastSessionCookie,
+      chain.parsedSetCookieHeader);
+
     // Temporary variable no longer needed
     delete chain.tempLastSessionCookie;
     //
@@ -725,25 +714,20 @@ setup(chainObj)
     } else {
       logRequest(chain);
       // console.log(JSON.stringify(chain.responseRawData, null, 2));
-      if (config.session.notSessionCookie === false) {
+      const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
+      if (config.session.rollingCookie === true) {
         console.log('\tExpect: status === 200');
         assert.strictEqual(chain.responseStatus, 200);
+        console.log('\tExpect: set-cookie header (because rollingCookie=true)');
+        assert.ok((chain.parsedSetCookieHeader != null) &&
+          (chain.parsedSetCookieHeader.length > 0));
+        console.log('\tExpect: Cookie not changed');
+        assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
+        console.log('\tExpect: Cookie expires value incremented by 3 seconds after time delay');
+        assert.ok((expiresDelta >= 2) && (expiresDelta <= 4));
       } else {
-        const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
-        if (config.session.rollingCookie === true) {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-          console.log('\tExpect: set-cookie header (because rollingCookie=true)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-            (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: Cookie not changed');
-          assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-          console.log('\tExpect: Cookie expires value incremented by 3 seconds after time delay');
-          assert.ok((expiresDelta >= 2) && (expiresDelta <= 4));
-        } else {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-        }
+        console.log('\tExpect: status === 200');
+        assert.strictEqual(chain.responseStatus, 200);
       }
       return Promise.resolve(chain);
     }
@@ -781,25 +765,20 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      if (config.session.notSessionCookie === false) {
+      const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
+      if (config.session.rollingCookie === true) {
         console.log('\tExpect: status === 200');
         assert.strictEqual(chain.responseStatus, 200);
+        console.log('\tExpect: set-cookie header (because rollingCookie=true)');
+        assert.ok((chain.parsedSetCookieHeader != null) &&
+          (chain.parsedSetCookieHeader.length > 0));
+        console.log('\tExpect: Cookie not changed');
+        assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
+        console.log('\tExpect: Cookie expires value incremented by 6 seconds after time delay');
+        assert.ok((expiresDelta >= 5) && (expiresDelta <= 7));
       } else {
-        const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
-        if (config.session.rollingCookie === true) {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-          console.log('\tExpect: set-cookie header (because rollingCookie=true)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-            (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: Cookie not changed');
-          assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-          console.log('\tExpect: Cookie expires value incremented by 6 seconds after time delay');
-          assert.ok((expiresDelta >= 5) && (expiresDelta <= 7));
-        } else {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-        }
+        console.log('\tExpect: status === 200');
+        assert.strictEqual(chain.responseStatus, 200);
       }
       return Promise.resolve(chain);
     }
@@ -838,25 +817,20 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain, { ignoreErrorStatus: 401 });
-      if (config.session.notSessionCookie === false) {
+      const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
+      if (config.session.rollingCookie === true) {
+        console.log('\tExpect: status === 200');
+        assert.strictEqual(chain.responseStatus, 200);
+        console.log('\tExpect: set-cookie header (because rollingCookie=true)');
+        assert.ok((chain.parsedSetCookieHeader != null) &&
+          (chain.parsedSetCookieHeader.length > 0));
+        console.log('\tExpect: Cookie not changed');
+        assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
+        console.log('\tExpect: Cookie expires value incremented by 10 seconds after time delay');
+        assert.ok((expiresDelta >= 9) && (expiresDelta <= 11));
+      } else {
         console.log('\tExpect: status === 401');
         assert.strictEqual(chain.responseStatus, 401);
-      } else {
-        const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
-        if (config.session.rollingCookie === true) {
-          console.log('\tExpect: status === 200');
-          assert.strictEqual(chain.responseStatus, 200);
-          console.log('\tExpect: set-cookie header (because rollingCookie=true)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-            (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: Cookie not changed');
-          assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-          console.log('\tExpect: Cookie expires value incremented by 10 seconds after time delay');
-          assert.ok((expiresDelta >= 9) && (expiresDelta <= 11));
-        } else {
-          console.log('\tExpect: status === 401');
-          assert.strictEqual(chain.responseStatus, 401);
-        }
       }
       return Promise.resolve(chain);
     }
@@ -1227,41 +1201,34 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       logRequest(chain);
-      if (config.session.notSessionCookie === false) {
+      if (config.session.rollingCookie === true) {
+        if (testEnv.trustedClient) {
+          console.log('\tExpect: status === 302');
+          assert.strictEqual(chain.responseStatus, 302);
+          console.log('\tExpect: redirect location match redirectURI');
+          assert.strictEqual(
+            testEnv.redirectURI,
+            chain.parsedLocationHeader.split('?')[0]);
+        } else {
+          console.log('\tExpect: status === 200');
+          assert.strictEqual(chain.responseStatus, 200);
+          console.log('\tExpect: body contains "<title>Resource Decision</title>"');
+          assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
+        }
+        console.log('\tExpect: set-cookie header (because rollingCookie=true)');
+        assert.ok((chain.parsedSetCookieHeader != null) &&
+        (chain.parsedSetCookieHeader.length > 0));
+        console.log('\tExpect: Cookie not changed');
+        assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
+        const expiresDelta =
+          chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
+        console.log('\tExpect: Cookie expires value incremented by 10 seconds after time delay');
+        assert.ok((expiresDelta >= 9) && (expiresDelta <= 11));
+      } else {
         console.log('\tExpect: status === 302');
         assert.strictEqual(chain.responseStatus, 302);
         console.log('\tExpect: Location header redirects to GET /login');
         assert.strictEqual(chain.parsedLocationHeader, '/login');
-      } else {
-        if (config.session.rollingCookie === true) {
-          if (testEnv.trustedClient) {
-            console.log('\tExpect: status === 302');
-            assert.strictEqual(chain.responseStatus, 302);
-            console.log('\tExpect: redirect location match redirectURI');
-            assert.strictEqual(
-              testEnv.redirectURI,
-              chain.parsedLocationHeader.split('?')[0]);
-          } else {
-            console.log('\tExpect: status === 200');
-            assert.strictEqual(chain.responseStatus, 200);
-            console.log('\tExpect: body contains "<title>Resource Decision</title>"');
-            assert.ok(chain.responseRawData.indexOf('<title>Resource Decision</title>') >= 0);
-          }
-          console.log('\tExpect: set-cookie header (because rollingCookie=true)');
-          assert.ok((chain.parsedSetCookieHeader != null) &&
-          (chain.parsedSetCookieHeader.length > 0));
-          console.log('\tExpect: Cookie not changed');
-          assert.strictEqual(chain.tempLastSessionCookie, chain.currentSessionCookie);
-          const expiresDelta =
-            chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
-          console.log('\tExpect: Cookie expires value incremented by 10 seconds after time delay');
-          assert.ok((expiresDelta >= 9) && (expiresDelta <= 11));
-        } else {
-          console.log('\tExpect: status === 302');
-          assert.strictEqual(chain.responseStatus, 302);
-          console.log('\tExpect: Location header redirects to GET /login');
-          assert.strictEqual(chain.parsedLocationHeader, '/login');
-        }
       }
       return Promise.resolve(chain);
     }

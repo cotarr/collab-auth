@@ -203,36 +203,27 @@ const sessionOptions = {
   secret: config.session.secret,
   cookie: {
     path: '/',
-    maxAge: null,
+    maxAge: config.session.maxAge,
     secure: (config.server.tls), // When TLS enabled, require secure cookies
     httpOnly: true,
     sameSite: 'Lax'
   }
 };
-// Session cookie clears when browser is closed.
-if (config.session.notSessionCookie) {
-  // express-session takes cookie.maxAge in milliseconds
-  sessionOptions.cookie.maxAge = config.session.maxAge;
-}
 
 if (config.session.enablePgSessionStore) {
   // SQL queries
   // List:       SELECT sid, expire FROM session;
   // Clear all:  DELETE FROM session;
   console.log('Using PostgresSQL connect-pg-simple for session storage');
-  // disable touch for fixed expiration cookie configuration
-  const disableTouch = ((config.session.notSessionCookie === true) &&
-    (config.session.rollingCookie === false));
-
   const pgPool = require('./db/pg-pool');
   const PgSessionStore = require('connect-pg-simple')(session);
   sessionOptions.store = new PgSessionStore({
     pool: pgPool,
     // connect-pg-simple ttl is in seconds
     ttl: config.session.ttl,
-    tableName: 'session',
     // disable touch for fixed expiration cookie configuration
-    disableTouch: disableTouch,
+    disableTouch: (config.session.rollingCookie === false),
+    tableName: 'session',
     // Connect-pg-simple takes prune time in seconds
     pruneSessionInterval: config.session.pruneInterval
   });

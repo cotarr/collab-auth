@@ -116,13 +116,12 @@ The following different authorization server configuration options
 are supported and should execute the tests without error
 
 
-| Configuration Option               |   |   |   |   |   |   |   |   |   |   |   |   |
-| ---------------------------------- | - | - | - | - | - | - | - | - | - | - | - | - |
-| .env DATABASE_ENABLE_POSTGRES      | F | F | F | T | T | T | F | F | F | T | T | T |
-| .env SESSION_ENABLE_POSTGRES       | F | F | F | T | T | T | F | F | F | T | T | T |
-| .env SESSION_NOT_SESSION_COOKIE    | F | T | T | F | T | T | F | T | T | F | T | T |
-| .env SESSION_SET_ROLLING_COOKIE    | F | F | T | F | F | T | F | F | T | F | F | T |
-| clients-db.json trustedClient      | F | F | F | F | F | F | T | T | T | T | T | T |
+| Configuration Option               |   |   |   |   |   |   |   |   |
+| ---------------------------------- | - | - | - | - | - | - | - | - |
+| .env DATABASE_ENABLE_POSTGRES      | F | F | T | T | F | F | T | T |
+| .env SESSION_ENABLE_POSTGRES       | F | F | T | T | F | F | T | T |
+| .env SESSION_SET_ROLLING_COOKIE    | F | T | F | T | F | T | F | T |
+| clients-db.json trustedClient      | F | F | F | F | T | T | T | T |
 
 Cookie and access_token expiration time may be tested by configuring the 
 following expiration times in seconds in the .env file.

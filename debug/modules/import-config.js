@@ -12,12 +12,6 @@ const fs = require('fs');
 const config = require('../../server/config/index.js');
 // console.log('config', JSON.stringify(config, null, 2));
 
-if ((config.session.rollingCookie) && (!config.session.notSessionCookie)) {
-  console.log('Configuration error');
-  console.log('rollingCookie=true not compatible with notSessionCookie=false');
-  process.exit(1);
-}
-
 let clients = [];
 try {
   clients = JSON.parse(fs.readFileSync('./clients-db.json', 'utf8'));
