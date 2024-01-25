@@ -44,7 +44,7 @@ exports.logRequest = (chain, options) => {
   if (showChainFlag) {
     console.log('-------------- DEBUG: chain object ----------------');
     console.log('chain', JSON.stringify(chain, null, 2));
-    console.log('-------------- DEUBG: end chain -------------------');
+    console.log('-------------- DEBUG: end chain -------------------');
   }
 };
 
@@ -169,7 +169,7 @@ exports.showJwtMetaData = (chain) => {
 
 /**
  * Notify user if virtual host mismatch is reject requests
- * @param {Number} chain.responseStatus - HTTP status code of previous fetch 
+ * @param {Number} chain.responseStatus - HTTP status code of previous fetch
  */
 exports.check404PossibleVhostError = (chain) => {
   if (chain.responseStatus === 404) {

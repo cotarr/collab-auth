@@ -75,20 +75,19 @@ const allowedAlternateRedirectRoutes = [
 ];
 
 /**
- * Middleware function to add session expiration time
- * in milliseconds to session record.
- * This is called from POST /login (password entry)
- * @param {Object} req - ExpressJs request object
- * @param {Object} res - ExpressJs response object
- * @param {Function} next - ExpressJs function to call next handler
+ * Add user login timestamp (unix seconds) to session
+ * This is called from passport local strategy callback function in auth.js
+ * @param {Object} req - ExpressJs request object, modified by this function
+ * @param {Object} user - User object (not used, pass through only)
+ * @returns {Promise} - Returns promise resolving to user object
  */
-exports.updateSessionExpireTime = function (req, res, next) {
-  if (req.session) {
-    if (!req.session.sessionExpiresMs) {
-      req.session.sessionExpiresMs = Date.now() + config.session.maxAge;
-    }
+exports.addLoginTimestamp = function (req, user) {
+  // Add a timestamp property that may be used to expire sessions
+  if ((req) && (req.session)) {
+    // loginTimestamp in Unix seconds
+    req.session.loginTimestamp = Math.floor(Date.now() / 1000);
   };
-  next();
+  return Promise.resolve(user);
 };
 
 /**
@@ -98,21 +97,21 @@ exports.updateSessionExpireTime = function (req, res, next) {
  */
 exports.checkSessionAuth = function (options) {
   return function (req, res, next) {
+    //
+    // Unless configured as rolling cookie, deny requests to expired sessions.
+    // Different session store packages handle expiration differently.
+    // This is an explicit check independent of session store touch/prune features.
+    //
     let expired = false;
-
-    if (req.session.cookie) {
-      // For case of rolling cookies skip this block
-      if (!config.session.rollingCookie) {
-        // For case of session cookie, or fixed expiration cookie
-        // deny requests that exceed maxAge of session
-        if (req.session.sessionExpiresMs) {
-          const timeNowMs = Date.now();
-          if (timeNowMs > req.session.sessionExpiresMs) {
-            expired = true;
-          }
+    if (!config.session.rollingCookie) {
+      if ((req) && (req.session) && (Object.hasOwn(req.session, 'loginTimestamp'))) {
+        // loginTimestamp in Unix seconds
+        if (Math.floor(Date.now() / 1000) > req.session.loginTimestamp + config.session.ttl) {
+          expired = true;
         }
       }
     }
+
     //
     // Case of not authorized, for valid routes redirect /login, else return status 401
     //

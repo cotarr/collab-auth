@@ -1,10 +1,10 @@
 {
   "name": "collab-auth",
-  "version": "0.0.23",
+  "version": "0.0.24-Dev",
   "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
   "scripts": {
-    "lint": "npx eslint server bin/www SQL-tools *.js",
+    "lint": "npx eslint server bin/www debug SQL-tools *.js",
     "start": "node ./bin/www",
     "config-dev-script": "bash ./config-dev-script.sh",
     "create-postgres-admin-user": "node ./SQL-tools/create-postgres-admin-user.js"

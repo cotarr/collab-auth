@@ -16,7 +16,7 @@ const { requireScopeForWebPanel } = require('./scope');
 const validate = require('./validate');
 const inputValidation = require('./input-validation');
 const logUtils = require('./log-utils');
-const { updateSessionExpireTime, checkSessionAuth } = require('./session-auth');
+const { checkSessionAuth } = require('./session-auth');
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -158,7 +158,6 @@ exports.login = [
   checkCookieExists,
   inputValidation.loginPostRequest,
   csrfProtection,
-  updateSessionExpireTime,
   passport.authenticate('local',
     {
       // V0.0.7 - Notes

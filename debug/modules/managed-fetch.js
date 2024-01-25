@@ -216,9 +216,11 @@ exports.managedFetch = (chain) => {
           }
 
           if ((response.ok) || (response.status === 302)) {
-            if (chain.parsedContentType.indexOf('application/json') >= 0) {
+            if ((chain.parsedContentType) &&
+              (chain.parsedContentType.indexOf('application/json') >= 0)) {
               return response.json();
-            } else if (chain.parsedContentType.indexOf('text/html') >= 0) {
+            } else if ((chain.parsedContentType) &&
+              (chain.parsedContentType.indexOf('text/html') >= 0)) {
               return response.text();
             } else {
               return response.text();

@@ -6,6 +6,7 @@ const { Strategy: LocalStrategy } = require('passport-local');
 const { BasicStrategy } = require('passport-http');
 const { Strategy: ClientPasswordStrategy } = require('passport-oauth2-client-password');
 const validate = require('./validate');
+const sessionAuth = require('./session-auth');
 const { addScopeToPassportReqObj } = require('./scope');
 const logUtils = require('./log-utils');
 const stats = require('./stats');
@@ -25,6 +26,7 @@ const stats = require('./stats');
 passport.use(new LocalStrategy({ passReqToCallback: true }, (req, username, password, done) => {
   db.users.findByUsername(username)
     .then((user) => validate.user(user, password))
+    .then((user) => sessionAuth.addLoginTimestamp(req, user))
     .then((user) => db.users.updateLoginTime(user))
     .then((user) => logUtils.logPassportLocalLogin(req, user))
     .then((user) => stats.incrementCounterPm(user, 'userLogin'))

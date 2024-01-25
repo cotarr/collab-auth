@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.0.24-Dev
+
+### Changed
+
+Refactored some code from v0.0.23 related to expiration of session in the express-session store.
+The change does not alter the functionality of the expiration check from v0.0.23.
+It was recoded to be consistent with related repository collab-frontend. 
+More descriptive variables names were also used.
+
+- In server/site.js - Removed middleware from POST /login route that was used to add login timestamp to the session.
+- In server/auth.js - Added code to the passport localStrategy 'local' callback function to add login timestamp to the session.
+- In server/session-auth.js - In the auth.check() function, refactored check for session expiration to match other changes.
+
 ## [v0.0.23](https://github.com/cotarr/collab-auth/releases/tag/v0.0.23) 2024-01-17
 
 This update added the capability to disable client accounts in the client database.
