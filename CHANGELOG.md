@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v0.2.25-dev 2024-02-24 Draft
+
+### Fixed
+
+Issue: When configured to use the postgresql database, after starting the 
+server for the first time, before any client accounts are created, the server crashes.
+This was introduced in v0.0.23.
+
+This was caused by the automatic schema update function `_updateSchema1()` in 
+server/pg/pg-client.js loading the postgresql `authclients` table, then 
+failing to check array length before accessing element 0.
+
+- Fix-1 - Add array length check in _updateSchema1().
+- Fix-2 - Function _updateSchema1() is not called unless environment variable COLLAB_AUTH_SCHEMA_UPGRADE is set to "1"
+
+In the case of an existing postgresql database where the authclients table 
+does not include a clientDisabled column, the function may automatically modify 
+the schema of the `authclients` table to add column `clientDisabled` by 
+starting the server one time with the following environment variable:
+
+```bash
+# On start, update table authclients schema to add column clientDisabled
+COLLAB_AUTH_SCHEMA_UPGRADE=1 node bin/www
+```
+
 ## [v0.0.24](https://github.com/cotarr/collab-auth/releases/tag/v0.0.24) 2024-01-25
 
 ### Changed

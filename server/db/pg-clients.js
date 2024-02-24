@@ -223,7 +223,8 @@ const _updateSchema1 = () => {
   };
   pgPool.query(queryAll)
     .then((queryResponse) => {
-      if (Object.hasOwn(queryResponse.rows[0], 'clientDisabled')) {
+      if ((queryResponse.rows.length > 0) &&
+        (Object.hasOwn(queryResponse.rows[0], 'clientDisabled'))) {
         return Promise.resolve(false);
       } else {
         console.log('----------------------------------------------------------');
@@ -247,10 +248,13 @@ const _updateSchema1 = () => {
     })
     .catch((error) => {
       console.log('An error occurred trying to upgrade the "collabauth" database schema ' +
-        'to add a new column "clientDisabled" to the "authClients" table.');
+        'to add a new column "clientDisabled" to the "authclients" table.');
       console.log('error: ', error.message || error.toString() || 'Unknown Error');
       process.exit(1);
     });
 };
 // On program start, call the function
-_updateSchema1();
+if (process.env.COLLAB_AUTH_SCHEMA_UPGRADE === '1') {
+  console.log('Env variable COLLAB_AUTH_SCHEMA_UPGRADE=1, checking database schema...');
+  _updateSchema1();
+}

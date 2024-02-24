@@ -2,7 +2,7 @@
 
 Your web browser may require TLS certificates for testing/
 This folder was created as a place to hold temporary TLS certificate files during testing. 
-To reduce security risks, it is recommended that the private key not be publically readable.
+To reduce security risks, it is recommended that the private key not be publicly readable.
 
 The default certificate location points to "certificate.pem" and "privatekey.pem" located in this folder.
 If you generate the files as shown below, there is no need to configure a file location.
@@ -21,10 +21,10 @@ SERVER_TLS=true
 
 The following bash commands should generate a temporary self signed certificate with proper filenames.
 The openssl program will prompt you with a series of questions. 
-If you are in a testing enviornment, you may omit the default values by entering a period [.].
-For testing, the only required value would be the Common Name CN, which you could use a ficticious domain name.
+If you are in a testing environment, you may omit the default values by entering a period [.].
+For testing, the only required value would be the Common Name CN, which you could use a factitious domain name.
 During testing, your web browser will reject the self signed TLS certificate as in error, but the web browser should
-allow an override option to temporarily use the self signed certificate and ingnore the security hostname verification.
+allow an override option to temporarily use the self signed certificate and ignore the security hostname verification.
 
 These bash commands:
 
