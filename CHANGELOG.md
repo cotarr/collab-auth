@@ -10,6 +10,11 @@ and this project adheres to
 
 ### Fixed
 
+In SQL-tools/create-oauth-tables.sql file, fixed semicolon instead of comma in SQL query.
+This is an example script to create new authclients table in postgresql database.
+
+### Fixed
+
 Issue: When configured to use the postgresql database, after starting the 
 server for the first time, before any client accounts are created, the server crashes.
 This was introduced in v0.0.23.
