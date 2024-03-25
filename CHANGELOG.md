@@ -20,6 +20,10 @@ effectively disable future logins until the timer expires. This is fixed as foll
 - In file server/auth.js, added code to Passport local strategy to reset the rate limit count after login succeeds.
 - In files server/app.js and server/site.js, relocated express-rate-limit middleware to external module rate-limiter.js
 
+### Tests update
+
+- Fixed Thunder Client collection thunder-collection_collab-auth-tests-2.json when new client not end of sorted list"
+
 ### Dependency update
 
 - Npm dependency update: dotenv@16.4.5, express@4.19.1  express-rate-limit@7.2.0, express-session@1.18.0
