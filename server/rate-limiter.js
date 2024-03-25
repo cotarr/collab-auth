@@ -74,7 +74,6 @@ const passwordRateLimit = rateLimit({
  * @returns {Promise} - Returns promise resolving to user object
 */
 const loginRateLimitReset = (req, user) => {
-  console.log('reset');
   loginFormRateLimit.resetKey(req.ip);
   passwordRateLimit.resetKey(req.ip);
   return Promise.resolve(user);

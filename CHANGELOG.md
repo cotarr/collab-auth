@@ -20,6 +20,11 @@ effectively disable future logins until the timer expires. This is fixed as foll
 - In file server/auth.js, added code to Passport local strategy to reset the rate limit count after login succeeds.
 - In files server/app.js and server/site.js, relocated express-rate-limit middleware to external module rate-limiter.js
 
+### Dependency update
+
+- Npm dependency update: dotenv@16.4.5, express@4.19.1  express-rate-limit@7.2.0, express-session@1.18.0
+- Development dependencies for eslint upgraded to current.
+
 ## [v0.0.25](https://github.com/cotarr/collab-auth/releases/tag/v0.0.25) 2024-02-24
 
 ### Fixed
