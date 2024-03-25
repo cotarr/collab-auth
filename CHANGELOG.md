@@ -6,7 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v0.2.25-dev 2024-02-24 Draft
+## v0.0.26-dev 2024-03-25
+
+### Fixed
+
+Issue: Middleware express-rate-limit is used as an IP address based rate limiter
+for password login attempts. In the current configuration, the counter of
+failed login attempts does not reset when a user password submission succeeds.
+Several valid logins in a short period of time can hit the limit and 
+effectively disable future logins until the timer expires. This is fixed as follows:
+
+- Created new module 'server/rate-limiter.js' to include all rate limit definitions. (Web, token, login)
+- In file server/auth.js, added code to Passport local strategy to reset the rate limit count after login succeeds.
+- In files server/app.js and server/site.js, relocated express-rate-limit middleware to external module rate-limiter.js
+
+## [v0.0.25](https://github.com/cotarr/collab-auth/releases/tag/v0.0.25) 2024-02-24
 
 ### Fixed
 

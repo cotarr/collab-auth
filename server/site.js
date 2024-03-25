@@ -6,7 +6,6 @@ const nodeEnv = process.env.NODE_ENV || 'development';
 
 // NPM modules
 const passport = require('passport');
-const rateLimit = require('express-rate-limit');
 const csrf = require('@dr.pogodin/csurf');
 const csrfProtection = csrf({ cookie: false });
 
@@ -17,6 +16,7 @@ const validate = require('./validate');
 const inputValidation = require('./input-validation');
 const logUtils = require('./log-utils');
 const { checkSessionAuth } = require('./session-auth');
+const { loginFormRateLimit, passwordRateLimit } = require('./rate-limiter');
 
 // const nodeEnv = process.env.NODE_ENV || 'development';
 
@@ -53,19 +53,6 @@ const loginFormDelay = (req, res, next) => {
     return next();
   }
 };
-
-/**
- * Middleware IP rate limiter to prevent excessive
- * calls to the fixed delay timer in the GET /login route
- */
-const loginFormRateLimit = rateLimit({
-  windowMs: config.limits.passwordRateLimitTimeMs,
-  max: config.limits.passwordRateLimitCount,
-  statusCode: 429,
-  message: 'Too many requests',
-  standardHeaders: false,
-  legacyHeaders: false
-});
 
 /**
  * Middleware to insert delay timer in GET /login route.
@@ -113,22 +100,6 @@ exports.redirectError = [
     res.set('Cache-Control', 'no-store').render('redirecterror', { name: req.user.name });
   }
 ];
-
-/**
- * Password submission rate limiter using express-rate-limit
- * Limit per IP address for POST request to /login
- * Successful request add to count.
- *
- * Middleware function
- */
-const passwordRateLimit = rateLimit({
-  windowMs: config.limits.passwordRateLimitTimeMs,
-  max: config.limits.passwordRateLimitCount,
-  statusCode: 429,
-  message: 'Too many requests',
-  standardHeaders: false,
-  legacyHeaders: false
-});
 
 /**
  * Check that HTTP cookie exists.

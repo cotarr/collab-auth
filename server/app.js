@@ -9,7 +9,7 @@ const express = require('express');
 const session = require('express-session');
 const oauth2 = require('./oauth2');
 const passport = require('passport');
-const rateLimit = require('express-rate-limit');
+const { tokenRateLimit, webRateLimit } = require('./rate-limiter');
 const logger = require('morgan');
 const helmet = require('helmet');
 
@@ -144,18 +144,6 @@ app.get('/favicon.ico', function (req, res, next) {
   res.status(204).send(null);
 });
 
-/**
- * Middleware IP rate limiter for token API routes
- */
-const tokenRateLimit = rateLimit({
-  windowMs: config.limits.tokenRateLimitTimeMs,
-  max: config.limits.tokenRateLimitCount,
-  statusCode: 429,
-  message: 'Too many requests',
-  standardHeaders: false,
-  legacyHeaders: false
-});
-
 //
 // Routes that authenticate by Basic Auth for use of access_tokens
 // are handled before the session middleware.
@@ -163,20 +151,6 @@ const tokenRateLimit = rateLimit({
 app.post('/oauth/token', tokenRateLimit, oauth2.token);
 app.post('/oauth/introspect', tokenRateLimit, oauth2.introspect);
 app.post('/oauth/token/revoke', tokenRateLimit, oauth2.revoke);
-
-/**
- * Middleware IP rate limiter for web server routes
- * All routes beyond this point are subject to network
- * request rate limit, when exceeded, returns 429
- */
-const webRateLimit = rateLimit({
-  windowMs: config.limits.webRateLimitTimeMs,
-  max: config.limits.webRateLimitCount,
-  statusCode: 429,
-  message: 'Too many requests',
-  standardHeaders: false,
-  legacyHeaders: false
-});
 
 // ----------------------------------------------------------
 // All routes beyond this point are subject to network
