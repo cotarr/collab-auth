@@ -26,7 +26,7 @@ effectively disable future logins until the timer expires. This is fixed as foll
 
 ### Dependency update
 
-- Npm dependency update: dotenv@16.4.5, express@4.19.1  express-rate-limit@7.2.0, express-session@1.18.0
+- Npm dependency update: dotenv@16.4.5, express@4.19.2  express-rate-limit@7.2.0, express-session@1.18.0
 - Development dependencies for eslint upgraded to current.
 
 ## [v0.0.25](https://github.com/cotarr/collab-auth/releases/tag/v0.0.25) 2024-02-24
