@@ -19,6 +19,7 @@
         <th>Number</th>
         <th>Username</th>
         <th>Name</th>
+        <th>Role</th>
         <th>Last Login</th>
         <th></th>
       </tr>
@@ -30,6 +31,7 @@
            <td><%= users[i].number %></td>
            <td><%= users[i].username %></td>
            <td><%= users[i].name %></td>
+           <td><%= users[i].role %></td>
            <td><%= users[i].lastLogin %></td>
            <td><a href="/panel/deleteuser?id=<%= users[i].id %>"><button class="button">Delete</button></a></td>
          </tr>

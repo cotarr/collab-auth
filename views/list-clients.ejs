@@ -18,6 +18,7 @@
         <th>Id</th>
         <th>Client Id</th>
         <th>Name</th>
+        <th>Allowed Scope</th>
         <th></th>
       </tr>
       <% for(var i=0; i < clients.length; i++) { %>
@@ -27,6 +28,7 @@
            <td><%= clients[i].id %></td>
            <td><%= clients[i].clientId %></td>
            <td><%= clients[i].name %></td>
+           <td><%= clients[i].allowedScope %></td>
            <td><a href="/panel/deleteclient?id=<%= clients[i].id %>"><button class="button">Delete</button></a></td>
          </tr>
       <% } %>

@@ -59,6 +59,16 @@ router.get('/listusers',
             username: user.username,
             name: user.name
           };
+          filteredUser.role = '';
+          if ((user.role) && (user.role.length > 0)) {
+            for (let j = 0; j < user.role.length; j++) {
+              if (j < user.role.length - 1) {
+                filteredUser.role += user.role[j] + ', ';
+              } else {
+                filteredUser.role += user.role[j];
+              }
+            }
+          }
           if (user.lastLogin) {
             filteredUser.lastLogin = user.lastLogin.toUTCString();
           } else {
@@ -445,6 +455,18 @@ router.get('/listclients',
             clientId: client.clientId,
             clientSecret: 'ssh-secret'
           };
+
+          filteredClient.allowedScope = '';
+          if ((client.allowedScope) && (client.allowedScope.length > 0)) {
+            for (let j = 0; j < client.allowedScope.length; j++) {
+              if (j < client.allowedScope.length - 1) {
+                filteredClient.allowedScope += client.allowedScope[j] + ', ';
+              } else {
+                filteredClient.allowedScope += client.allowedScope[j];
+              }
+            }
+          }
+
           // Change background color to gray for disabled clients
           if (client.clientDisabled) {
             filteredClient.trClassTag = ' class="tr-list-disabled"';
