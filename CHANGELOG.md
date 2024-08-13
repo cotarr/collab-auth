@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Next v0.0.28-dev
+## [v0.0.28](https://github.com/cotarr/collab-auth/releases/tag/v0.0.28) 2024-08-13
+
+### Changed
 
 - Admin panel, add column "Role" to the list users panel.
 - Admin panel, add column "Allowed Scope" to the list clients panel.
