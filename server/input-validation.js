@@ -16,7 +16,7 @@ const idAllowedChars =
 const scopeAllowedChars =
   'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890.,_';
 const uriAllowedChars =
-  'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:,"\'/%._-?&';
+  'abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890:,"\'/[]%._-?&';
 
 /**
  * Middleware error handler (web Interface)

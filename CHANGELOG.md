@@ -8,6 +8,16 @@ and this project adheres to
 
 ## next
 
+### Fixed
+
+Issue: When using the admin editor to create or modify a client account record,
+the field for "Allowed Redirect URI" did not permit numeric IPv6 addresses 
+when entered with brackets, such as IPv6 localhost `http://[::1]:4000/login/callback`.
+
+- In file server/input-validation, added the bracket characters "[]" to the list of allowed characters for URI input validation.
+
+### Updated
+
 - Update outdated npm packages: pg@8.12.0, rotating-file-stream@3.2.3
 - Update README.md for debug test script description
 
