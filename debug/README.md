@@ -130,7 +130,7 @@ This will enable various timers which will make the test pause and run slowly.
 | Configuration Option                        |   |
 | ------------------------------------------- | - |
 | ,env OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS | 5 |
-| ,ebv SESSION_EXPIRE_SEC                     | 8 |
+| ,env SESSION_EXPIRE_SEC                     | 8 |
 
 The program includes a network request rate limiter that uses
 the express-rate-limit middleware. The default is 10 requests 
@@ -267,3 +267,43 @@ shows the approach to a chain of tests.
   })
   // ...
   ```
+
+# Simplified test configuration
+
+- Setup .env to match intended configuration for the authorization server
+- At the end of the .env file, add the following environment variables for use with specific scripts as listed.
+- When finished testing, these environment variables MUST be removed
+
+### Tests: client-grant.js, code-grant.js, login-form-submission.js, protected-routes, public-routes.js, redirect-timing-debug.js
+
+```bash
+LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+LIMITS_WEB_RATE_LIMIT_COUNT=1000
+```
+
+### Tests: access-token.js, cookie.js
+
+```bash
+LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+LIMITS_WEB_RATE_LIMIT_COUNT=1000
+OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=5
+SESSION_EXPIRE_SEC=8
+```
+### Tests: rate-limit.js
+
+```bash
+LIMITS_PASSWORD_RATE_LIMIT_COUNT=4
+LIMITS_TOKEN_RATE_LIMIT_COUNT=6
+LIMITS_WEB_RATE_LIMIT_COUNT=16
+```
+### Tests: load-test-introspect.js
+
+```bash
+LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+LIMITS_WEB_RATE_LIMIT_COUNT=1000
+TESTENV_LT_COUNT=10
+TESTENV_LT_PERIODMS=0
+```

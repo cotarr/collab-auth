@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## next
+
+- Update outdated npm packages: pg@8.12.0, rotating-file-stream@3.2.3
+- Update README.md for debug test script description
+
 ## [v0.0.28](https://github.com/cotarr/collab-auth/releases/tag/v0.0.28) 2024-08-13
 
 ### Changed
