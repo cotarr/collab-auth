@@ -1,8 +1,11 @@
 {
   "name": "collab-auth",
-  "version": "0.0.29",
+  "version": "0.0.30-dev",
   "description": "Oauth2 server used on a collaboration project for learning oauth2orize and passport",
   "main": "bin/www",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "lint": "npx eslint server bin/www debug SQL-tools *.js",
     "start": "node ./bin/www",
@@ -22,11 +25,11 @@
   "dependencies": {
     "@dr.pogodin/csurf": "^1.13.0",
     "bcryptjs": "^2.4.3",
-    "connect-pg-simple": "^9.0.1",
+    "connect-pg-simple": "^10.0.0",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
-    "express": "^4.19.2",
+    "express": "^4.21.0",
     "express-rate-limit": "^7.4.0",
     "express-session": "^1.18.0",
     "express-validator": "^7.2.0",
@@ -40,7 +43,7 @@
     "passport-local": "^1.0.0",
     "passport-oauth2-client-password": "^0.1.2",
     "pg": "^8.12.0",
-    "rotating-file-stream": "^3.2.3",
+    "rotating-file-stream": "^3.2.4",
     "uid2": "^1.0.0",
     "uuid": "^10.0.0"
   },

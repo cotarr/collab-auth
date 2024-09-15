@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+### Next (v0.0.30-dev)
+
+### Changed
+
+- Fix npm audit warning: update to express@4.21.0
+
+- Update npm dependency: rotating-file-stream@3.2.4
+
+- Update npm major version dependency connect-pg-simple v9 to v10.0.0
+- In package.json, require node >= 18.0 for compatibility with npm connect-pg-simple v10 dependencies. This was previous requirement in /docs/ 
+
 ## [v0.0.29](https://github.com/cotarr/collab-auth/releases/tag/v0.0.29) 2024-09-02
 
 ### Fixed
