@@ -6,11 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-### Next (v0.0.30-dev)
+## [v0.0.30](https://github.com/cotarr/collab-auth/releases/tag/v0.0.30) 2024-09-15
 
 ### Changed
 
-- Fix npm audit warning: update to express@4.21.0
+- Fix npm audit security warning: update to express@4.21.0
 
 - Update npm dependency: rotating-file-stream@3.2.4
 
