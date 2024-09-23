@@ -1,13 +1,26 @@
-// access-token.js
+// access-token-client.js
 //
+// It is an overall test of access token validation for token
+// created using client credentials grant.
+
+// This API test script was written to explore the relationship between
+// the contents of the access_token payload compared with the associated
+// token meta-data that is stored in the authorization server database.
 // The collab-auth server generates OAuth 2.0 access_tokens
-// that are created as JWT token signed by RSA private key.
+// that are created as JWT tokens signed using an RSA private key.
+// This demonstrates validation of tokens, detection of an expired access tokens,
+// and expiration of token meta-data stored in the authorization server.
+//
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
+//    OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=10
 //
 // The tests in this module were primarily written for the author
 // to better understand how JWT tokens are verified by the Oauth 2.0 server.
 //
-// The tests are limited in scope and not comprehensive of
-// all possible security risks.
+// The tests are limited in scope and not comprehensive of all possible security risks.
 // -----------------------------------------------------------
 'use strict';
 
@@ -15,7 +28,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./test/access-token.js');
+  console.log('Must be run from repository base folder as: node debug/access-token-client.js');
   process.exit(1);
 }
 
@@ -54,14 +67,19 @@ const chainObj = Object.create(null);
  * @param {Object} chain - Chain object passed from promise to promise
  * @param {Boolean} chain.abortSleepTimer - Flag, abort time if true
  * @param {Number} timeSeconds - Timer expiration in seconds
+ * @param {String} logMessage - Optional message to print into log
  * @returns {Promise} resolving to chain object
  */
-const sleep = (chain, timeSeconds) => {
+const sleep = (chain, timeSeconds, logMessage) => {
+  let messageStr = '';
+  if ((logMessage != null) && (logMessage.length > 0)) {
+    messageStr = ' (' + logMessage + ')';
+  }
   if (chain.abortSleepTimer) {
     delete chain.abortSleepTimer;
     return Promise.resolve(chain);
   } else {
-    console.log('\nWaiting for ' + timeSeconds.toString() + ' seconds');
+    console.log('\nWaiting for ' + timeSeconds.toString() + ' seconds' + messageStr);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(chain);
@@ -517,7 +535,7 @@ setup(chainObj)
     chain.requestMethod = 'POST';
     chain.requestFetchURL = encodeURI(testEnv.authURL + '/oauth/token');
     chain.requestAuthorization = 'basic';
-    if (config.oauth2.clientTokenExpiresInSeconds === 5) {
+    if (config.oauth2.clientTokenExpiresInSeconds === 10) {
       chain.requestBody = {
         grant_type: 'client_credentials',
         scope: 'api.read api.write'
@@ -525,7 +543,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     } else {
       console.log('\nTo test token expiration, ' +
-        'configure server: OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=5');
+        'configure server: OAUTH2_CLIENT_TOKEN_EXPIRES_IN_SECONDS=10');
       chain.abortSleepTimer = true;
       chain.abortManagedFetch = true;
       chain.skipInlineTests = true;
@@ -558,6 +576,16 @@ setup(chainObj)
     }
   })
 
+  // --------------------------------
+  // Wait for access token to expire
+  // --------------------------------
+  .then((chain) => sleep(
+    chain,
+    // Set timer 4 + 8 = 12 seconds, expire in 10 seconds
+    4,
+    'Delay before confirming token still works.'
+  ))
+
   // ----------------------------------------------------------
   // 101 POST /oauth/introspect - Verify token accepted before time delay
   // ----------------------------------------------------------
@@ -567,7 +595,7 @@ setup(chainObj)
     chain.requestMethod = 'POST';
     chain.requestFetchURL = encodeURI(testEnv.authURL + '/oauth/introspect');
     chain.requestAuthorization = 'basic';
-    if (config.oauth2.clientTokenExpiresInSeconds === 5) {
+    if (config.oauth2.clientTokenExpiresInSeconds === 10) {
       chain.requestBody = {
         // access_token: newToken
         access_token: chain.parsedAccessToken
@@ -596,9 +624,15 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  // Wait for token to expire
-
-  .then((chain) => sleep(chain, 10))
+  // --------------------------------
+  // Wait for access token to expire
+  // --------------------------------
+  .then((chain) => sleep(
+    chain,
+    // Set timer 4 + 8 = 12 seconds, expire in 10 seconds
+    8,
+    'Waiting for access token to expire'
+  ))
 
   // ----------------------------------------------------------
   // 102 POST /oauth/introspect - Expect access token expired after delay
@@ -609,7 +643,7 @@ setup(chainObj)
     chain.requestMethod = 'POST';
     chain.requestFetchURL = encodeURI(testEnv.authURL + '/oauth/introspect');
     chain.requestAuthorization = 'basic';
-    if (config.oauth2.clientTokenExpiresInSeconds === 5) {
+    if (config.oauth2.clientTokenExpiresInSeconds === 10) {
       chain.requestBody = {
         access_token: chain.parsedAccessToken
       };
@@ -644,7 +678,7 @@ setup(chainObj)
     chain.requestMethod = 'POST';
     chain.requestFetchURL = encodeURI(testEnv.authURL + '/oauth/introspect');
     chain.requestAuthorization = 'basic';
-    if (config.oauth2.clientTokenExpiresInSeconds === 5) {
+    if (config.oauth2.clientTokenExpiresInSeconds === 10) {
       //
       // build new access token
       //

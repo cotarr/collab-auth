@@ -107,7 +107,7 @@ exports.save = (client) => {
         };
         return pgPool.query(saveQuery);
       } else {
-        const err = new Error('clientId already exists');
+        const err = new Error('client already exists');
         err.status = 400;
         throw err;
       }

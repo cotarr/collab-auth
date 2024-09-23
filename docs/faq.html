@@ -53,8 +53,17 @@
               The primary focus was on grant type: authorization code grant and client credentials grant. 
               Less attention was spent on implicit grant and password grant.
               Unused grant types can be disabled in the configuration.
-              In July 2023 after the Postman desktop deprecated use of local files,
-              the API tests were converted to VSCode Thunder Client format.
+              In July 2023 Postman became inoperable due to paywall block and the collections 
+              have been removed. The API tests were converted to the VSCode extension ThunderClient.
+              In Sept 2024 ThunderClient also became inoperable due to paywall 
+              block and the collections have also been removed.
+              In response, the "debug/" directory contains a collection of different test scripts.
+              These are NodeJs Javascript programs intended to be run in the terminal. 
+              They contain custom debug tests that use the NodeJs assertion library.
+              However, the scope of the testing was limited to learning how OAuth 2.0 works.
+              The tests basically run through all the features, one by one, to make sure 
+              everything works, but they do not challenge all the failure modes.
+              These tests should not be considered a comprehensive security challenge.
             </p>
             <ul>
               <li>No automated tests included.</li>
@@ -83,7 +92,7 @@
               input data entered into the form.
             </p>
             <p>
-              Since it was available, csrf proection was added to the oauth login form, the 
+              Since it was available, csrf protection was added to the oauth login form, the 
               password change form, and the oauth client trust decision form.
               This may not be necessary, because the trust decision already includes a random 
               oauthorize transaction code, and both login and password forms require 
@@ -127,9 +136,9 @@
               some of the oauth 2.0 routes.
             </p>
             <p>
-              The oauthorize server (library) appears to have it's own internal input validaiton.
+              The oauthorize server (library) appears to have it's own internal input validation.
               The oauthorize npm repository has large user base and good history.
-              Adding input validation middleware infront of the oauthorize server may be of limited benefit.
+              Adding input validation middleware in front of the oauthorize server may be of limited benefit.
             </p>
             <p>
               Possible issues:

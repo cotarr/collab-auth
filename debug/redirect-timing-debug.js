@@ -1,40 +1,57 @@
 // redirect-timing-debug
 //
-// This was a custom debug tool used to debug redirect errors that occur
-// after user's password entry.
-//
-// The first request (1) modifies the session's record in the session store
-// by adding a returnTo property to the session with the full URL of the
-// unauthorized request.
-//
-// The second request (2) modifies the session's record in the session store
-// by adding the CSRF token for the login password entry form
-// to the session's database record.
-//
-// The third request (3) is intended to read the saved returnTo URL
-// after successful password entry. A 302 redirect will send the
-// browser to the remember returnTo URL.
-//
+// This script is custom debug tool used to debug redirect
+// errors that occur after user's password entry.
+
+// The first request (1) modifies the session's record in the
+// session store by adding a returnTo property to the session
+// with the full URL of the unauthorized request.
+
+// The second request (2) modifies the session's record in the
+// session store by adding the CSRF token for the login password
+// entry form to the session's database record.
+
+// The third request (3) is intended to read the saved returnTo
+// URL after successful password entry. A 302 redirect will send
+// the browser to the remember returnTo URL.
+
 // Debug Use:
-//
+
 // A timing race condition is possible where request (2) overwrites the
 // remember returnTo URL from request (1) when writing the CSRF token,
 // causing request (3) to redirect to a /redirecterror error page.
+
+// The series of tests will run continuously until the count is exceeded
+// or the process is stopped with ctrl-C.
+
+// CAUTION: this adds 1 session record to the session store
+// database for each iteration.
 //
-// The series of tests will run continuously 1 per second in a timer loop
-// until stopped with ctrl-C.
+// ```bash
+// # command line example
+// TESTENV_RT_COUNT=1 TESTENV_RT_PERIODMS=1000 node ./debug/redirect-timing-debug.js
+// ```
+
+// ```bash
+// # Recommended test configuration
+// LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+// LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+// LIMITS_WEB_RATE_LIMIT_COUNT=1000
+// TESTENV_RT_COUNT=1
+// TESTENV_RT_PERIODMS=1000
 //
-// Caution: this adds 1 session record to the session store database for
-// each iteration.
+// The tests in this module were primarily written for the author
+// to better understand the OAuth 2.0 authorization code grant workflow.
 //
-// ------------------------------------------------------------------------------
+// The tests are limited in scope and not comprehensive of all possible security risks.
+// ---------------------------------------------------------------
 'use strict';
 
 const assert = require('node:assert');
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/redirect-timing.js');
+  console.log('Must be run from repository base folder as: node debug/redirect-timing.js');
   process.exit(1);
 }
 
@@ -78,6 +95,9 @@ const setup = (chain) => {
   chain.requestAcceptType = 'text/html';
   return Promise.resolve(chain);
 };
+
+let errorAbortFlag = false;
+let testActiveFlag = false;
 
 /**
  * Wrapper for repetitive execution using timer
@@ -260,16 +280,57 @@ const repeatTest = () => {
     // Assert did not exit, assume all tests passed
     //
     .then((chain) => {
-      console.log('---------------------');
-      console.log('  All Tests Passed');
-      console.log('---------------------');
+      console.log();
+      console.log('Redirect Timing test ' + counter.toString() + ' passed passed');
+      console.log();
     })
 
     //
     // In normal testing, no errors should be rejected in the promise chain.
     // In the case of hardware network errors, catch the error.
-    .catch((err) => showHardError(err));
+    .catch((err) => {
+      showHardError(err);
+      errorAbortFlag = true;
+    });
 }; // repeatTest();
 
+const countLimit = testEnv.redirectTiming.countLimit;
+const periodMs = testEnv.redirectTiming.periodMs;
+let counter = 0;
+
+if (countLimit < 1) {
+  console.error('Error, countLimit is zero, test must be run at least one time');
+  process.exit(1);
+}
+
+/**
+ * Function to serve as setInterval() looped function, providing loop exit conditions.
+ */
+const loopFunction = () => {
+  if (counter >= countLimit) {
+    console.log('---------------------');
+    console.log('  All Tests Passed');
+    console.log('---------------------');
+    process.exit(0);
+  }
+  if (errorAbortFlag) {
+    console.log('Cycle timer aborted due to errors');
+    process.exit(1);
+  }
+  if (testActiveFlag === true) {
+    console.log('Error, overlapping tests');
+  }
+  testActiveFlag = true;
+  repeatTest();
+  counter++;
+  testActiveFlag = false;
+};
+
+//
+// Run the tests loop
+//
+console.log(testEnv);
 repeatTest();
-// setInterval(repeatTest, 2000);
+counter++;
+// Loop timer for running tests
+setInterval(loopFunction, periodMs);

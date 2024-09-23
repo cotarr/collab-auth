@@ -1,3 +1,4 @@
+// import-config.js
 //
 // The testing utility programs in the /debug/ folder will
 // extract test values directly from the authorization server configuration.
@@ -9,6 +10,8 @@
 
 const fs = require('fs');
 
+// Note: loading config will import the .env file into
+// the process.env object for use in configuration
 const config = require('../../server/config/index.js');
 // console.log('config', JSON.stringify(config, null, 2));
 
@@ -47,16 +50,16 @@ if (users.length < 1) {
 //
 const testEnv = {};
 testEnv.clientIndex = 0;
-if (process.env.TESTENV_CLIENTINDEX) {
+if ('TESTENV_CLIENTINDEX' in process.env) {
   testEnv.clientIndex = parseInt(process.env.TESTENV_CLIENTINDEX);
 }
 testEnv.userIndex = 0;
-if (process.env.TESTENV_USERINDEX) {
+if ('TESTENV_USERINDEX' in process.env) {
   testEnv.userIndex = parseInt(process.env.TESTENV_USERINDEX);
 }
 
 testEnv.redirectURIIndex = 0;
-if (process.env.TESTENV_REDIRECTURIINDEX) {
+if ('TESTENV_REDIRECTURIINDEX' in process.env) {
   testEnv.redirectURIIndex = parseInt(process.env.TESTENV_REDIRECTURIINDEX);
 }
 
@@ -102,6 +105,16 @@ testEnv.password = users[testEnv.userIndex].password;
 if (process.env.TESTENV_PASSWORD) {
   testEnv.password = process.env.TESTENV_PASSWORD;
 }
+
+// For script load-test-introspect.js
+testEnv.loadTest = {};
+testEnv.loadTest.countLimit = parseInt(process.env.TESTENV_LT_COUNT || '10');
+testEnv.loadTest.periodMs = parseInt(process.env.TESTENV_LT_PERIODMS || '0');
+
+// For script redirect-timing.js
+testEnv.redirectTiming = {};
+testEnv.redirectTiming.countLimit = parseInt(process.env.TESTENV_RT_COUNT || '1');
+testEnv.redirectTiming.periodMs = parseInt(process.env.TESTENV_RT_PERIODMS || '1000');
 
 // console.log(JSON.stringify(testEnv, null, 2));
 

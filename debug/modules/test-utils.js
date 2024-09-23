@@ -1,4 +1,7 @@
 // test-utils.js
+//
+// The file contains common toolbox functions used by test test modules.
+// -----------------------------------------------------------
 'use-strict';
 
 /**

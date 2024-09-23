@@ -16,19 +16,19 @@
 
           <table class="account-table" border="1" cellpadding="5px">
             <tr>
-              <td><label for "name">Name</label></td>
+              <td><label for "name">name</label></td>
               <td><input class="input" type="text" name="name" autocomplete="OFF" required /></td>
             </tr>
             <tr>
-              <td><label for "clientId">Client ID</label></td>
+              <td><label for "clientId">clientId</label></td>
               <td><input class="input" type="text" name="clientId" autocomplete="OFF" required /></td>
             </tr>
             <tr>
-              <td><label for="clientSecret">Client Secret</label></td>
+              <td><label for="clientSecret">clientSecret</label></td>
               <td><input class="input" type="text" name="clientSecret" value="<%= clientDefault.clientSecret %>"/></td>
             </tr>
             <tr>
-              <td><label for "trustedClient">Trusted Client</label></td>
+              <td><label for "trustedClient">trustedClient</label></td>
               <td><input type="checkbox" name="trustedClient" <%= clientDefault.trustedClient %> /></td>
             </tr>
             <tr>
@@ -36,11 +36,11 @@
               <td><textarea type="text" name="allowedScope" cols="80" rows="3"><%= clientDefault.allowedScope %></textarea></td>
             </tr>
             <tr>
-              <td><label for "allowedRedirectURI">Allowed Redirect URI</label></td>
+              <td><label for "allowedRedirectURI">allowedRedirectURI</label></td>
               <td><textarea type="text" name="allowedRedirectURI" cols="80" rows="3"><%= clientDefault.allowedRedirectURI %></textarea></td>
             </tr>
             <tr>
-              <td><label for "clientDisabled">Client disabled</label></td>
+              <td><label for "clientDisabled">clientDisabled</label></td>
               <td><input type="checkbox" name="clientDisabled" /></td>
             </tr>
           </table>

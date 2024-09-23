@@ -1,13 +1,22 @@
-// code-grant.js
+// code-grant-demo.js
 //
-// API test set used to demonstrate and test the OAuth2
-// authorization code grant workflow
+// This API test set is used to demonstrate and test the OAuth2
+// authorization code grant workflow. Learning about the code-grant-demo
+// module was the main purpose of the project. It is the most complex
+// OAuth 2.0 workflow, and difficult to understand. This is a step by
+// step execution of the authorization handshakes using authorization
+// code grant. This script incorporates use of refresh_tokens that are
+// used to replaced expired access_token.
+//
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
 //
 // The tests in this module were primarily written for the author
 // to better understand the OAuth 2.0 authorization code grant workflow.
 //
-// The tests are limited in scope and not comprehensive of
-// all possible security risks.
+// The tests are limited in scope and not comprehensive of all possible security risks.
 // ---------------------------------------------------------------
 'use strict';
 
@@ -15,7 +24,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/code-grant.js');
+  console.log('Must be run from repository base folder as: node debug/code-grant-demo.js');
   process.exit(1);
 }
 
@@ -339,9 +348,9 @@ setup(chainObj)
     assert.strictEqual(chain.responseStatus, 302);
     // console.log('parsedLocationHeader: ', chain.parsedLocationHeader);
     console.log('\tExpect: parsedLocationHeader has authorization code');
-    assert.ok(chain.parsedLocationHeader.indexOf('code=') >= 1);
+    assert.ok(chain.parsedLocationHeader.indexOf('code=') >= 0);
     console.log('\tExpect: parsedLocationHeader header has state nonce');
-    assert.ok(chain.parsedLocationHeader.indexOf('state=') >= 1);
+    assert.ok(chain.parsedLocationHeader.indexOf('state=') >= 0);
 
     //
     // Parse Data
@@ -804,9 +813,9 @@ setup(chainObj)
     assert.strictEqual(chain.responseStatus, 302);
     // console.log('parsedLocationHeader: ', chain.parsedLocationHeader);
     console.log('\tExpect: parsedLocationHeader has authorization code');
-    assert.ok(chain.parsedLocationHeader.indexOf('code=') >= 1);
+    assert.ok(chain.parsedLocationHeader.indexOf('code=') >= 0);
     console.log('\tExpect: parsedLocationHeader has state nonce');
-    assert.ok(chain.parsedLocationHeader.indexOf('state=') >= 1);
+    assert.ok(chain.parsedLocationHeader.indexOf('state=') >= 0);
 
     //
     // Parse Data

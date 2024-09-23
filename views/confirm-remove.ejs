@@ -2,7 +2,7 @@
 <html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8">
-    <title>Collab-auth menu</title>
+    <title>Reset Connections</title>
     <link rel="stylesheet" href="/css/styles.css">
   </head>
   <body>
@@ -11,7 +11,7 @@
       <form action="/panel/removealltokens" method="post">
         <fieldset>      
           <input type="hidden" name="_csrf" value="<%= csrfToken %>">
-          <h2>Remove Tokens</h2>
+          <h2>Reset Connection Tokens and Cookies</h2>
           <div class="content-area">
             This function will remove all access-tokens and refresh-tokens from the database.
             All remote web servers and resource servers will need to obtain new tokens

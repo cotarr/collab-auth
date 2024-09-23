@@ -18,36 +18,36 @@
           <input class="input" name="id" type="hidden" value="<%= user.id %>" />
 
           <table class="account-table" border="1" cellpadding="5px">
-            <tr><td>Id</td></td><td><%= user.id %></td></tr>
-            <tr><td>Number</td></td><td><%= user.number %></td></tr>
+            <tr><td>id</td></td><td><%= user.id %></td></tr>
+            <tr><td>number</td></td><td><%= user.number %></td></tr>
             <tr>
-              <td><label for "name">Name</label></td>
+              <td><label for "name">name</label></td>
               <td><input class="input" type="text" name="name" value="<%= user.name %>" /></td>
             </tr>
-            <tr><td>Username</td><td><%= user.username %></td></tr>
+            <tr><td>username</td><td><%= user.username %></td></tr>
             <tr>
-              <td><label for="newpassword1">New password</label></td>
+              <td><label for="newpassword1">newpassword1</label></td>
               <td><input class="input" type="password" name="newpassword1"
                 minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>"
                 value="" autocomplete="new-password" /></td>
             </tr>
             <tr>
-              <td><label for="newpassword2">New password again</label></td>
+              <td><label for="newpassword2">newpassword2</label></td>
               <td><input class="input" type="password" name="newpassword2"
                 minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>"
                 value="" autocomplete="new-password" /></td>
             </tr>
             <tr<%- user.trClassTag %>>
-              <td><label for "loginDisabled">Login Disabled</label></td>
+              <td><label for "loginDisabled">loginDisabled</label></td>
               <td><input type="checkbox" name="loginDisabled" <%= user.disabled %> ></td>
             </tr>
             <tr>
-              <td><label for "role">Role</label></td>
+              <td><label for "role">role</label></td>
               <td><textarea type="text" name="role" cols="80" rows="3"><%= user.role %></textarea></td>
             </tr>
-            <tr><td>Last Login</td><td><%= user.lastLogin %></td></tr>
-            <tr><td>Updated At</td><td><%= user.updatedAt %></td></tr>
-            <tr><td>Created At</td><td><%= user.createdAt %></td></tr>
+            <tr><td>lastLogin</td><td><%= user.lastLogin %></td></tr>
+            <tr><td>updatedAt</td><td><%= user.updatedAt %></td></tr>
+            <tr><td>createdAt</td><td><%= user.createdAt %></td></tr>
           </table>
           <div class="div-height-20"></div>
           <div>

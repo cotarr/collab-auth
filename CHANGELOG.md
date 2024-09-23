@@ -6,6 +6,59 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## Next
+
+This release is a comprehensive update to the custom CLI test scripts in the /debug/ directory.
+
+### Motivation/Rant
+
+Last week, after updating NPM dependencies in version V0.0.30, it was discovered that the VSCode 
+extension ThunderClient was hopelessly broken due to changes in the ThunderClient paywall.
+The local environment is no longer available in the free version.
+This is needed to store transient data, such as CSRF tokens and authorization codes between requests. 
+ThunderClient no longer functions and has been deleted. The legacy test collections 
+can be found in commit 35ffbee6e69010dbf155d641d2fbca86eb9de237 from 2024-09-15.
+
+### Added: Test improvements
+
+- Comprehensive update to the CLI scripts in the "debug/" folder, see debug/README.md
+
+### Updated
+
+- Update some outdated npm dependencies: pg@8.13.0, rotating-file-stream@3.2.5
+
+### Changed (configuration)
+
+- server/config/index.js - Added new environment variable `OAUTH2_AUTH_CODE_EXPIRES_IN_SECONDS` with default value 10 seconds (previously 60 seconds hardcoded).
+- Update documentation to describe new environment variable `OAUTH2_AUTH_CODE_EXPIRES_IN_SECONDS`
+
+### Fixed
+
+  - views/view-client.ejs, fix id property, the closing tag was found to be duplicated two times `</td></td>`
+  - views/view-user.ejs, fix id property (2 places), the closing was found to be duplicated two times `</td></td>`
+  - example-clients-db.json, missing property: "clientDisabled": false
+
+### Changed (Minor text message changes)
+
+The following changes are limited to the string values used as column and row heading in the html table. The associated object property key names in the JavaScript code did not change.
+
+- views/create-client.js - change row heading names in HTML table.
+- views/edit-client.js - change column heading names in HTML table.
+- views/list-clients.js - change column heading names in HTML table.
+- views/view-client.ejs - change column heading names in HTML table.
+- views/create-user.js - change row heading names in HTML table.
+- views/edit-user.js - change column heading names in HTML table.
+- views/list-users.js - change column heading names in HTML table.
+- views/view-users.js - change column heading names in HTML table.
+- views/stats.js - update page title
+- views/confirm-remove.ejs - update page title
+
+Correction of error message so RAM database and PostgreSQL database have same error text values.
+
+  - server/db/mem-client.js - change error message "clientname already exists" to 'client already exists"
+  - server/db/pg-client.js - change error message "clientId already exists" to 'client already exists"
+
 ## [v0.0.30](https://github.com/cotarr/collab-auth/releases/tag/v0.0.30) 2024-09-15
 
 ### Changed

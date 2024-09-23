@@ -1,8 +1,34 @@
 // protected-routes.js
 //
-// Confirm that protected routes are blocked
+// This script will confirm that protected routes are blocked when
+// access control credentials are not provided. Access to protected
+// routes may be limited by combination of cookies, basic auth
+// credentials, and CSRF tokens.
 //
-// ------------------------------------------------------------------------------
+// Note that other protected routes that are related to the administration
+// page are tested in the alternate script `debug/admin-access-check.js`
+//
+// # Example of protected routes
+//  /secure
+//  /changepassword
+//  /redirecterror
+//  /noscope
+//  /dialog/authorize
+//  /dialog/authorize/decision
+//  /oauth/introspect
+//  /oauth/token
+//  /oauth/token/revoke
+//
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
+//
+// The tests in this module were primarily written for the author
+// to better understand how JWT tokens are verified by the Oauth 2.0 server.
+//
+// The tests are limited in scope and not comprehensive of all possible security risks.
+// -----------------------------------------------------------
 'use strict';
 
 const assert = require('node:assert');
@@ -13,7 +39,7 @@ const signature = require('cookie-signature');
 const uid = require('uid-safe').sync;
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/protected-routes.js');
+  console.log('Must be run from repository base folder as: node debug/protected-routes.js');
   process.exit(1);
 }
 
@@ -394,259 +420,6 @@ setup(chainObj)
     chain.requestAcceptType = 'text/html';
     return Promise.resolve(chain);
   })
-
-  // -----------------------------------------------
-  // 400 GET /panel/menu (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '400 GET /panel/menu (fail: cookie required)';
-    chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/menu');
-    chain.currentSessionCookie = chain.badCookie;
-    chain.requestAcceptType = 'text/html';
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain))
-
-  // -----------------------------------------------
-  // 401 GET /panel/listusers (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '401 GET /panel/listusers (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/listusers');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain))
-
-  // -----------------------------------------------
-  // 402 GET /panel/viewuser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '401 GET /panel/viewuser (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/viewuser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain))
-
-  // -----------------------------------------------
-  // 403 GET /panel/createuser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '403 GET /panel/createuser (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/createuser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 404 GET /panel/edituser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '404 GET /panel/edituser (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/edituser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 405 GET /panel/deleteuser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '405 GET /panel/deleteuser (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/deleteuser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 406 GET /panel/listclients (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '406 GET /panel/listclients (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/listclients');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain))
-
-  // -----------------------------------------------
-  // 407 GET /panel/viewclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '407 GET /panel/viewclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/viewclient');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain))
-
-  // -----------------------------------------------
-  // 408 GET /panel/createclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '408 GET /panel/createclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/createclient');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 409 GET /panel/editclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '409 GET /panel/editclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/editclient');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 410 GET /panel/deleteclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '410 GET /panel/deleteclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/deleteclient');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 411 GET /panel/removealltokens (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '411 GET /panel/removealltokens (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/removealltokens');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 412 GET /panel/stats (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 200
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '412 GET /panel/stats (fail: cookie required)';
-    chain.requestMethod = 'GET';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/stats');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain))
-
-  // -----------------------------------------------
-  // 500 POST /panel/createuser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '500 POST /panel/createuser (fail: cookie required)';
-    chain.requestMethod = 'POST';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/createuser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 501 POST /panel/editeuser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '501 POST /panel/editeuser (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/edituser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 502 POST /panel/deleteeuser (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '502 POST /panel/deleteeuser (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/deleteuser');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 503 POST /panel/createclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '503 POST /panel/createclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/createclient');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 504 POST /panel/editeclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '504 POST /panel/editeclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/editclient');
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
-
-  // -----------------------------------------------
-  // 505 POST /panel/deleteeclient (fail: cookie required)
-  // In admin-panel.js
-  // Good cookie returns 422
-  // -----------------------------------------------
-  .then((chain) => {
-    chain.testDescription = '505 POST /panel/deleteeclient (fail: cookie required)';
-    chain.requestFetchURL = encodeURI(testEnv.authURL + '/panel/deleteclient');
-    // chain.currentSessionCookie = chain.goodCookie;
-    return Promise.resolve(chain);
-  })
-  .then((chain) => managedFetch(chain))
-  .then((chain) => validateResponse(chain, 302, '/panel/unauthorized'))
 
   // -----------------------------------------------
   // 999 POST /login - End of test, check for positive end test

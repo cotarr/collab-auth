@@ -256,7 +256,8 @@ exports.managedFetch = (chain) => {
           }
           if (showRawResponse) {
             console.log('------------ RAW RESPONSE BODY --------------');
-            if (chain.parsedContentType.toLowerCase().indexOf('application/json') >= 0) {
+            if ((chain.parsedContentType) &&
+              (chain.parsedContentType.toLowerCase().indexOf('application/json') >= 0)) {
               console.log(JSON.stringify(data, null, 2));
             } else {
               console.log(data);

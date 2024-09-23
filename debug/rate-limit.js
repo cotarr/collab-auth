@@ -1,14 +1,26 @@
 // rate-limit.js
 //
-// Confirm that express-rate-limit is working properly
+// The collab-auth web server includes rate limiting on several of the routes.
+// This script will subject the web server to repeated requests to confirm
+// that future requests are rejected after the limits are exceeded.
+// To run this script. specific rate limits are required.
 //
-// ------------------------------------------------------------------------------
+//    # Required settings
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=4
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=6
+//    LIMITS_WEB_RATE_LIMIT_COUNT=16
+//
+// The tests in this module were primarily written for the author
+// to better understand how JWT tokens are verified by the Oauth 2.0 server.
+//
+// The tests are limited in scope and not comprehensive of all possible security risks.
+// -----------------------------------------------------------
 'use strict';
 
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/protected-routes.js');
+  console.log('Must be run from repository base folder as: node debug/rate-limit.js');
   process.exit(1);
 }
 

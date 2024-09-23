@@ -1,13 +1,19 @@
-// client-grant.js
+// client-grant-demo.js
 //
-// API test set used to demonstrate and test the OAuth2
-// client credentials grant workflow
+// This API test set is used to demonstrate and test the OAuth2 client credentials
+// grant workflow. Client grant is the simplest Oauth 2.0 workflow. A new
+// access token can be obtained using a single POST request where client
+// credentials are exchanged for an access token.
+//
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
 //
 // The tests in this module were primarily written for the author
 // to better understand the OAuth 2.0 client grant workflow.
 //
-// The tests are limited in scope and not comprehensive of
-// all possible security risks.
+// The tests are limited in scope and not comprehensive of all possible security risks.
 // ---------------------------------------------------------------
 'use strict';
 
@@ -15,7 +21,7 @@ const assert = require('node:assert');
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/client-grant.js');
+  console.log('Must be run from repository base folder as: node debug/client-grant-demo.js');
   process.exit(1);
 }
 

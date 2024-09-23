@@ -18,18 +18,18 @@
           <input class="input" name="id" type="hidden" value="<%= aclient.id %>" />
 
           <table class="account-table" border="1" cellpadding="5px">
-            <tr><td>Id</td></td><td><%= aclient.id %></td></tr>
-            <tr><td>Client ID</td><td><%= aclient.clientId %></td></tr>
+            <tr><td>id</td></td><td><%= aclient.id %></td></tr>
+            <tr><td>clientId</td><td><%= aclient.clientId %></td></tr>
             <tr>
-              <td><label for "name">Client Name</label></td>
+              <td><label for "name">name</label></td>
               <td><input class="input" type="text" name="name" value="<%= aclient.name %>" /></td>
             </tr>
             <tr>
-              <td><label for="clientSecret">Client Secret</label></td>
+              <td><label for="clientSecret">clientSecret</label></td>
               <td><input class="input" type="text" name="clientSecret" value="<%= aclient.clientSecret %>"/></td>
             </tr>
             <tr>
-              <td><label for "trustedClient">Trusted Client</label></td>
+              <td><label for "trustedClient">trustedClient</label></td>
               <td><input type="checkbox" name="trustedClient" <%= aclient.trustedClient %> ></td>
             </tr>
             <tr>
@@ -37,15 +37,15 @@
               <td><textarea type="text" name="allowedScope" cols="80" rows="3"><%= aclient.allowedScope %></textarea></td>
             </tr>
             <tr>
-              <td><label for "allowedRedirectURI">Allowed Redirect URI</label></td>
+              <td><label for "allowedRedirectURI">allowedRedirectURI</label></td>
               <td><textarea type="text" name="allowedRedirectURI" cols="80" rows="3"><%= aclient.allowedRedirectURI %></textarea></td>
             </tr>
             <tr<%- aclient.trClassTag %>>
-              <td><label for "clientDisabled">Client disabled</label></td>
+              <td><label for "clientDisabled">clientDisabled</label></td>
               <td><input type="checkbox" name="clientDisabled" <%= aclient.disabled %> ></td>
             </tr>
-            <tr><td>Updated At</td><td><%= aclient.updatedAt %></td></tr>
-            <tr><td>Created At</td><td><%= aclient.createdAt %></td></tr>
+            <tr><td>updatedAt</td><td><%= aclient.updatedAt %></td></tr>
+            <tr><td>createdAt</td><td><%= aclient.createdAt %></td></tr>
           </table>
           <div class="div-height-20"></div>
           <div>

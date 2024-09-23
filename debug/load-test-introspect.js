@@ -1,24 +1,23 @@
 // load-test-introspect.js
 //
-// This module will obtain an access_token, then spawn
-// a collection of concurrent asynchronous requests
-// to POST /oauth/introspect, checking token signature
-// and looking up token meta-data in the database.
+// This module will obtain an access_token, then spawn a collection of
+// concurrent asynchronous requests to POST /oauth/introspect, checking
+// token signature and looking up token meta-data in the database.
 // It will calculate the rate in requests/second.
 //
 // Environment variables
 //
-//   TESTENV_LT_COUNT - Number of requests to send during testing (default 10)
-//   TESTENV_LT_PERIODMS - If 0, send requests at maximum rate
-//     if > 0, limit rate, value of milliseconds/request (default 0).
+// TESTENV_LT_COUNT - Number of requests to send during testing (default 10)
+// TESTENV_LT_PERIODMS - If 0, send requests at maximum rate,
+//    if > 0, limit rate, value of milliseconds/request (default 0).
 //
-// Command line:
+// Command configuration may be included in the .env file,
+// or they may precede the command line as shown below.
 //
-//   TESTENV_LT_COUNT=25 TESTENV_LT_PERIODMS=40 node debug/load-test-introspect.js
+//     TESTENV_LT_COUNT=25 TESTENV_LT_PERIODMS=40 node debug/load-test-introspect.js
 //
-// Example response
+// Example response:
 //
-// ...
 // Test: 4 Spawn multiple asynchronous /oauth/introspect requests
 //      Requested:  100
 //      Launched:   100
@@ -26,15 +25,31 @@
 //      Errors:     0
 //      Elapsed:    0.337 seconds
 //      Rate:       296.7 requests/second
-//  ...
-// ---------------------------------------------------------------
+//
+// Configuration
+//
+//    # Recommended settings
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
+//    # Number of requests to send during testing (default 10)
+//    TESTENV_LT_COUNT=10
+//    # If 0, send requests at maximum rate
+//    # if > 0, limit rate, value of milliseconds/request (default 0)
+//    TESTENV_LT_PERIODMS=0
+//
+// The tests in this module were primarily written for the author
+// to better understand how JWT tokens are verified by the Oauth 2.0 server.
+//
+// The tests are limited in scope and not comprehensive of all possible security risks.
+// -----------------------------------------------------------
 'use strict';
 
 const assert = require('node:assert');
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/client-grant.js');
+  console.log('Must be run from repository base folder as: node debug/load-test-introspect.js');
   process.exit(1);
 }
 
@@ -56,8 +71,8 @@ const {
   check404PossibleVhostError
 } = require('./modules/test-utils');
 
-const countLimit = parseInt(process.env.TESTENV_LT_COUNT || '10');
-const periodMs = parseInt(process.env.TESTENV_LT_PERIODMS || '0');
+const countLimit = testEnv.loadTest.countLimit;
+const periodMs = testEnv.loadTest.periodMs;
 let launchedCount = 0;
 let completedCount = 0;
 let errorCount = 0;
@@ -302,6 +317,11 @@ setup(chainObj)
         launchedDoneMs = Date.now();
         stackedAsyncIntrospect(chain.parsedAccessToken, 1);
       }
+      setTimeout(() => {
+        console.log('---------------------');
+        console.log('  All Tests Passed');
+        console.log('---------------------');
+      }, 1000);
     } else {
       //
       // Case of spawning requests at equal spaced intervals
@@ -313,6 +333,11 @@ setup(chainObj)
           stackedAsyncIntrospect(chain.parsedAccessToken, 1);
         } else {
           clearInterval(timerId);
+          setTimeout(() => {
+            console.log('---------------------');
+            console.log('  All Tests Passed');
+            console.log('---------------------');
+          }, 1000);
         }
       }
       const timerId = setInterval(spawnRequest, periodMs);

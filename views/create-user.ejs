@@ -16,35 +16,35 @@
 
           <table class="account-table" border="1" cellpadding="5px">
             <tr>
-              <td><label for "name">Name</label></td>
+              <td><label for "name">name</label></td>
               <td><input class="input" type="text" name="name" autocomplete="OFF" required /></td>
             </tr>
             <tr>
-              <td><label for "number">Number</label></td>
+              <td><label for "number">number</label></td>
               <td><input class="input" type="number" name="number" autocomplete="OFF" required /></td>
             </tr>
             <tr>
-              <td><label for "username">Username</label></td>
+              <td><label for "username">username</label></td>
               <td><input class="input" type="text" name="username" autocomplete="OFF" required /></td>
             </tr>
             <tr>
-              <td><label for="newpassword1">Password</label></td>
+              <td><label for="newpassword1">newpassword1</label></td>
               <td><input class="input" type="password" name="newpassword1"
                 minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>"
                 autocomplete="new-password" value="" required /></td>
             </tr>
             <tr>
-              <td><label for="newpassword2">Password Again</label></td>
+              <td><label for="newpassword2">newpassword2</label></td>
               <td><input class="input" type="password" name="newpassword2"
                 minlength="<%= opt.minPwLen %>" maxlength="<%= opt.maxPwLen %>" 
                 autocomplete="new-password" value="" required /></td>
             </tr>
             <tr>
-              <td><label for "loginDisabled">Login Disabled</label></td>
+              <td><label for "loginDisabled">loginDisabled</label></td>
               <td><input type="checkbox" name="loginDisabled" /></td>
             </tr>
             <tr>
-              <td><label for "role">Role</label></td>
+              <td><label for "role">role</label></td>
               <td><textarea type="text" name="role" cols="80" rows="3"><%= defaultUser.role %></textarea></td>
             </tr>
           </table>

@@ -1,9 +1,19 @@
 // login-form-submission
 //
-// This script will emulate the browser submission of the
-// HTML form for user password entry.
+// This script will emulate the browser submission of the HTML form for user password entry.
+// This script will demonstrate detection of various errors conditions that can
+// occur when users interact with the login form.
 //
-// ------------------------------------------------------------------------------
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
+//
+// The tests in this module were primarily written for the author
+// to better understand how JWT tokens are verified by the Oauth 2.0 server.
+//
+// The tests are limited in scope and not comprehensive of all possible security risks.
+// -----------------------------------------------------------
 'use strict';
 
 const assert = require('node:assert');
@@ -13,7 +23,7 @@ const Tokens = require('../node_modules/@dr.pogodin/csurf/tokens.js');
 const tokens = new Tokens({});
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/login-form-submission.js');
+  console.log('Must be run from repository base folder as: node debug/login-form-submission.js');
   process.exit(1);
 }
 

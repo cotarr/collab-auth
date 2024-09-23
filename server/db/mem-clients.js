@@ -118,7 +118,7 @@ exports.save = (client) => {
     // Check for pre-existing clients, error
     const foundClient = clients.find((cli) => cli.clientId === client.clientId);
     if (!(foundClient == null)) {
-      err = new Error('clientname already exists');
+      err = new Error('client already exists');
       err.status = 400;
     }
     if (!err) {

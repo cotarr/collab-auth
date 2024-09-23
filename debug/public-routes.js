@@ -1,15 +1,33 @@
 // public-routes.js
 //
-// Confirm that public routes are accessible without login
+// This script will confirm that routes intended to be public are
+// accessible when the browser does not provide a valid cookie.
+// There are several html routes that must be accessible at all
+// times for unauthenticated requests.
+// This include access control forms, such as `/login` and `/logout`.
+// Additional routes, such as `/status`, `robots.txt`,
+// `/.well-known/security.txt`, `/not-found.html` and several css style files.
 //
-// ------------------------------------------------------------------------------
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
+//        # Optional configuration (else test skipped)
+//        SITE_SECURITY_CONTACT=security@example.com
+//        SITE_SECURITY_EXPIRES="Fri, 1 Apr 2022 08:00:00 -0600"
+//
+// The tests in this module were primarily written for the author
+// to better understand how JWT tokens are verified by the Oauth 2.0 server.
+//
+// The tests are limited in scope and not comprehensive of all possible security risks.
+// -----------------------------------------------------------
 'use strict';
 
 const assert = require('node:assert');
 const fs = require('node:fs');
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/public-routes.js');
+  console.log('Must be run from repository base folder as: node debug/public-routes.js');
   process.exit(1);
 }
 

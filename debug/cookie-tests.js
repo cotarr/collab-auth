@@ -1,9 +1,25 @@
-// cookie.js
+// cookie-tests.js
 //
 // The collab-auth server uses HTTP cookies to manage browser sessions
 // during authentication of the user's identity by submission
 // of username and password. The sessions and cookies are created
 // by the express-session middleware and use passport as authorization middleware.
+// This script is more a a deep dive into learning how cookies work in general
+// using express-session and passport as authorization middleware.
+// During the code grant workflow, cookies issued by the browser are used
+// to authenticate the identity of the user when requesting a new authorization code.
+// The script includes two options for cookies with fixed expiration cookies and rolling cookies,
+// where rolling cookies will extend the cookie expiration with each request.
+
+//    # Recommended test configuration
+//    LIMITS_PASSWORD_RATE_LIMIT_COUNT=1000
+//    LIMITS_TOKEN_RATE_LIMIT_COUNT=1000
+//    LIMITS_WEB_RATE_LIMIT_COUNT=1000
+//    SESSION_EXPIRE_SEC=8
+//        # Option 1 of 2
+//        SESSION_SET_ROLLING_COOKIE=false
+//        # Option 1 of 2
+//        SESSION_SET_ROLLING_COOKIE=true
 //
 // The tests in this module were primarily written for the author
 // to better understand how the cookies are verified in the server.
@@ -21,7 +37,7 @@ const signature = require('cookie-signature');
 const uid = require('uid-safe').sync;
 
 if (!fs.existsSync('./package.json')) {
-  console.log('Must be run from repository base folder as: node ./debug/cookie-grant.js');
+  console.log('Must be run from repository base folder as: node debug/cookie-tests.js');
   process.exit(1);
 }
 
@@ -46,23 +62,29 @@ const chainObj = Object.create(null);
 
 /**
  * Promise based sleep timer
- * @param {Object} chain - Data variables passed from promise to promise.
+ * @param {Object} chain - Chain object passed from promise to promise
  * @param {Boolean} chain.abortSleepTimer - Flag, abort time if true
  * @param {Number} timeSeconds - Timer expiration in seconds
+ * @param {String} logMessage - Optional message to print into log
+ * @returns {Promise} resolving to chain object
  */
-const sleep = (chain, timeSeconds) => {
+const sleep = (chain, timeSeconds, logMessage) => {
+  let messageStr = '';
+  if ((logMessage != null) && (logMessage.length > 0)) {
+    messageStr = ' (' + logMessage + ')';
+  }
   if (chain.abortSleepTimer) {
     delete chain.abortSleepTimer;
     return Promise.resolve(chain);
   } else {
-    console.log('\nWaiting for ' + timeSeconds.toString() + ' seconds');
+    console.log('\nWaiting for ' + timeSeconds.toString() + ' seconds' + messageStr);
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         resolve(chain);
       }, timeSeconds * 1000);
     });
   }
-};
+}; // sleep ()
 
 /**
  * Initialize shared variables used in chain of promises
@@ -702,7 +724,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 3))
+  .then((chain) => sleep(chain, 3, 'Delay - Waiting for cookie to expire'))
   .then((chain) => managedFetch(chain))
   //
   // Assertion Tests...
@@ -716,6 +738,7 @@ setup(chainObj)
       // console.log(JSON.stringify(chain.responseRawData, null, 2));
       const expiresDelta = chain.currentSessionCookieExpires - chain.tempLastSessionCookieExpires;
       if (config.session.rollingCookie === true) {
+        chain.sleepDelayMessage = 'Delay - Waiting for cookie to expire';
         console.log('\tExpect: status === 200');
         assert.strictEqual(chain.responseStatus, 200);
         console.log('\tExpect: set-cookie header (because rollingCookie=true)');
@@ -726,6 +749,7 @@ setup(chainObj)
         console.log('\tExpect: Cookie expires value incremented by 3 seconds after time delay');
         assert.ok((expiresDelta >= 2) && (expiresDelta <= 4));
       } else {
+        chain.sleepDelayMessage = 'Delay - Expecting cookie to be expired';
         console.log('\tExpect: status === 200');
         assert.strictEqual(chain.responseStatus, 200);
       }
@@ -757,7 +781,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 3))
+  .then((chain) => sleep(chain, 3, 'Delay - Waiting for cookie to expire'))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     if (chain.skipInlineTests) {
@@ -809,7 +833,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 4))
+  .then((chain) => sleep(chain, 4, chain.sleepDelayMessage))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     if (chain.skipInlineTests) {
@@ -861,7 +885,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 10))
+  .then((chain) => sleep(chain, 10, 'Delay - Expecting cookie to be expired'))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     if (chain.skipInlineTests) {
@@ -898,7 +922,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 4))
+  .then((chain) => sleep(chain, 4, 'Delay - Expecting cookie to be expired'))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     // Temporary variables no longer needed
@@ -1071,7 +1095,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 3))
+  .then((chain) => sleep(chain, 3, 'Delay - Waiting for cookie to expire'))
   .then((chain) => managedFetch(chain))
   //
   // Assertion Tests...
@@ -1134,7 +1158,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 3))
+  .then((chain) => sleep(chain, 3, 'Delay - Waiting for cookie to expire'))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     if (chain.skipInlineTests) {
@@ -1193,7 +1217,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 4))
+  .then((chain) => sleep(chain, 4, chain.sleepDelayMessage))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     if (chain.skipInlineTests) {
@@ -1253,7 +1277,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 10))
+  .then((chain) => sleep(chain, 10, 'Delay - Expecting cookie to be expired'))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     if (chain.skipInlineTests) {
@@ -1288,7 +1312,7 @@ setup(chainObj)
       return Promise.resolve(chain);
     }
   })
-  .then((chain) => sleep(chain, 4))
+  .then((chain) => sleep(chain, 4, 'Delay - Expecting cookie to be expired'))
   .then((chain) => managedFetch(chain))
   .then((chain) => {
     // Temporary variables no longer needed
