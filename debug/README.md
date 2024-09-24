@@ -4,6 +4,9 @@ This "debug/" folder contains a set of JavaScript files that can be used to
 debug and test the collab-auth web server application. 
 This debug/README.md file includes instructions for running these tests.
 
+Note: OAuth 2 grant types Implicit Grant and Password Grant are excluded
+from these tests because these are generally considered deprecated.
+
 ## List of scripts
 
 ### debug/clear-database.js

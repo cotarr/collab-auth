@@ -17,6 +17,13 @@ fi
 # Make filename available to nodejs web server as enviornment variable
 export SERVER_PID_FILENAME="$PID_FILENAME"
 
+# Used to log script failure when exit code not 0
+LOG_DATE=$(date +%s)
+LOG_FILENAME="$PID_DIR/runner_log_$LOG_DATE.txt"
+echo "Script debug/runner.sh error log" > $LOG_FILENAME
+echo "Date: $(date --rfc-3339=seconds)" >> $LOG_FILENAME
+echo >> $LOG_FILENAME
+
 # Unless debugging, ignore output
 NODE_OUTPUT=/dev/null
 #NODE_OUTPUT=/dev/stdout
@@ -86,7 +93,26 @@ function restart_server
   }
 
 #
-# Prerequisite checks, script run from proper folder
+# Check previous function to see if return code shows error
+#
+function check_for_errors
+  {
+    RETURN_CODE=$?
+    if [ $RETURN_CODE == 0 ] 
+    then
+      echo "Test: $1" >> $LOG_FILENAME
+    else
+      echo "Test: $1 (Errors detected)" >> $LOG_FILENAME
+      # Show on console
+      echo
+      echo "=============================="
+      echo "Test: $1"
+      echo "returned non-zero error code"
+      echo "=============================="
+    fi
+  }
+
+#
 #
 if [ ! -e debug ] || [ ! -f package.json ]; then
   echo "Script must be run from repository base folder"
@@ -100,6 +126,22 @@ if [ ! -e $PID_DIR ] ; then
   echo
   exit 1
 fi
+
+echo
+echo "======================================================="
+echo "WARNING: The runner.sh script will modify the database"
+echo "======================================================="
+echo
+echo "Table: session       Action: All records deleted"
+echo "Table: accesstokens  Action: All records deleted"
+echo "Table: refreshtokens Action: All records deleted"
+echo "Table: authusers     Action: New records created, then deleted"
+echo "Table: authusers     Action: New records created, then deleted"
+echo
+echo "     Ctrl-C now to abort (You have 15 seconds)"
+echo "======================================================="
+echo
+sleep 5
 
 # ---------------------
 # Display Server Config
@@ -183,6 +225,7 @@ echo
 echo "Executing: node clear-database.js"
 sleep 5
 node ./debug/clear-database.js
+check_for_errors 1-clear-database
 sleep 5
 
 # ---------------------
@@ -192,6 +235,7 @@ echo
 echo "Executing: node debug/client-grant-demo.js"
 sleep 5
 node ./debug/client-grant-demo.js
+check_for_errors 2-client-grant-demo
 sleep 5
 
 # ---------------------
@@ -201,6 +245,7 @@ echo
 echo "Executing: node debug/code-grant-demo.js"
 sleep 5
 node ./debug/code-grant-demo.js
+check_for_errors 3-code-grant-demo
 sleep 5
 
 # ---------------------
@@ -210,6 +255,7 @@ echo
 echo "Executing: node debug/login-form-submission.js"
 sleep 5
 node ./debug/login-form-submission.js
+check_for_errors 4-login-form-submission
 sleep 5
 
 # ---------------------
@@ -219,6 +265,7 @@ echo
 echo "Executing: node debug/protected-routes.js"
 sleep 5
 node ./debug/protected-routes.js
+check_for_errors 5-protected-routes
 sleep 5
 
 # ---------------------
@@ -228,6 +275,7 @@ echo
 echo "Executing: node debug/public-routes.js"
 sleep 5
 node ./debug/public-routes.js
+check_for_errors 6-public-routes
 sleep 5
 
 # ---------------------
@@ -237,6 +285,7 @@ echo
 echo "Executing: node debug/admin-user-edit.js"
 sleep 5
 node ./debug/admin-user-edit.js
+check_for_errors 7-admin-user-edit
 sleep 5
 
 # ---------------------
@@ -246,6 +295,7 @@ echo
 echo "Executing: node debug/admin-access-check.js"
 sleep 5
 node ./debug/admin-access-check.js
+check_for_errors 8-admin-access-check
 sleep 5
 
 # ---------------------
@@ -255,6 +305,7 @@ echo
 echo "Executing: node debug/admin-scope-check.js"
 sleep 5
 node ./debug/admin-scope-check.js
+check_for_errors 9-admin-scope-check
 sleep 5
 
 # -------------------------------------------------
@@ -276,6 +327,7 @@ echo
 echo "Executing: node debug/admin-client-edit.js"
 sleep 5
 node ./debug/admin-client-edit.js
+check_for_errors 10-admin-client-edit
 sleep 5
 
 # -------------------------------------------------
@@ -297,6 +349,7 @@ echo
 echo "Executing: node debug/admin-disabled.js"
 sleep 5
 node ./debug/admin-disabled.js
+check_for_errors 11-admin-disabled
 sleep 5
 
 # -------------------------------------------------
@@ -318,6 +371,7 @@ echo
 echo "Executing: node debug/access-token-client.js"
 sleep 5
 node ./debug/access-token-client.js
+check_for_errors 12-access-token-client
 sleep 5
 
 # -------------------------------------------------
@@ -345,6 +399,7 @@ echo
 echo "Executing: node debug/access-token-user.js"
 sleep 5
 node ./debug/access-token-user.js
+check_for_errors 13-access-token-user
 sleep 5
 
 # -------------------------------------------------
@@ -368,6 +423,7 @@ echo
 echo "Executing: node debug/cookie-tests.js"
 sleep 5
 node ./debug/cookie-tests.js
+check_for_errors 14-cookie-tests
 sleep 5
 
 # -------------------------------------------------
@@ -391,6 +447,7 @@ echo
 echo "Executing: node debug/cookie-tests.js"
 sleep 5
 node ./debug/cookie-tests.js
+check_for_errors 15-cookie-tests
 sleep 5
 
 
@@ -417,6 +474,7 @@ echo
 echo "Executing: node debug/rate-limit.js"
 sleep 5
 node ./debug/rate-limit.js
+check_for_errors 16-rate-limit
 sleep 5
 
 
@@ -443,6 +501,7 @@ echo
 echo "Executing: node load-test-introspect.js"
 sleep 5
 node ./debug/load-test-introspect.js
+check_for_errors 17-load-test-introspect
 sleep 5
 
 # -------------------------------------------------
@@ -467,6 +526,7 @@ echo
 echo "Executing: node redirect-timing-debug.js"
 sleep 5
 node ./debug/redirect-timing-debug.js
+check_for_errors 18-redirect-timing-debug
 sleep 5
 
 # ---------------------
@@ -476,6 +536,7 @@ echo
 echo "Executing: node clear-database.js"
 sleep 5
 node ./debug/clear-database.js
+check_for_errors 19-clear-database
 sleep 5
 
 # --------
@@ -484,6 +545,11 @@ sleep 5
 echo
 echo "All tests completed, stopping server"
 stop_server
+echo
+echo >> $LOG_FILENAME
+echo "runner.sh - End of log" >> $LOG_FILENAME
+echo
+cat $LOG_FILENAME
 echo
 echo "Script runner.sh completed"
 echo

@@ -48,21 +48,36 @@
               Q: What testing has been performed?
             </p>
             <p>
-              A: During coding, functions were debugged manually, primarily using postman.
-              The postman collections were extracted and included in the repository.
+              A: During coding, functions were debugged manually using postman and 
+              console.log() statements. Postman worked great as a learning tool.
+              At this stage, scope of this development testing was limited to learning how OAuth 2.0 works
               The primary focus was on grant type: authorization code grant and client credentials grant. 
               Less attention was spent on implicit grant and password grant.
               Unused grant types can be disabled in the configuration.
-              In July 2023 Postman became inoperable due to paywall block and the collections 
-              have been removed. The API tests were converted to the VSCode extension ThunderClient.
+            </p><p>
+              In July 2023 Postman became inoperable due elimination of the scratchpad. 
+              The postman collections have been removed from the repository.
+              The API tests were re-written using the VSCode extension ThunderClient.
               In Sept 2024 ThunderClient also became inoperable due to paywall 
               block and the collections have also been removed.
-              In response, the "debug/" directory contains a collection of different test scripts.
-              These are NodeJs Javascript programs intended to be run in the terminal. 
-              They contain custom debug tests that use the NodeJs assertion library.
-              However, the scope of the testing was limited to learning how OAuth 2.0 works.
+            </p><p>
+              As this is an older project, the primary use of the API test scripts has been to 
+              make sure that NPM dependency updates that are applied to clear GitHub dependabot 
+              security notifications would not introduce breaking changes.
+              After the frustrating experience with changes to two different API testing clients,
+              a set of replacement tests were written for the purpose of 
+              testing for errors following NPM dependency updates.
+              In the repository, the &quot;debug/&quot; directory contains custom a set of 
+              custom scripts written in native JavaScript that use the internal NodeJs 
+              <a href="https://nodejs.org/docs/latest-v18.x/api/globals.html">fetch</a>
+              library to make HTTP requests that are applied to the internal NodeJs 
+              <a href="https://nodejs.org/docs/latest-v18.x/api/assert.html">assertion</a>
+              library to evaluate the HTTP responses.
               The tests basically run through all the features, one by one, to make sure 
-              everything works, but they do not challenge all the failure modes.
+              everything work following an NPM dependency update.
+              Detail instructions can be found in the &quot;debug/README.md&quot; file.
+              OAuth 2 grant types Implicit Grant and Password Grant are excluded
+              from these tests, because these are generally considered deprecated.
               These tests should not be considered a comprehensive security challenge.
             </p>
             <ul>

@@ -86,6 +86,7 @@ exports.showHardError = (err) => {
   if ((Object.hasOwn(process.env, 'SHOWSTACK')) && (parseInt(process.env.SHOWSTACK) === 1)) {
     if (err.stack) console.log(err.stack);
   }
+  process.exit(1);
 };
 
 /**

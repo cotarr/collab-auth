@@ -762,10 +762,6 @@ QkseSgdL9TrTsLg
           the token to the authorization server. The authorization server will verify the token's
           digital signature, extract token ID, search token database for matching ID, then 
           return the token's meta-data to the backend database server.
-          As part of this exercise, a custom npm module collab-backend-token-auth was
-          created to perform this function. The module is a Node Express middleware 
-          that can be inserted into the node route processing.
-          In order to examine the code for collab-backend-api, both repositories would be relevant.
         </p>
 
         <div class="section-title">Clone Repository</div>
@@ -1028,15 +1024,10 @@ listening: :::4000 IPv6
           Therefore, the IOT device must obtain a new valid Oauth 2.0 access_token.
         </p>
         <p>
-          This project includes a custom npm module collab-iot-client-token
-          that was written as part of this project.
-          This module will connect to the authorization server over the network.
-          Using the IOT device's client credentials, the IOT device will request a new
-          access token using client credentials grant. Upon receipt of the access_token,
-          the collab-iot-client-token module will return the valid access_token 
-          to it's parent collab-iot-device application so the IOT device can gain 
-          access to the database API server. In order to examine the code for 
-          collab-iot-device, both repositories would be relevant.
+          The IOT device will connect to the authorization server over the network.
+          Using the IOT device's client credentials, it will request a new
+          access token using client credentials grant. It will use the access token
+          to gain access to the database API server.
         </p>
         <p>
           This implementation also supports use of token scope for granular permissions.
