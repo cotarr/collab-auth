@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next
+## [v0.0.32](https://github.com/cotarr/collab-auth/releases/tag/v0.0.32) 2024-10-05
 
 - Edited package-lock.json to force cookie@0.7.1 to clear npm audit warning.
 - Update .github/workflows/codeql-analysis.yml from v2 to v3 scanning configuration
