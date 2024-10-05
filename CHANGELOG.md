@@ -10,6 +10,7 @@ and this project adheres to
 ## Next
 
 - Edited package-lock.json to force cookie@0.7.1 to clear npm audit warning.
+- Update .github/workflows/codeql-analysis.yml from v2 to v3 scanning configuration
 
 ## [v0.0.31](https://github.com/cotarr/collab-auth/releases/tag/v0.0.31) 2024-09-24
 
