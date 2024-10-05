@@ -7,6 +7,10 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Next
+
+- Edited package-lock.json to force cookie@0.7.1 to clear npm audit warning.
+
 ## [v0.0.31](https://github.com/cotarr/collab-auth/releases/tag/v0.0.31) 2024-09-24
 
 This release is a comprehensive update to the custom CLI test scripts in the /debug/ directory.
