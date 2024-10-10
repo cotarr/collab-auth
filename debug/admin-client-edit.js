@@ -875,7 +875,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"_csrf"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Required value","path":"_csrf"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"id"\'');
@@ -896,7 +895,7 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Server generated values not allowed","path":"createdAt"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid param","path":"extraneousKey"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid param","path":"extraneousKey"') >= 0);
-    /* eslint-enable max-len */
+
     return Promise.resolve(chain);
   }) // 200 POST /panel/editclient
 
@@ -934,7 +933,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"name"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid characters in string","path":"name"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"allowedScope"\'');
@@ -945,7 +943,6 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Checkbox requires on/off","path":"trustedClient"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Checkbox requires on/off","path":"clientDisabled"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Checkbox requires on/off","path":"clientDisabled"') >= 0);
-    /* eslint-enable max-len */
     return Promise.resolve(chain);
   }) // 201 POST /panel/editclient
 
@@ -987,10 +984,9 @@ setup(chainObj)
     console.log('\tExpect: status === 400');
     assert.strictEqual(chain.responseStatus, 400);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains "client already exists"');
     assert.ok(chain.responseErrorMessage.indexOf('client already exists') >= 0);
-    /* eslint-enable max-len */
+
     return Promise.resolve(chain);
   }) // 300 POST /panel/createclient
 
@@ -1030,7 +1026,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"_csrf"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Required value","path":"_csrf"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"name"\'');
@@ -1051,7 +1046,7 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Server generated values not allowed","path":"createdAt"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid param","path":"extraneousKey"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid param","path":"extraneousKey"') >= 0);
-    /* eslint-enable max-len */
+
     return Promise.resolve(chain);
   }) // 301 POST /panel/createclient
 
@@ -1089,7 +1084,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"name"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid characters in string","path":"name"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"allowedScope"\'');
@@ -1100,7 +1094,7 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Checkbox requires on/off","path":"trustedClient"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Checkbox requires on/off","path":"clientDisabled"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Checkbox requires on/off","path":"clientDisabled"') >= 0);
-    /* eslint-enable max-len */
+
     return Promise.resolve(chain);
   }) // 302 POST /panel/createclient
 

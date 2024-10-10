@@ -445,10 +445,8 @@ setup(chainObj)
 
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"_csrf""\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Required value","path":"_csrf"') >= 0);
-    /* eslint-enable max-len */
 
     delete chain.requestBody;
     return Promise.resolve(chain);

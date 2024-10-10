@@ -1441,12 +1441,10 @@ setup(chainObj)
 
       console.log('\tExpect: status === 403');
       assert.strictEqual(chain.responseStatus, 403);
-      /* eslint-disable max-len */
       console.log('\tExpect: Error message contains \'"error":"invalid_grant"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"error":"invalid_grant"') >= 0);
       console.log('\tExpect: Error message contains \'"error_description":"Invalid authorization code"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"error_description":"Invalid authorization code"') >= 0);
-      /* eslint-enable max-len */
       return Promise.resolve(chain);
     } // not skipped
   }) // 212 POST /oauth/token
@@ -1638,12 +1636,10 @@ setup(chainObj)
 
       console.log('\tExpect: status === 403');
       assert.strictEqual(chain.responseStatus, 403);
-      /* eslint-disable max-len */
       console.log('\tExpect: Error message contains \'"error":"invalid_grant"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"error":"invalid_grant"') >= 0);
       console.log('\tExpect: Error message contains \'"error_description":"Invalid authorization code"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"error_description":"Invalid authorization code"') >= 0);
-      /* eslint-enable max-len */
       return Promise.resolve(chain);
     }
   }) // 215 POST /oauth/token
@@ -1964,10 +1960,8 @@ setup(chainObj)
 
       console.log('\tExpect: status === 400');
       assert.strictEqual(chain.responseStatus, 400);
-      /* eslint-disable max-len */
       console.log('\tExpect: Error message contains \'"msg":"Required value","path":"transaction_id"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"msg":"Required value","path":"transaction_id"') >= 0);
-      /* eslint-enable max-len */
       return Promise.resolve(chain);
     } // not skipped
   }) // 225 POST /dialog/authorize/decision
@@ -2475,13 +2469,10 @@ setup(chainObj)
       logRequest(chain, { ignoreErrorStatus: 403 });
       // console.log(JSON.stringify(chain.responseRawData, null, 2));
       // console.log(chain.responseErrorMessage);
-
-      /* eslint-disable max-len */
       console.log('\tExpect: Error message contains \'"error":"invalid_grant"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"error":"invalid_grant"') >= 0);
       console.log('\tExpect: Error message contains \'"error_description":"Invalid refresh token"\'');
       assert.ok(chain.responseErrorMessage.indexOf('"error_description":"Invalid refresh token"') >= 0);
-      /* eslint-enable max-len */
       //
       // Parse Data
       //

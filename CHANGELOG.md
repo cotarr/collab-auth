@@ -9,6 +9,9 @@ and this project adheres to
 
 ## Next
 
+- Upgrade eslint from version 8 to version 9.
+- Edit eslint override directives in various places where not compatible with version 9 (No code changes)
+
 - Update helmet@8.0.0 with comments for helmet defaults in server/app.mjs
 - Update npm dependencies: @dr.pogodin/csurf@1.14.0, express@4.21.1, express-rate-limit@7.4.1, express-session@1.18.1
 - Delete and regenerate package-lock.json, confirmed npm no audit warning after package updates

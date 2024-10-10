@@ -64,7 +64,7 @@ exports.removeExpired = () => {
     if (new Date() > codes[key].expirationDate) {
       const expiredToken = codes[key];
       delete codes[key];
-      accumulator[key] = expiredToken; // eslint-disable-line no-param-reassign
+      accumulator[key] = expiredToken;
     }
     return accumulator;
   }, Object.create(null));

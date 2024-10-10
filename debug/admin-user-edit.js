@@ -841,7 +841,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"_csrf"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Required value","path":"_csrf"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"id"\'');
@@ -860,7 +859,6 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Server generated values not allowed","path":"createdAt"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid param","path":"extraneousKey"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid param","path":"extraneousKey"') >= 0);
-    /* eslint-enable max-len */
 
     return Promise.resolve(chain);
   }) // 200 POST /panel/edituser
@@ -900,14 +898,12 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"name"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid characters in string","path":"name"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Checkbox requires on/off","path":"loginDisabled"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Checkbox requires on/off","path":"loginDisabled"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"role"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid characters in string","path":"role"') >= 0);
-    /* eslint-enable max-len */
 
     return Promise.resolve(chain);
   }) // 201 POST /panel/edituser
@@ -1012,10 +1008,8 @@ setup(chainObj)
     console.log('\tExpect: status === 400');
     assert.strictEqual(chain.responseStatus, 400);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains "username or number already exists"');
     assert.ok(chain.responseErrorMessage.indexOf('username or number already exists') >= 0);
-    /* eslint-enable max-len */
 
     // Temporary variable no longer needed
     delete chain.requestBody;
@@ -1067,10 +1061,8 @@ setup(chainObj)
     console.log('\tExpect: status === 400');
     assert.strictEqual(chain.responseStatus, 400);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains "username or number already exists"');
     assert.ok(chain.responseErrorMessage.indexOf('username or number already exists') >= 0);
-    /* eslint-enable max-len */
 
     // Temporary variable no longer needed
     delete chain.requestBody;
@@ -1175,10 +1167,8 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Invalid positive integer value","path":"number"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid positive integer value","path":"number') >= 0);
-    /* eslint-enable max-len */
 
     // Temporary variable no longer needed
     delete chain.requestBody;
@@ -1226,7 +1216,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"_csrf"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Required value","path":"_csrf"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Required value","path":"number"\'');
@@ -1247,7 +1236,6 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Forbidden property (Server generated)","path":"createdAt"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid param","path":"extraneousKey"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid param","path":"extraneousKey"') >= 0);
-    /* eslint-enable max-len */
 
     // Temporary variable no longer needed
     delete chain.requestBody;
@@ -1296,7 +1284,6 @@ setup(chainObj)
     console.log('\tExpect: status === 422');
     assert.strictEqual(chain.responseStatus, 422);
 
-    /* eslint-disable max-len */
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"name"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid characters in string","path":"name"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid characters in string","path":"username"\'');
@@ -1309,7 +1296,6 @@ setup(chainObj)
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid string length","path":"newpassword1"') >= 0);
     console.log('\tExpect: Error message contains \'"msg":"Invalid string length","path":"newpassword2"\'');
     assert.ok(chain.responseErrorMessage.indexOf('"msg":"Invalid string length","path":"newpassword2"') >= 0);
-    /* eslint-enable max-len */
 
     // Temporary variable no longer needed
     delete chain.requestBody;

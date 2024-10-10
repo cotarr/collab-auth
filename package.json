@@ -7,7 +7,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "lint": "npx eslint server bin/www debug SQL-tools *.js",
+    "lint": "npx eslint server bin/www debug SQL-tools",
     "start": "node ./bin/www",
     "config-dev-script": "bash ./config-dev-script.sh",
     "create-postgres-admin-user": "node ./SQL-tools/create-postgres-admin-user.js"
@@ -48,10 +48,8 @@
     "uuid": "^10.0.0"
   },
   "devDependencies": {
-    "eslint": "^8.57.0",
-    "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.1.1"
+    "@eslint/js": "^9.12.0",
+    "eslint": "^9.12.0",
+    "globals": "^15.11.0"
   }
 }
