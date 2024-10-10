@@ -57,7 +57,7 @@ app.use(logger(logConfig.format, logConfig.options));
 // ------------------------------
 // Content Security Policy (CSP)
 // ------------------------------
-// -- Helmet CSP defaults v7.0.0 --
+// -- Helmet CSP defaults v8.0.0 --
 //
 // default-src 'self';
 // base-uri 'self';
@@ -90,13 +90,13 @@ const contentSecurityPolicy = {
 // ----------------------------------------
 // HTTP Security Headers
 // ----------------------------------------
-// -- Helmet Default headers v7.0.0 --
+// -- Helmet Default headers v8.0.0 --
 //
 // Cross-Origin-Opener-Policy: same-origin
 // Cross-Origin-Resource-Policy: same-origin
 // Origin-Agent-Cluster: ?1
 // Referrer-Policy: no-referrer
-// Strict-Transport-Security: max-age=15552000; includeSubDomains
+// Strict-Transport-Security: max-age=31536000; includeSubDomains
 // X-Content-Type-Options: nosniff
 // X-DNS-Prefetch-Control: off
 // X-Download-Options: noopen

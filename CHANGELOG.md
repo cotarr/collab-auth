@@ -7,6 +7,12 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## Next
+
+- Update helmet@8.0.0 with comments for helmet defaults in server/app.mjs
+- Update npm dependencies: @dr.pogodin/csurf@1.14.0, express@4.21.1, express-rate-limit@7.4.1, express-session@1.18.1
+- Delete and regenerate package-lock.json, confirmed npm no audit warning after package updates
+
 ## [v0.0.32](https://github.com/cotarr/collab-auth/releases/tag/v0.0.32) 2024-10-05
 
 - Edited package-lock.json to force cookie@0.7.1 to clear npm audit warning.
