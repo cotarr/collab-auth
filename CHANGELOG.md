@@ -7,6 +7,8 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+- Bump eslint to version v9.15.0 to clear GitHub Dependabot audit warning.
+
 ## [v0.0.33](https://github.com/cotarr/collab-auth/releases/tag/v0.0.33) 2024-10-10
 
 - Upgrade eslint from version 8 to version 9.
