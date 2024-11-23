@@ -7,10 +7,29 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next
+## Next v0.0.35
 
-- Copy /debug/ folder to external repository "collab-auth-dev-tools"
-- Delete /debug/ folder
+In version v0.0.35 there are no code changes to the main collab-auth application.
+The purpose of this change is to remove the debug test folder from the collab-auth repository and
+create a new collab-auth-dev-tools repository to contain the relocated tests. There 
+are two reasons for doing this:
+
+First, the test scripts are not compatible with the GitHub CodeQL venerability scanner.
+Although test script CodeQL issues have been been designated as (Ignore, used in tests), 
+the number of issues causes CodeQL to fail for exceeding limits for repeating too many issues 
+in the public (free) GitHub CodeQL scanner.
+
+The second reason to move the debug scripts to an external repository is to allow the
+the debug tests to be further evolved and cleaned up without having to make commits
+the the main collab-auth repository, when there are no actual application code changes were made.
+
+### Changed
+
+- Copy /debug/ folder from the collab-auth repository to the external git repository "collab-auth-dev-tools"
+- Delete /debug/ folder from collab-auth repository
+- Add "debug" folder to .gitignore file in collab-auth repository. This is to allow /debug/ to be a symlink to the external repository.
+- Remove debug folder from package.json eslint `npm run lint` command.
+- Update /docs/ to address removal of /debug/ folder to an external repository.
 
 ## [v0.0.34](https://github.com/cotarr/collab-auth/releases/tag/v0.0.34) 2024-11-20
 

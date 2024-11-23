@@ -7,7 +7,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "lint": "npx eslint server bin/www debug SQL-tools",
+    "lint": "npx eslint server bin/www SQL-tools",
     "start": "node ./bin/www",
     "config-dev-script": "bash ./config-dev-script.sh",
     "create-postgres-admin-user": "node ./SQL-tools/create-postgres-admin-user.js"

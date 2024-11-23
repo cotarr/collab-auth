@@ -67,7 +67,11 @@
               After the frustrating experience with changes to two different API testing clients,
               a set of replacement tests were written for the purpose of 
               testing for errors following NPM dependency updates.
-              In the repository, the &quot;debug/&quot; directory contains custom a set of 
+              These are located in an external repository &quot;collab-auth-dev-tools&quot;.
+              In the repository, the &quot;debug/&quot; directory can be inserted
+              into the collab-auth repository as a symlink. The filename is listed
+              in the .gitignore file to hide the debug symlink from git commits. 
+              The &quot;debug/&quot; directory contains custom a set of 
               custom scripts written in native JavaScript that use the internal NodeJs 
               <a href="https://nodejs.org/docs/latest-v18.x/api/globals.html">fetch</a>
               library to make HTTP requests that are applied to the internal NodeJs 
@@ -81,7 +85,7 @@
               These tests should not be considered a comprehensive security challenge.
             </p>
             <ul>
-              <li>No automated tests included.</li>
+              <li>No automated tests included during installation.</li>
               <li>No formal testing has been performed.</li>
             </ul>
           </a></td></tr>

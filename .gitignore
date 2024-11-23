@@ -15,5 +15,6 @@ notes.md
 *.tar
 .env
 sessions
+debug
 logs
 
