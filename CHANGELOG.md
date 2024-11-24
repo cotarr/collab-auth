@@ -7,7 +7,7 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## Next v0.0.35
+## [v0.0.35](https://github.com/cotarr/collab-auth/releases/tag/v0.0.35) 2024-11-23
 
 In version v0.0.35 there are no code changes to the main collab-auth application.
 The purpose of this change is to remove the debug test folder from the collab-auth repository and
