@@ -7,6 +7,11 @@ and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
+## [v0.0.36](https://github.com/cotarr/collab-auth/releases/tag/v0.0.36) 2024-12-10
+
+- Update express@4.21.2 to clear npm audit warning
+- Update other dependencies to latest
+
 ## [v0.0.35](https://github.com/cotarr/collab-auth/releases/tag/v0.0.35) 2024-11-23
 
 In version v0.0.35 there are no code changes to the main collab-auth application.
